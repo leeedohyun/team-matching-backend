@@ -40,4 +40,13 @@ public class Member extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Alarm> alarms = new ArrayList<>();
+
+    @Builder
+    public Member(String loginId, String password, String email, String nickName, String university) {
+        this.loginId = loginId;
+        this.password = password;
+        this.email = email;
+        this.nickName = nickName;
+        this.university = university;
+    }
 }
