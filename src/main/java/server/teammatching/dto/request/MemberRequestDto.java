@@ -1,8 +1,7 @@
-package server.teammatching.dto;
+package server.teammatching.dto.request;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
-import server.teammatching.entity.Member;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -33,14 +32,4 @@ public class MemberRequest {
     @NotBlank(message = "현재 재학중인 대학교를 입력해야 합니다.")
     @ApiModelProperty(example = "대학교")
     private String university;
-
-    public Member toEntity() {
-        return Member.builder()
-                .loginId(loginId)
-                .nickName(nickName)
-                .university(university)
-                .email(email)
-                .password(password)
-                .build();
-    }
 }
