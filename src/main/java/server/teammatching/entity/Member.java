@@ -1,6 +1,8 @@
 package server.teammatching.entity;
 
 import lombok.*;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import server.teammatching.dto.request.MemberRequestDto;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -48,5 +50,15 @@ public class Member extends BaseTimeEntity {
         this.email = email;
         this.nickName = nickName;
         this.university = university;
+    }
+
+    public static Member createMember(MemberRequestDto request, PasswordEncoder passwordEncoder) {
+        return Member.builder()
+                .loginId(request.getLoginId())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .nickName(request.getNickName())
+                .university(request.getUniversity())
+                .email(request.getEmail())
+                .build();
     }
 }
