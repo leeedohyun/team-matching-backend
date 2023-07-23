@@ -7,7 +7,6 @@ import server.teammatching.entity.Member;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-@ToString
 public class MemberResponseDto {
 
     private Long memberId;

@@ -12,7 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import server.teammatching.Service.MemberService;
+import server.teammatching.service.MemberService;
 import server.teammatching.dto.request.MemberRequestDto;
 import server.teammatching.dto.response.MemberResponseDto;
 
@@ -54,8 +54,6 @@ class MemberControllerTest {
                 .nickName("member1")
                 .university("홍익대학교")
                 .build();
-
-        System.out.println(responseDto.toString());
 
         when(memberService.join(any(MemberRequestDto.class))).thenReturn(responseDto);
 

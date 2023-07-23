@@ -1,7 +1,6 @@
 package server.teammatching.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -9,6 +8,8 @@ import server.teammatching.dto.request.MemberRequestDto;
 import server.teammatching.dto.response.MemberResponseDto;
 import server.teammatching.entity.Member;
 import server.teammatching.repository.MemberRepository;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -26,14 +27,8 @@ public class MemberService {
         return MemberResponseDto.from(savedMember, "회원가입이 성공했습니다.");
     }
 
-    public String upload(String image, Long memberId) {
-        Member uploadedMember = memberRepository.findById(memberId).get();
-        System.out.println(uploadedMember.getId());
-        System.out.println(uploadedMember.getImage());
-        if (uploadedMember != null) {
-            uploadedMember.updateImage(image);
-        }
-        return uploadedMember.getImage();
+    public List<Member> findAll() {
+        return memberRepository.findAll();
     }
 
     private void validateDuplicateLoginId(Member member) {
