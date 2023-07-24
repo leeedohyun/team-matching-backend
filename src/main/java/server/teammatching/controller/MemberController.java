@@ -57,4 +57,11 @@ public class MemberController {
         MemberUpdateResponseDto updateResponse = memberService.update(memberId, updateRequest);
         return ResponseEntity.ok(updateResponse);
     }
+
+    @ApiOperation(value = "회원 탈퇴 API")
+    @DeleteMapping("{id}/withdrawal")
+    public ResponseEntity delete(@PathVariable("id") Long memberId) {
+        memberService.delete(memberId);
+        return ResponseEntity.ok("탈퇴가 되었습니다.");
+    }
 }

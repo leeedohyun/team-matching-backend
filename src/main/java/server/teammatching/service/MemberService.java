@@ -15,12 +15,13 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 public class MemberService {
 
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
 
+    @Transactional
     public MemberResponseDto join(MemberRequestDto request) {
         Member createdMember = Member.createMember(request, passwordEncoder);
         validateDuplicateLoginId(createdMember);
@@ -40,6 +41,7 @@ public class MemberService {
         return memberRepository.findAll();
     }
 
+    @Transactional
     public MemberUpdateResponseDto update(Long memberId, MemberUpdateRequestDto updateRequest) {
         Member findMember = memberRepository.findById(memberId)
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 회원입니다."));
@@ -56,6 +58,13 @@ public class MemberService {
 
         memberRepository.save(findMember);
         return MemberUpdateResponseDto.from(findMember, "업데이트 성공");
+    }
+
+    @Transactional
+    public void delete(Long memberId) {
+        Member findMember = memberRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 회원입니다."));
+        memberRepository.delete(findMember);
     }
 
     private void validateDuplicateLoginId(Member member) {
