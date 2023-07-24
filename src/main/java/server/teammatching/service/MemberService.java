@@ -5,7 +5,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import server.teammatching.dto.request.MemberRequestDto;
+import server.teammatching.dto.request.MemberUpdateRequestDto;
 import server.teammatching.dto.response.MemberResponseDto;
+import server.teammatching.dto.response.MemberUpdateResponseDto;
 import server.teammatching.entity.Member;
 import server.teammatching.repository.MemberRepository;
 
@@ -27,8 +29,33 @@ public class MemberService {
         return MemberResponseDto.from(savedMember, "회원가입이 성공했습니다.");
     }
 
+    public MemberResponseDto findOne(Long memberId) {
+        Member findMember = memberRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 회원입니다."));
+
+        return MemberResponseDto.from(findMember, "조회 성공");
+    }
+
     public List<Member> findAll() {
         return memberRepository.findAll();
+    }
+
+    public MemberUpdateResponseDto update(Long memberId, MemberUpdateRequestDto updateRequest) {
+        Member findMember = memberRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 회원입니다."));
+
+        if (updateRequest.getUpdatedNickName() != null) {
+            findMember.updateNickName(updateRequest.getUpdatedNickName());
+        }
+        if (updateRequest.getUpdatedEmail() != null) {
+            findMember.updateEmail(updateRequest.getUpdatedEmail());
+        }
+        if (updateRequest.getUpdatedUniversity() != null) {
+            findMember.updateUniversity(updateRequest.getUpdatedUniversity());
+        }
+
+        memberRepository.save(findMember);
+        return MemberUpdateResponseDto.from(findMember, "업데이트 성공");
     }
 
     private void validateDuplicateLoginId(Member member) {
