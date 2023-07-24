@@ -15,6 +15,8 @@ import server.teammatching.entity.Member;
 import server.teammatching.repository.MemberRepository;
 
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -247,5 +249,28 @@ class MemberServiceTest {
 
         //then
         assertThat(member.getNickName()).isNotEqualTo("홍익대학교");
+    }
+
+    @Test
+    @DisplayName(value = "회원 탈퇴 테스트")
+    public void 회원_탈퇴_테스트() throws Exception {
+        //given
+        Member member = Member.builder()
+                .loginId("ldfj1")
+                .email("eere22@naver.com")
+                .nickName("member")
+                .password("1111ddf")
+                .university("홍익대학교")
+                .build();
+
+        //when
+        Member savedMember = memberRepository.save(member);
+        Long withdrawalMemberId = savedMember.getId();
+        memberService.delete(withdrawalMemberId);
+
+        //then
+        assertNotNull(withdrawalMemberId);
+        assertThatThrownBy(() -> memberRepository.findById(withdrawalMemberId).get())
+                .isInstanceOf(NoSuchElementException.class);
     }
 }
