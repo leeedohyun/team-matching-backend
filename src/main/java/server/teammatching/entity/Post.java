@@ -1,9 +1,8 @@
 package server.teammatching.entity;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
+import server.teammatching.dto.request.TeamForm;
 
 import javax.persistence.*;
 
@@ -51,5 +50,30 @@ public class Post extends BaseTimeEntity {
     private Member leader;
 
     @OneToOne(fetch = FetchType.LAZY, mappedBy = "post", cascade = CascadeType.ALL)
+    @Setter
     private Recruitment recruitment;
+
+    @Builder
+    public Post(String title, int recruitNumber, String field, PostStatus status, PostType type,
+                String content, Member leader) {
+        this.title = title;
+        this.recruitNumber = recruitNumber;
+        this.field = field;
+        this.status = status;
+        this.type = type;
+        this.content = content;
+        this.leader = leader;
+    }
+
+    public static Post createTeam(TeamForm form, Member member) {
+        return Post.builder()
+                .title(form.getTitle())
+                .field(form.getField())
+                .recruitNumber(form.getRecruitNumber())
+                .type(PostType.TEAM)
+                .status(PostStatus.모집중)
+                .leader(member)
+                .content(form.getContent())
+                .build();
+    }
 }
