@@ -2,6 +2,7 @@ package server.teammatching.entity;
 
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
+import server.teammatching.dto.request.ProjectRequestDto;
 import server.teammatching.dto.request.TeamAndStudyCreateRequestDto;
 
 import javax.persistence.*;
@@ -9,6 +10,8 @@ import javax.persistence.*;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Builder
 public class Post extends BaseTimeEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -86,6 +89,21 @@ public class Post extends BaseTimeEntity {
                 .status(PostStatus.모집중)
                 .leader(member)
                 .content(form.getContent())
+                .build();
+    }
+
+    public static Post createProject(ProjectRequestDto requestDto, Member member) {
+        return Post.builder()
+                .title(requestDto.getTitle())
+                .field(requestDto.getField())
+                .recruitNumber(requestDto.getRecruitNumber())
+                .type(PostType.PROJECT)
+                .status(PostStatus.모집중)
+                .leader(member)
+                .content(requestDto.getContent())
+                .backendNumber(requestDto.getBackendNumber())
+                .designerNumber(requestDto.getDesignerNumber())
+                .frontendNumber(requestDto.getFrontendNumber())
                 .build();
     }
 }
