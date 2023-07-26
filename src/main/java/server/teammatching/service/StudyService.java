@@ -11,25 +11,25 @@ import server.teammatching.repository.MemberRepository;
 import server.teammatching.repository.PostRepository;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
-public class TeamService {
+@Transactional
+public class StudyService {
 
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;
 
-    public TeamAndStudyCreateResponseDto create(TeamAndStudyCreateRequestDto form , Long memberId) {
+    public TeamAndStudyCreateResponseDto create(TeamAndStudyCreateRequestDto requestDto, Long memberId) {
         Member leader = memberRepository.findById(memberId)
                 .orElseThrow(() -> new RuntimeException("유효하지 않은 사용자 id 입니다."));
 
-        Post team = Post.createTeam(form, leader);
-        Post savedTeam = postRepository.save(team);
+        Post createdStudy = Post.createStudy(requestDto, leader);
+        Post savedStudy = postRepository.save(createdStudy);
         return TeamAndStudyCreateResponseDto.builder()
-                .title(savedTeam.getTitle())
-                .content(savedTeam.getContent())
-                .postId(savedTeam.getId())
+                .title(savedStudy.getTitle())
+                .postId(savedStudy.getId())
                 .memberId(leader.getId())
-                .type(savedTeam.getType())
+                .type(savedStudy.getType())
+                .content(savedStudy.getContent())
                 .build();
     }
 }

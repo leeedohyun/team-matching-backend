@@ -6,7 +6,7 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class TeamForm {
+public class TeamAndStudyCreateRequestDto {
 
     private String title;
     private int recruitNumber;

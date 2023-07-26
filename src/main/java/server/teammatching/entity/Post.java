@@ -2,7 +2,7 @@ package server.teammatching.entity;
 
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
-import server.teammatching.dto.request.TeamForm;
+import server.teammatching.dto.request.TeamAndStudyCreateRequestDto;
 
 import javax.persistence.*;
 
@@ -65,12 +65,24 @@ public class Post extends BaseTimeEntity {
         this.leader = leader;
     }
 
-    public static Post createTeam(TeamForm form, Member member) {
+    public static Post createTeam(TeamAndStudyCreateRequestDto form, Member member) {
         return Post.builder()
                 .title(form.getTitle())
                 .field(form.getField())
                 .recruitNumber(form.getRecruitNumber())
                 .type(PostType.TEAM)
+                .status(PostStatus.모집중)
+                .leader(member)
+                .content(form.getContent())
+                .build();
+    }
+
+    public static Post createStudy(TeamAndStudyCreateRequestDto form, Member member) {
+        return Post.builder()
+                .title(form.getTitle())
+                .field(form.getField())
+                .recruitNumber(form.getRecruitNumber())
+                .type(PostType.STUDY)
                 .status(PostStatus.모집중)
                 .leader(member)
                 .content(form.getContent())

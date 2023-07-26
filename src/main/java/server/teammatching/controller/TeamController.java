@@ -5,8 +5,8 @@ import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import server.teammatching.dto.request.TeamForm;
-import server.teammatching.dto.response.TeamResponse;
+import server.teammatching.dto.request.TeamAndStudyCreateRequestDto;
+import server.teammatching.dto.response.TeamAndStudyCreateResponseDto;
 import server.teammatching.service.TeamService;
 
 import java.net.URI;
@@ -21,9 +21,9 @@ public class TeamController {
 
     @ApiOperation(value = "팀 생성 API")
     @PostMapping("/new")
-    public ResponseEntity create(@RequestBody TeamForm form, @RequestParam Long memberId) {
-        TeamResponse teamResponse = teamService.create(form, memberId);
-        return ResponseEntity.created(URI.create(String.format("/new/%s", teamResponse.getPostId())))
-                .body(teamResponse);
+    public ResponseEntity create(@RequestBody TeamAndStudyCreateRequestDto form, @RequestParam Long memberId) {
+        TeamAndStudyCreateResponseDto teamAndStudyCreateResponseDto = teamService.create(form, memberId);
+        return ResponseEntity.created(URI.create(String.format("/new/%s", teamAndStudyCreateResponseDto.getPostId())))
+                .body(teamAndStudyCreateResponseDto);
     }
 }

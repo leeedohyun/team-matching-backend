@@ -7,7 +7,7 @@ import server.teammatching.entity.PostType;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class TeamResponse {
+public class TeamAndStudyCreateResponseDto {
 
     private Long postId;
     private Long memberId;
