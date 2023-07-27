@@ -53,7 +53,6 @@ public class Post extends BaseTimeEntity {
     private Member leader;
 
     @OneToOne(fetch = FetchType.LAZY, mappedBy = "post", cascade = CascadeType.ALL)
-    @Setter
     private Recruitment recruitment;
 
     @Builder
@@ -105,5 +104,21 @@ public class Post extends BaseTimeEntity {
                 .designerNumber(requestDto.getDesignerNumber())
                 .frontendNumber(requestDto.getFrontendNumber())
                 .build();
+    }
+
+    public void updateTitle(String title) {
+        this.title = title;
+    }
+
+    public void updateField(String field) {
+        this.field = field;
+    }
+
+    public void updateRecruitNumber(int recruitNumber) {
+        this.recruitNumber = recruitNumber;
+    }
+
+    public void updateContent(String content) {
+        this.content = content;
     }
 }
