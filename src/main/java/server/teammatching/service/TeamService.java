@@ -28,7 +28,7 @@ public class TeamService {
                 .title(savedTeam.getTitle())
                 .content(savedTeam.getContent())
                 .postId(savedTeam.getId())
-                .memberId(leader.getId())
+                .memberId(savedTeam.getLeader().getId())
                 .type(savedTeam.getType())
                 .build();
     }

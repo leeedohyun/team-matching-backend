@@ -57,53 +57,60 @@ public class Post extends BaseTimeEntity {
 
     @Builder
     public Post(String title, int recruitNumber, String field, PostStatus status, PostType type,
-                String content, Member leader) {
+                String content) {
         this.title = title;
         this.recruitNumber = recruitNumber;
         this.field = field;
         this.status = status;
         this.type = type;
         this.content = content;
+    }
+
+    public void setLeader(Member leader) {
         this.leader = leader;
+        //leader.getPostList().add(this);
     }
 
     public static Post createTeam(TeamAndStudyCreateRequestDto form, Member member) {
-        return Post.builder()
+        Post team = Post.builder()
                 .title(form.getTitle())
                 .field(form.getField())
                 .recruitNumber(form.getRecruitNumber())
                 .type(PostType.TEAM)
                 .status(PostStatus.모집중)
-                .leader(member)
                 .content(form.getContent())
                 .build();
+        team.setLeader(member);
+        return team;
     }
 
     public static Post createStudy(TeamAndStudyCreateRequestDto form, Member member) {
-        return Post.builder()
+        Post study = Post.builder()
                 .title(form.getTitle())
                 .field(form.getField())
                 .recruitNumber(form.getRecruitNumber())
                 .type(PostType.STUDY)
                 .status(PostStatus.모집중)
-                .leader(member)
                 .content(form.getContent())
                 .build();
+        study.setLeader(member);
+        return study;
     }
 
     public static Post createProject(ProjectRequestDto requestDto, Member member) {
-        return Post.builder()
+        Post project = Post.builder()
                 .title(requestDto.getTitle())
                 .field(requestDto.getField())
                 .recruitNumber(requestDto.getRecruitNumber())
                 .type(PostType.PROJECT)
                 .status(PostStatus.모집중)
-                .leader(member)
                 .content(requestDto.getContent())
                 .backendNumber(requestDto.getBackendNumber())
                 .designerNumber(requestDto.getDesignerNumber())
                 .frontendNumber(requestDto.getFrontendNumber())
                 .build();
+        project.setLeader(member);
+        return project;
     }
 
     public void updateTitle(String title) {
