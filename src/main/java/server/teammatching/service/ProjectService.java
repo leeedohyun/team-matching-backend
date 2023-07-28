@@ -6,8 +6,12 @@ import server.teammatching.dto.request.ProjectRequestDto;
 import server.teammatching.dto.response.ProjectResponseDto;
 import server.teammatching.entity.Member;
 import server.teammatching.entity.Post;
+import server.teammatching.entity.PostType;
 import server.teammatching.repository.MemberRepository;
 import server.teammatching.repository.PostRepository;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -71,5 +75,25 @@ public class ProjectService {
                 .content(savedProject.getContent())
                 .type(savedProject.getType())
                 .build();
+    }
+
+    public List<ProjectResponseDto> checkAllProject() {
+        List<ProjectResponseDto> allProjects = new ArrayList<>();
+        List<Post> findAllProjects = postRepository.findByType(PostType.PROJECT);
+
+        for (Post findProject : findAllProjects) {
+            ProjectResponseDto project = ProjectResponseDto.builder()
+                    .postId(findProject.getId())
+                    .memberId(findProject.getLeader().getId())
+                    .title(findProject.getTitle())
+                    .designerNumber(findProject.getDesignerNumber())
+                    .backendNumber(findProject.getBackendNumber())
+                    .frontendNumber(findProject.getFrontendNumber())
+                    .content(findProject.getContent())
+                    .type(findProject.getType())
+                    .build();
+            allProjects.add(project);
+        }
+        return allProjects;
     }
 }

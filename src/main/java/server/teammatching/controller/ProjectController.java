@@ -7,9 +7,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import server.teammatching.dto.request.ProjectRequestDto;
 import server.teammatching.dto.response.ProjectResponseDto;
+import server.teammatching.entity.Post;
 import server.teammatching.service.ProjectService;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -32,5 +34,12 @@ public class ProjectController {
     public ResponseEntity update(@RequestBody ProjectRequestDto updateRequest, @PathVariable("id") Long projectId) {
         ProjectResponseDto updateResponse = projectService.update(updateRequest, projectId);
         return ResponseEntity.ok(updateResponse);
+    }
+
+    @ApiOperation(value = "모든 프로젝트 조회 API")
+    @GetMapping("")
+    public ResponseEntity checkAllProject() {
+        List<ProjectResponseDto> allProjectsResponse = projectService.checkAllProject();
+        return ResponseEntity.ok(allProjectsResponse);
     }
 }
