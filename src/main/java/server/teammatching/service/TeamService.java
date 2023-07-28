@@ -1,14 +1,20 @@
 package server.teammatching.service;
 
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.GetMapping;
 import server.teammatching.dto.request.TeamAndStudyCreateRequestDto;
 import server.teammatching.dto.response.TeamAndStudyCreateResponseDto;
 import server.teammatching.entity.Member;
 import server.teammatching.entity.Post;
+import server.teammatching.entity.PostType;
 import server.teammatching.repository.MemberRepository;
 import server.teammatching.repository.PostRepository;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @Transactional
@@ -58,5 +64,22 @@ public class TeamService {
                 .type(savedTeam.getType())
                 .content(savedTeam.getContent())
                 .build();
+    }
+
+    public List<TeamAndStudyCreateResponseDto> checkAllTeams() {
+        List<Post> findTeams = postRepository.findByType(PostType.TEAM);
+        List<TeamAndStudyCreateResponseDto> allTeams = new ArrayList<>();
+
+        for (Post findTeam : findTeams) {
+            TeamAndStudyCreateResponseDto team = TeamAndStudyCreateResponseDto.builder()
+                    .postId(findTeam.getId())
+                    .memberId(findTeam.getLeader().getId())
+                    .title(findTeam.getTitle())
+                    .type(findTeam.getType())
+                    .content(findTeam.getContent())
+                    .build();
+            allTeams.add(team);
+        }
+        return allTeams;
     }
 }
