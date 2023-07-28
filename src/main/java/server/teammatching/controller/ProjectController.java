@@ -22,7 +22,7 @@ public class ProjectController {
 
     @ApiOperation(value = "프로젝트 생성 API")
     @PostMapping("/new")
-    public ResponseEntity create(@RequestBody ProjectRequestDto requestDto, Long memberId) {
+    public ResponseEntity<ProjectResponseDto> create(@RequestBody ProjectRequestDto requestDto, Long memberId) {
         ProjectResponseDto responseDto = projectService.create(requestDto, memberId);
         return ResponseEntity.created(URI.create(String.format("/new/%s", responseDto.getPostId())))
                 .body(responseDto);
@@ -30,28 +30,29 @@ public class ProjectController {
 
     @ApiOperation(value = "프로젝트 정보 수정 API")
     @PatchMapping("/{id}")
-    public ResponseEntity update(@RequestBody ProjectRequestDto updateRequest, @PathVariable("id") Long projectId) {
+    public ResponseEntity<ProjectResponseDto> update(@RequestBody ProjectRequestDto updateRequest,
+                                                     @PathVariable("id") Long projectId) {
         ProjectResponseDto updateResponse = projectService.update(updateRequest, projectId);
         return ResponseEntity.ok(updateResponse);
     }
 
     @ApiOperation(value = "모든 프로젝트 조회 API")
     @GetMapping("")
-    public ResponseEntity checkAllProject() {
+    public ResponseEntity<List<ProjectResponseDto>> checkAllProject() {
         List<ProjectResponseDto> allProjectsResponse = projectService.checkAllProjects();
         return ResponseEntity.ok(allProjectsResponse);
     }
 
     @ApiOperation(value = "회원이 생성한 프로젝트 조회 API")
     @GetMapping("/{id}")
-    public ResponseEntity checkMemberProject(@PathVariable("id") Long memberId) {
+    public ResponseEntity<List<ProjectResponseDto>> checkMemberProject(@PathVariable("id") Long memberId) {
         List<ProjectResponseDto> allMemberProjectsResponse = projectService.checkMemberProjects(memberId);
         return ResponseEntity.ok(allMemberProjectsResponse);
     }
 
     @ApiOperation(value = "프로젝트 삭제 API")
     @DeleteMapping("/{id}/delete")
-    public ResponseEntity delete(@PathVariable("id") Long postId) {
+    public ResponseEntity<String> delete(@PathVariable("id") Long postId) {
         projectService.delete(postId);
         return ResponseEntity.ok("정상적으로 삭제되었습니다.");
     }

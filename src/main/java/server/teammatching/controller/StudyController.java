@@ -22,36 +22,38 @@ public class StudyController {
 
     @ApiOperation(value = "스터디 생성 API")
     @PostMapping("/new")
-    public ResponseEntity create(@RequestBody TeamAndStudyCreateRequestDto requestDto, @RequestParam Long memberId) {
+    public ResponseEntity<TeamAndStudyCreateResponseDto> create(@RequestBody TeamAndStudyCreateRequestDto requestDto,
+                                                                @RequestParam Long memberId) {
         TeamAndStudyCreateResponseDto responseDto = studyService.create(requestDto, memberId);
         return ResponseEntity.created(URI.create(String.format("/new/%s", responseDto.getPostId())))
-                .body(requestDto);
+                .body(responseDto);
     }
 
     @ApiOperation(value = "스터디 정보 수정 API")
     @PatchMapping("/{id}")
-    public ResponseEntity update(@RequestBody TeamAndStudyCreateRequestDto updateRequest, @PathVariable("id") Long studyId) {
+    public ResponseEntity<TeamAndStudyCreateResponseDto> update(@RequestBody TeamAndStudyCreateRequestDto updateRequest,
+                                                                @PathVariable("id") Long studyId) {
         TeamAndStudyCreateResponseDto updateResponse = studyService.update(updateRequest, studyId);
         return ResponseEntity.ok(updateResponse);
     }
 
     @ApiOperation(value = "모든 스터디 조회 API")
     @GetMapping("")
-    public ResponseEntity checkAllStudies() {
+    public ResponseEntity<List<TeamAndStudyCreateResponseDto>> checkAllStudies() {
         List<TeamAndStudyCreateResponseDto> allStudiesResponse = studyService.checkAllStudies();
         return ResponseEntity.ok(allStudiesResponse);
     }
 
     @ApiOperation(value = "회원이 생성한 스터디 조회 API")
     @GetMapping("{id}")
-    public ResponseEntity checkMemberStudies(@PathVariable("id") Long memberId) {
+    public ResponseEntity<List<TeamAndStudyCreateResponseDto>> checkMemberStudies(@PathVariable("id") Long memberId) {
         List<TeamAndStudyCreateResponseDto> allMemberStudiesResponse = studyService.checkMemberStudies(memberId);
         return ResponseEntity.ok(allMemberStudiesResponse);
     }
 
     @ApiOperation(value = "스터디 삭제 API")
     @DeleteMapping("/{id}/delete")
-    public ResponseEntity delete(@PathVariable("id") Long studyId) {
+    public ResponseEntity<String> delete(@PathVariable("id") Long studyId) {
         studyService.delete(studyId);
         return ResponseEntity.ok("정상적으로 삭제되었습니다.");
     }

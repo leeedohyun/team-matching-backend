@@ -139,10 +139,10 @@ class MemberServiceTest {
         memberService.join(request2);
         memberService.join(request3);
 
-        List<Member> memberList = memberService.findAll();
+        List<MemberResponseDto> all = memberService.findAll();
 
         //then
-        assertThat(memberList.size()).isEqualTo(3);
+        assertThat(all.size()).isEqualTo(3);
     }
 
     @Test

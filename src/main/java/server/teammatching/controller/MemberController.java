@@ -9,7 +9,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import server.teammatching.dto.request.MemberUpdateRequestDto;
 import server.teammatching.dto.response.MemberUpdateResponseDto;
-import server.teammatching.entity.Member;
 import server.teammatching.service.MemberService;
 import server.teammatching.dto.request.MemberRequestDto;
 import server.teammatching.dto.response.MemberResponseDto;
@@ -39,28 +38,29 @@ public class MemberController {
 
     @ApiOperation(value = "회원 정보 조회 API")
     @GetMapping("/{id}")
-    public ResponseEntity getMemberInfo(@PathVariable("id") Long memberId) {
+    public ResponseEntity<MemberResponseDto> getMemberInfo(@PathVariable("id") Long memberId) {
         MemberResponseDto memberResponse = memberService.findOne(memberId);
         return ResponseEntity.ok(memberResponse);
     }
 
     @ApiOperation(value = "모든 회원 조회 API")
     @GetMapping("")
-    public ResponseEntity list() {
-        List<Member> memberList = memberService.findAll();
-        return ResponseEntity.ok(memberList);
+    public ResponseEntity<List<MemberResponseDto>> list() {
+        List<MemberResponseDto> memberListResponse = memberService.findAll();
+        return ResponseEntity.ok(memberListResponse);
     }
 
     @ApiOperation(value = "회원 정보 수정 API")
     @PatchMapping("/{id}/edit")
-    public ResponseEntity update(@PathVariable("id") Long memberId, MemberUpdateRequestDto updateRequest) {
+    public ResponseEntity<MemberUpdateResponseDto> update(@PathVariable("id") Long memberId,
+                                                          MemberUpdateRequestDto updateRequest) {
         MemberUpdateResponseDto updateResponse = memberService.update(memberId, updateRequest);
         return ResponseEntity.ok(updateResponse);
     }
 
     @ApiOperation(value = "회원 탈퇴 API")
     @DeleteMapping("{id}/withdrawal")
-    public ResponseEntity delete(@PathVariable("id") Long memberId) {
+    public ResponseEntity<String> delete(@PathVariable("id") Long memberId) {
         memberService.delete(memberId);
         return ResponseEntity.ok("탈퇴가 되었습니다.");
     }

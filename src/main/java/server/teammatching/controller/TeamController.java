@@ -22,7 +22,8 @@ public class TeamController {
 
     @ApiOperation(value = "팀 생성 API")
     @PostMapping("/new")
-    public ResponseEntity create(@RequestBody TeamAndStudyCreateRequestDto form, @RequestParam Long memberId) {
+    public ResponseEntity<TeamAndStudyCreateResponseDto> create(@RequestBody TeamAndStudyCreateRequestDto form,
+                                                                @RequestParam Long memberId) {
         TeamAndStudyCreateResponseDto teamAndStudyCreateResponseDto = teamService.create(form, memberId);
         return ResponseEntity.created(URI.create(String.format("/new/%s", teamAndStudyCreateResponseDto.getPostId())))
                 .body(teamAndStudyCreateResponseDto);
@@ -30,29 +31,29 @@ public class TeamController {
 
     @ApiOperation(value = "팀 정보 수정 API")
     @PatchMapping("/{id}")
-    public ResponseEntity update(@RequestBody TeamAndStudyCreateRequestDto requestDto,
-                                 @PathVariable("id") Long postId) {
+    public ResponseEntity<TeamAndStudyCreateResponseDto> update(@RequestBody TeamAndStudyCreateRequestDto requestDto,
+                                                                @PathVariable("id") Long postId) {
         TeamAndStudyCreateResponseDto responseDto = teamService.update(requestDto, postId);
         return ResponseEntity.ok(responseDto);
     }
 
     @ApiOperation(value = "모든 팀 조회 API")
     @GetMapping("")
-    public ResponseEntity checkAllTeams() {
+    public ResponseEntity<List<TeamAndStudyCreateResponseDto>> checkAllTeams() {
         List<TeamAndStudyCreateResponseDto> allTeamsResponse = teamService.checkAllTeams();
         return ResponseEntity.ok(allTeamsResponse);
     }
 
     @ApiOperation(value = "회원이 생성한 팀 조회 API")
     @GetMapping("/{id}")
-    public ResponseEntity checkMemberTeams(@PathVariable("id") Long memberId) {
+    public ResponseEntity<List<TeamAndStudyCreateResponseDto>> checkMemberTeams(@PathVariable("id") Long memberId) {
         List<TeamAndStudyCreateResponseDto> allMemberTeamsResponse = teamService.checkMemberTeams(memberId);
         return ResponseEntity.ok(allMemberTeamsResponse);
     }
 
     @ApiOperation(value = "팀 삭제 API")
     @DeleteMapping("/{id}/delete")
-    public ResponseEntity delete(@PathVariable("id") Long teamId) {
+    public ResponseEntity<String> delete(@PathVariable("id") Long teamId) {
         teamService.delete(teamId);
         return ResponseEntity.ok("정상적으로 삭제되었습니다.");
     }
