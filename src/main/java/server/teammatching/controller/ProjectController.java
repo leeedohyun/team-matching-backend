@@ -7,7 +7,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import server.teammatching.dto.request.ProjectRequestDto;
 import server.teammatching.dto.response.ProjectResponseDto;
-import server.teammatching.entity.Post;
 import server.teammatching.service.ProjectService;
 
 import java.net.URI;
@@ -48,5 +47,12 @@ public class ProjectController {
     public ResponseEntity checkMemberProject(@PathVariable("id") Long memberId) {
         List<ProjectResponseDto> allMemberProjectsResponse = projectService.checkMemberProjects(memberId);
         return ResponseEntity.ok(allMemberProjectsResponse);
+    }
+
+    @ApiOperation(value = "프로젝트 삭제 API")
+    @DeleteMapping("/{id}/delete")
+    public ResponseEntity delete(@PathVariable("id") Long postId) {
+        projectService.delete(postId);
+        return ResponseEntity.ok("정상적으로 삭제되었습니다.");
     }
 }

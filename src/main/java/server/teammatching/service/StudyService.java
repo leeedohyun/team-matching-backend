@@ -99,4 +99,10 @@ public class StudyService {
         }
         return allMemberStudies;
     }
+
+    public void delete(Long studyId) {
+        Post findStudy = postRepository.findById(studyId)
+                .orElseThrow(() -> new RuntimeException("유효하지 않은 스터디 id 입니다."));
+        postRepository.delete(findStudy);
+    }
 }

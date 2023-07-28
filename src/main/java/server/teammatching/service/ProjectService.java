@@ -119,4 +119,10 @@ public class ProjectService {
         }
         return memberProjects;
     }
+
+    public void delete(Long postId) {
+        Post findProject = postRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("유효하지 않은 프로젝트 id 입니다."));
+        postRepository.delete(findProject);
+    }
 }
