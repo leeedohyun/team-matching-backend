@@ -80,4 +80,23 @@ public class StudyService {
         }
         return allStudies;
     }
+
+    public List<TeamAndStudyCreateResponseDto> checkMemberStudies(Long memberId) {
+        Member findLeader = memberRepository.findById(memberId)            .
+                orElseThrow(() -> new RuntimeException("유효하지 않은 사용자 id 입니다."));
+        List<Post> findMemberStudies = postRepository.findByLeaderAndType(findLeader, PostType.STUDY);
+        List<TeamAndStudyCreateResponseDto> allMemberStudies = new ArrayList<>();
+
+        for (Post findMemberStudy : findMemberStudies) {
+            TeamAndStudyCreateResponseDto study = TeamAndStudyCreateResponseDto.builder()
+                    .postId(findMemberStudy.getId())
+                    .memberId(findMemberStudy.getLeader().getId())
+                    .title(findMemberStudy.getTitle())
+                    .type(findMemberStudy.getType())
+                    .content(findMemberStudy.getContent())
+                    .build();
+            allMemberStudies.add(study);
+        }
+        return allMemberStudies;
+    }
 }
