@@ -7,8 +7,12 @@ import server.teammatching.dto.request.TeamAndStudyCreateRequestDto;
 import server.teammatching.dto.response.TeamAndStudyCreateResponseDto;
 import server.teammatching.entity.Member;
 import server.teammatching.entity.Post;
+import server.teammatching.entity.PostType;
 import server.teammatching.repository.MemberRepository;
 import server.teammatching.repository.PostRepository;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -58,5 +62,22 @@ public class StudyService {
                 .type(savedStudy.getType())
                 .content(savedStudy.getContent())
                 .build();
+    }
+
+    public List<TeamAndStudyCreateResponseDto> checkAllStudies() {
+        List<Post> findStudies = postRepository.findByType(PostType.STUDY);
+        List<TeamAndStudyCreateResponseDto> allStudies = new ArrayList<>();
+
+        for (Post findStudy : findStudies) {
+            TeamAndStudyCreateResponseDto study = TeamAndStudyCreateResponseDto.builder()
+                    .postId(findStudy.getId())
+                    .memberId(findStudy.getLeader().getId())
+                    .title(findStudy.getTitle())
+                    .type(findStudy.getType())
+                    .content(findStudy.getContent())
+                    .build();
+            allStudies.add(study);
+        }
+        return allStudies;
     }
 }

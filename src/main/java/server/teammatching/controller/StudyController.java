@@ -10,6 +10,7 @@ import server.teammatching.dto.response.TeamAndStudyCreateResponseDto;
 import server.teammatching.service.StudyService;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -32,5 +33,12 @@ public class StudyController {
     public ResponseEntity update(@RequestBody TeamAndStudyCreateRequestDto updateRequest, @PathVariable("id") Long studyId) {
         TeamAndStudyCreateResponseDto updateResponse = studyService.update(updateRequest, studyId);
         return ResponseEntity.ok(updateResponse);
+    }
+
+    @ApiOperation(value = "모든 스터디 조회 API")
+    @GetMapping("")
+    public ResponseEntity checkAllStudies() {
+        List<TeamAndStudyCreateResponseDto> allStudiesResponse = studyService.checkAllStudies();
+        return ResponseEntity.ok(allStudiesResponse);
     }
 }
