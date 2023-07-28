@@ -45,7 +45,7 @@ public class ProjectController {
 
     @ApiOperation(value = "회원이 생성한 프로젝트 조회 API")
     @GetMapping("/{id}")
-    public ResponseEntity checkMemberProject(@RequestParam Long memberId) {
+    public ResponseEntity checkMemberProject(@PathVariable("id") Long memberId) {
         List<ProjectResponseDto> allMemberProjectsResponse = projectService.checkMemberProjects(memberId);
         return ResponseEntity.ok(allMemberProjectsResponse);
     }
