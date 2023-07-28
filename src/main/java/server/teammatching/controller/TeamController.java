@@ -26,4 +26,12 @@ public class TeamController {
         return ResponseEntity.created(URI.create(String.format("/new/%s", teamAndStudyCreateResponseDto.getPostId())))
                 .body(teamAndStudyCreateResponseDto);
     }
+
+    @ApiOperation(value = "팀 정보 수정 API")
+    @PatchMapping("/{id}")
+    public ResponseEntity update(@RequestBody TeamAndStudyCreateRequestDto requestDto,
+                                 @PathVariable("id") Long postId) {
+        TeamAndStudyCreateResponseDto responseDto = teamService.update(requestDto, postId);
+        return ResponseEntity.ok(responseDto);
+    }
 }

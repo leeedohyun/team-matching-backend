@@ -28,8 +28,35 @@ public class TeamService {
                 .title(savedTeam.getTitle())
                 .content(savedTeam.getContent())
                 .postId(savedTeam.getId())
-                .memberId(leader.getId())
+                .memberId(savedTeam.getLeader().getId())
                 .type(savedTeam.getType())
+                .build();
+    }
+
+    public TeamAndStudyCreateResponseDto update(TeamAndStudyCreateRequestDto requestDto, Long postId) {
+        Post findTeam = postRepository.findById(postId)
+                .orElseThrow(() -> new IllegalStateException("유효하지 않은 팀 id 입니다."));
+
+        if (requestDto.getTitle() != null) {
+            findTeam.updateTitle(requestDto.getTitle());
+        }
+        if (requestDto.getField() != null) {
+            findTeam.updateField(requestDto.getField());
+        }
+        if (requestDto.getRecruitNumber() != 0) {
+            findTeam.updateRecruitNumber(requestDto.getRecruitNumber());
+        }
+        if (requestDto.getContent() != null) {
+            findTeam.updateContent(requestDto.getContent());
+        }
+
+        Post savedTeam = postRepository.save(findTeam);
+        return TeamAndStudyCreateResponseDto.builder()
+                .postId(savedTeam.getId())
+                .memberId(savedTeam.getLeader().getId())
+                .title(savedTeam.getTitle())
+                .type(savedTeam.getType())
+                .content(savedTeam.getContent())
                 .build();
     }
 }

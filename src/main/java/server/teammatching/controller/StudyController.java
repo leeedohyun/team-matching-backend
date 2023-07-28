@@ -26,4 +26,11 @@ public class StudyController {
         return ResponseEntity.created(URI.create(String.format("/new/%s", responseDto.getPostId())))
                 .body(requestDto);
     }
+
+    @ApiOperation(value = "스터디 정보 수정 API")
+    @PatchMapping("/{id}")
+    public ResponseEntity update(@RequestBody TeamAndStudyCreateRequestDto updateRequest, @PathVariable("id") Long studyId) {
+        TeamAndStudyCreateResponseDto updateResponse = studyService.update(updateRequest, studyId);
+        return ResponseEntity.ok(updateResponse);
+    }
 }

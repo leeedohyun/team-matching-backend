@@ -54,4 +54,45 @@ class TeamServiceTest {
         assertThat(teamAndStudyCreateResponseDto.getType()).isEqualTo(PostType.TEAM);
         assertThat(teamAndStudyCreateResponseDto.getContent()).isEqualTo(teamAndStudyCreateRequestDto.getContent());
     }
+
+    @Test
+    @DisplayName(value = "팀 수정 테스트")
+    public void 팀_수정_테스트() throws Exception {
+        //given
+        Member member = Member.builder()
+                .loginId("login")
+                .email("dkfdk@gmaiol.com")
+                .nickName("member")
+                .university("hongik")
+                .password("1234")
+                .build();
+
+        memberRepository.save(member);
+
+        TeamAndStudyCreateRequestDto teamAndStudyCreateRequestDto = TeamAndStudyCreateRequestDto.builder()
+                .title("OO팀 모집합니다.")
+                .field("공모전")
+                .recruitNumber(4)
+                .content("OO팀 모집합니다. 열심히 참여하실 분들 구합니다.")
+                .build();
+
+        TeamAndStudyCreateResponseDto responseDto = teamService.create(teamAndStudyCreateRequestDto, member.getId());
+
+        TeamAndStudyCreateRequestDto updateRequest = TeamAndStudyCreateRequestDto.builder()
+                .title(null)
+                .field(null)
+                .recruitNumber(2)
+                .content(null)
+                .build();
+
+        //when
+        TeamAndStudyCreateResponseDto updateResponse = teamService.update(updateRequest, responseDto.getPostId());
+
+        //then
+        assertThat(updateResponse.getTitle()).isEqualTo(responseDto.getTitle());
+        assertThat(updateResponse.getType()).isEqualTo(responseDto.getType());
+        assertThat(updateResponse.getContent()).isEqualTo(responseDto.getContent());
+        assertThat(updateResponse.getMemberId()).isEqualTo(responseDto.getMemberId());
+        assertThat(updateResponse.getPostId()).isEqualTo(responseDto.getPostId());
+    }
 }

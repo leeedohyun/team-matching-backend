@@ -33,4 +33,43 @@ public class ProjectService {
                 .content(savedProject.getContent())
                 .build();
     }
+
+    public ProjectResponseDto update(ProjectRequestDto updateRequest, Long projectId) {
+        Post findProject = postRepository.findById(projectId)
+                .orElseThrow(() -> new IllegalStateException("유효하지 않은 팀 id 입니다."));
+
+        if (updateRequest.getTitle() != null) {
+            findProject.updateTitle(updateRequest.getTitle());
+        }
+        if (updateRequest.getField() != null) {
+            findProject.updateField(updateRequest.getField());
+        }
+        if (updateRequest.getRecruitNumber() != 0) {
+            findProject.updateRecruitNumber(updateRequest.getRecruitNumber());
+        }
+        if (updateRequest.getFrontendNumber() != 0) {
+            findProject.updateFrontendNumber(updateRequest.getFrontendNumber());
+        }
+        if (updateRequest.getBackendNumber() != 0) {
+            findProject.updateBackendNumber(updateRequest.getBackendNumber());
+        }
+        if (updateRequest.getDesignerNumber() != 0) {
+            findProject.updateDesignerNumber(updateRequest.getDesignerNumber());
+        }
+        if (updateRequest.getContent() != null) {
+            findProject.updateContent(updateRequest.getContent());
+        }
+
+        Post savedProject = postRepository.save(findProject);
+        return ProjectResponseDto.builder()
+                .postId(savedProject.getId())
+                .memberId(savedProject.getLeader().getId())
+                .title(savedProject.getTitle())
+                .designerNumber(savedProject.getDesignerNumber())
+                .backendNumber(savedProject.getBackendNumber())
+                .frontendNumber(savedProject.getFrontendNumber())
+                .content(savedProject.getContent())
+                .type(savedProject.getType())
+                .build();
+    }
 }

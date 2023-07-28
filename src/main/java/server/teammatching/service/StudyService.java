@@ -32,4 +32,31 @@ public class StudyService {
                 .content(savedStudy.getContent())
                 .build();
     }
+
+    public TeamAndStudyCreateResponseDto update(TeamAndStudyCreateRequestDto updateRequest, Long studyId) {
+        Post findStudy = postRepository.findById(studyId)
+                .orElseThrow(() -> new IllegalStateException("유효하지 않은 팀 id 입니다."));
+
+        if (updateRequest.getTitle() != "") {
+            findStudy.updateTitle(updateRequest.getTitle());
+        }
+        if (updateRequest.getField() != "") {
+            findStudy.updateField(updateRequest.getField());
+        }
+        if (updateRequest.getRecruitNumber() != 0) {
+            findStudy.updateRecruitNumber(updateRequest.getRecruitNumber());
+        }
+        if (updateRequest.getContent() != "") {
+            findStudy.updateContent(updateRequest.getContent());
+        }
+
+        Post savedStudy = postRepository.save(findStudy);
+        return TeamAndStudyCreateResponseDto.builder()
+                .postId(savedStudy.getId())
+                .memberId(savedStudy.getLeader().getId())
+                .title(savedStudy.getTitle())
+                .type(savedStudy.getType())
+                .content(savedStudy.getContent())
+                .build();
+    }
 }
