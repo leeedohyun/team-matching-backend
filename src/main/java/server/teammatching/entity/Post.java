@@ -68,7 +68,7 @@ public class Post extends BaseTimeEntity {
 
     public void setLeader(Member leader) {
         this.leader = leader;
-        //leader.getPostList().add(this);
+        leader.getPostList().add(this);
     }
 
     public static Post createTeam(TeamAndStudyCreateRequestDto form, Member member) {
@@ -127,5 +127,17 @@ public class Post extends BaseTimeEntity {
 
     public void updateContent(String content) {
         this.content = content;
+    }
+
+    public void updateDesignerNumber(int designerNumber) {
+        this.designerNumber = designerNumber;
+    }
+
+    public void updateFrontendNumber(int frontendNumber) {
+        this.frontendNumber = frontendNumber;
+    }
+
+    public void updateBackendNumber(int backendNumber) {
+        this.backendNumber = backendNumber;
     }
 }
