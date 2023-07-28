@@ -42,4 +42,11 @@ public class TeamController {
         List<TeamAndStudyCreateResponseDto> allTeamsResponse = teamService.checkAllTeams();
         return ResponseEntity.ok(allTeamsResponse);
     }
+
+    @ApiOperation(value = "회원이 생성한 팀 조회 API")
+    @GetMapping("/{id}")
+    public ResponseEntity checkMemberTeams(@PathVariable("id") Long memberId) {
+        List<TeamAndStudyCreateResponseDto> allMemberTeamsResponse = teamService.checkMemberTeams(memberId);
+        return ResponseEntity.ok(allMemberTeamsResponse);
+    }
 }

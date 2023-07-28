@@ -1,10 +1,8 @@
 package server.teammatching.service;
 
-import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
 import server.teammatching.dto.request.TeamAndStudyCreateRequestDto;
 import server.teammatching.dto.response.TeamAndStudyCreateResponseDto;
 import server.teammatching.entity.Member;
@@ -81,5 +79,24 @@ public class TeamService {
             allTeams.add(team);
         }
         return allTeams;
+    }
+
+    public List<TeamAndStudyCreateResponseDto> checkMemberTeams(Long memberId) {
+        Member findLeader = memberRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("유효하지 않은 사용자 id 입니다."));
+        List<Post> findMemberTeams = postRepository.findByLeaderAndType(findLeader, PostType.TEAM);
+        List<TeamAndStudyCreateResponseDto> allMemberTeams = new ArrayList<>();
+
+        for (Post findMemberTeam : findMemberTeams) {
+            TeamAndStudyCreateResponseDto team = TeamAndStudyCreateResponseDto.builder()
+                    .postId(findMemberTeam.getId())
+                    .memberId(findMemberTeam.getLeader().getId())
+                    .title(findMemberTeam.getTitle())
+                    .type(findMemberTeam.getType())
+                    .content(findMemberTeam.getContent())
+                    .build();
+            allMemberTeams.add(team);
+        }
+        return allMemberTeams;
     }
 }
