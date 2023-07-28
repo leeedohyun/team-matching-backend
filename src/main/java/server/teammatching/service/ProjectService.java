@@ -77,7 +77,7 @@ public class ProjectService {
                 .build();
     }
 
-    public List<ProjectResponseDto> checkAllProject() {
+    public List<ProjectResponseDto> checkAllProjects() {
         List<ProjectResponseDto> allProjects = new ArrayList<>();
         List<Post> findAllProjects = postRepository.findByType(PostType.PROJECT);
 
@@ -95,5 +95,28 @@ public class ProjectService {
             allProjects.add(project);
         }
         return allProjects;
+    }
+
+    public List<ProjectResponseDto> checkMemberProjects(Long memberId) {
+        Member findLeader = memberRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("유효하지 않은 사용자 id 입니다."));
+
+        List<Post> findMemberProjects = postRepository.findByLeaderAndType(findLeader, PostType.PROJECT);
+        List<ProjectResponseDto> memberProjects = new ArrayList<>();
+
+        for (Post findMemberProject : findMemberProjects) {
+            ProjectResponseDto project = ProjectResponseDto.builder()
+                    .postId(findMemberProject.getId())
+                    .memberId(findMemberProject.getLeader().getId())
+                    .title(findMemberProject.getTitle())
+                    .designerNumber(findMemberProject.getDesignerNumber())
+                    .backendNumber(findMemberProject.getBackendNumber())
+                    .frontendNumber(findMemberProject.getFrontendNumber())
+                    .content(findMemberProject.getContent())
+                    .type(findMemberProject.getType())
+                    .build();
+            memberProjects.add(project);
+        }
+        return memberProjects;
     }
 }

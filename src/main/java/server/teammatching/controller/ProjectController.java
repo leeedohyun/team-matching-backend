@@ -39,7 +39,14 @@ public class ProjectController {
     @ApiOperation(value = "모든 프로젝트 조회 API")
     @GetMapping("")
     public ResponseEntity checkAllProject() {
-        List<ProjectResponseDto> allProjectsResponse = projectService.checkAllProject();
+        List<ProjectResponseDto> allProjectsResponse = projectService.checkAllProjects();
         return ResponseEntity.ok(allProjectsResponse);
+    }
+
+    @ApiOperation(value = "회원이 생성한 프로젝트 조회 API")
+    @GetMapping("/{id}")
+    public ResponseEntity checkMemberProject(@RequestParam Long memberId) {
+        List<ProjectResponseDto> allMemberProjectsResponse = projectService.checkMemberProjects(memberId);
+        return ResponseEntity.ok(allMemberProjectsResponse);
     }
 }
