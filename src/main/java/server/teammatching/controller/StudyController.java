@@ -48,4 +48,11 @@ public class StudyController {
         List<TeamAndStudyCreateResponseDto> allMemberStudiesResponse = studyService.checkMemberStudies(memberId);
         return ResponseEntity.ok(allMemberStudiesResponse);
     }
+
+    @ApiOperation(value = "스터디 삭제 API")
+    @DeleteMapping("/{id}/delete")
+    public ResponseEntity delete(@PathVariable("id") Long studyId) {
+        studyService.delete(studyId);
+        return ResponseEntity.ok("정상적으로 삭제되었습니다.");
+    }
 }
