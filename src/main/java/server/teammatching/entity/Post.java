@@ -48,7 +48,7 @@ public class Post extends BaseTimeEntity {
     @Lob
     private String content;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "member_id")
     private Member leader;
 

@@ -10,6 +10,7 @@ import server.teammatching.dto.response.TeamAndStudyCreateResponseDto;
 import server.teammatching.service.TeamService;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -33,5 +34,19 @@ public class TeamController {
                                  @PathVariable("id") Long postId) {
         TeamAndStudyCreateResponseDto responseDto = teamService.update(requestDto, postId);
         return ResponseEntity.ok(responseDto);
+    }
+
+    @ApiOperation(value = "모든 팀 조회 API")
+    @GetMapping("")
+    public ResponseEntity checkAllTeams() {
+        List<TeamAndStudyCreateResponseDto> allTeamsResponse = teamService.checkAllTeams();
+        return ResponseEntity.ok(allTeamsResponse);
+    }
+
+    @ApiOperation(value = "회원이 생성한 팀 조회 API")
+    @GetMapping("/{id}")
+    public ResponseEntity checkMemberTeams(@PathVariable("id") Long memberId) {
+        List<TeamAndStudyCreateResponseDto> allMemberTeamsResponse = teamService.checkMemberTeams(memberId);
+        return ResponseEntity.ok(allMemberTeamsResponse);
     }
 }
