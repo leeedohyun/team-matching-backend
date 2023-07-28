@@ -49,4 +49,11 @@ public class TeamController {
         List<TeamAndStudyCreateResponseDto> allMemberTeamsResponse = teamService.checkMemberTeams(memberId);
         return ResponseEntity.ok(allMemberTeamsResponse);
     }
+
+    @ApiOperation(value = "팀 삭제 API")
+    @DeleteMapping("/{id}/delete")
+    public ResponseEntity delete(@PathVariable("id") Long teamId) {
+        teamService.delete(teamId);
+        return ResponseEntity.ok("정상적으로 삭제되었습니다.");
+    }
 }

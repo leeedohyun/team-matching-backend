@@ -99,4 +99,10 @@ public class TeamService {
         }
         return allMemberTeams;
     }
+
+    public void delete(Long teamId) {
+        Post findTeam = postRepository.findById(teamId)
+                .orElseThrow(() -> new RuntimeException("유효하지 않은 스터디 id 입니다."));
+        postRepository.delete(findTeam);
+    }
 }
