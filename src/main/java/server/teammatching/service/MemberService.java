@@ -11,6 +11,7 @@ import server.teammatching.dto.response.MemberUpdateResponseDto;
 import server.teammatching.entity.Member;
 import server.teammatching.repository.MemberRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -37,8 +38,22 @@ public class MemberService {
         return MemberResponseDto.from(findMember, "조회 성공");
     }
 
-    public List<Member> findAll() {
-        return memberRepository.findAll();
+    public List<MemberResponseDto> findAll() {
+        List<Member> members = memberRepository.findAll();
+        List<MemberResponseDto> membersResponse = new ArrayList<>();
+
+        for (Member member : members) {
+            MemberResponseDto response = MemberResponseDto.builder()
+                    .memberId(member.getId())
+                    .email(member.getEmail())
+                    .loginId(member.getLoginId())
+                    .nickName(member.getNickName())
+                    .university(member.getUniversity())
+                    .message("조회 성공")
+                    .build();
+            membersResponse.add(response);
+        }
+        return membersResponse;
     }
 
     @Transactional

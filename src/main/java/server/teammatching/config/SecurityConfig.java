@@ -1,4 +1,4 @@
-package server.teammatching.common;
+package server.teammatching.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -1,4 +1,4 @@
-package server.teammatching.common.swagger;
+package server.teammatching.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,5 +32,4 @@ public class SwaggerConfig {
                 .version("0.1")
                 .build();
     }
-
 }
