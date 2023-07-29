@@ -1,14 +1,12 @@
 package server.teammatching.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 
 import javax.persistence.*;
 
 @Entity
 @Getter
-@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Application extends BaseTimeEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,16 +28,18 @@ public class Application extends BaseTimeEntity {
     @JoinColumn(name = "post_id")
     private Post post;
 
-    public static Application applyProject(Member appliedMember, Post project) {
-        Application application = Application.builder()
-                .status(ApplicationStatus.대기중)
-                .post(project)
-                .build();
-        application.setAppliedMember(appliedMember);
-        return application;
+    @Builder
+    public Application(ApplicationStatus status, Member appliedMember, Post post) {
+        this.status = status;
+        this.appliedMember = appliedMember;
+        this.post = post;
     }
 
-    private void setAppliedMember(Member appliedMember) {
-        this.appliedMember = appliedMember;
+    public static Application applyProject(Member appliedMember, Post project) {
+        return Application.builder()
+                .status(ApplicationStatus.대기중)
+                .appliedMember(appliedMember)
+                .post(project)
+                .build();
     }
 }

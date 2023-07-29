@@ -2,6 +2,7 @@ package server.teammatching.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import server.teammatching.dto.response.ApplicationResponse;
 import server.teammatching.entity.Application;
 import server.teammatching.entity.Member;
@@ -11,7 +12,8 @@ import server.teammatching.repository.ApplicationRepository;
 import server.teammatching.repository.MemberRepository;
 import server.teammatching.repository.PostRepository;
 
-import javax.transaction.Transactional;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -47,5 +49,22 @@ public class ApplicationService {
                 .id(application.getPost().getId())
                 .title(application.getPost().getTitle())
                 .build();
+    }
+
+    @Transactional(readOnly = true)
+    public List<ApplicationResponse> checkAllApplications(Long memberId) {
+        Member findMember = memberRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("유효하지 않은 회원 id 입니다."));
+        List<Application> appliedList = applicationRepository.findByAppliedMember(findMember);
+        List<ApplicationResponse> appliedResponses = new ArrayList<>();
+
+        for (Application application : appliedList) {
+            ApplicationResponse response = ApplicationResponse.builder()
+                    .title(application.getPost().getTitle())
+                    .id(application.getPost().getId())
+                    .build();
+            appliedResponses.add(response);
+        }
+        return appliedResponses;
     }
 }

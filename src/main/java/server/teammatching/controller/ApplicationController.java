@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.*;
 import server.teammatching.dto.response.ApplicationResponse;
 import server.teammatching.service.ApplicationService;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @Api(tags = {"지원 API"})
@@ -38,5 +40,12 @@ public class ApplicationController {
                                                           @RequestParam Long memberId) {
         ApplicationResponse applicationResponse = applicationService.applyTeam(studyId, memberId);
         return ResponseEntity.ok(applicationResponse);
+    }
+
+    @ApiOperation(value = "회원이 지원한 모든 지원 리스트 조회 API")
+    @GetMapping("")
+    public ResponseEntity<List<ApplicationResponse>> checkAllApplications(@RequestParam Long memberId) {
+        List<ApplicationResponse> applicationResponses = applicationService.checkAllApplications(memberId);
+        return ResponseEntity.ok(applicationResponses);
     }
 }
