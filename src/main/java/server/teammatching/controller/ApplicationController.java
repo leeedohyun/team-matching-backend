@@ -31,4 +31,12 @@ public class ApplicationController {
         ApplicationResponse applicationResponse = applicationService.applyStudy(studyId, memberId);
         return ResponseEntity.ok(applicationResponse);
     }
+
+    @ApiOperation(value = "팀 지원 API")
+    @PostMapping("/teams/{id}")
+    public ResponseEntity<ApplicationResponse> applyTeam(@PathVariable("id") Long studyId,
+                                                          @RequestParam Long memberId) {
+        ApplicationResponse applicationResponse = applicationService.applyTeam(studyId, memberId);
+        return ResponseEntity.ok(applicationResponse);
+    }
 }

@@ -23,27 +23,24 @@ public class ApplicationService {
     private final PostRepository postRepository;
 
     public ApplicationResponse applyProject(Long projectId, Long memberId) {
-        Member appliedMember = memberRepository.findById(memberId)
-                .orElseThrow(() -> new RuntimeException("유효하지 않은 회원 id 입니다."));
-        Post project = postRepository.findByIdAndType(projectId, PostType.PROJECT)
-                .orElseThrow(() -> new RuntimeException("유효하지 않은 프로젝트 id 입니다."));
-
-        Application application = Application.applyProject(appliedMember, project);
-        applicationRepository.save(application);
-
-        return ApplicationResponse.builder()
-                .id(application.getPost().getId())
-                .title(application.getPost().getTitle())
-                .build();
+        return getApplicationResponse(memberId, projectId, PostType.PROJECT, "유효하지 않은 프로젝트 id 입니다.");
     }
 
     public ApplicationResponse applyStudy(Long studyId, Long memberId) {
+        return getApplicationResponse(memberId, studyId, PostType.STUDY, "유효하지 않은 스터디 id 입니다.");
+    }
+
+    public ApplicationResponse applyTeam(Long teamId, Long memberId) {
+        return getApplicationResponse(memberId, teamId, PostType.TEAM, "유효하지 않은 스터디 id 입니다.");
+    }
+
+    private ApplicationResponse getApplicationResponse(Long memberId, Long postId, PostType type, String message) {
         Member appliedMember = memberRepository.findById(memberId)
                 .orElseThrow(() -> new RuntimeException("유효하지 않은 회원 id 입니다."));
-        Post study = postRepository.findByIdAndType(studyId, PostType.STUDY)
-                .orElseThrow(() -> new RuntimeException("유효하지 않은 스터디 id 입니다."));
+        Post post = postRepository.findByIdAndType(postId, type)
+                .orElseThrow(() -> new RuntimeException(message));
 
-        Application application = Application.applyProject(appliedMember, study);
+        Application application = Application.applyProject(appliedMember, post);
         applicationRepository.save(application);
 
         return ApplicationResponse.builder()
