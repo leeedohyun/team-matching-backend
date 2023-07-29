@@ -8,6 +8,6 @@ import lombok.*;
 @Builder
 public class ApplicationResponse {
 
-    private Long projectId;
+    private Long id;
     private String title;
 }

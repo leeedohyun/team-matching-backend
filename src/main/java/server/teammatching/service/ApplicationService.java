@@ -32,7 +32,22 @@ public class ApplicationService {
         applicationRepository.save(application);
 
         return ApplicationResponse.builder()
-                .projectId(application.getPost().getId())
+                .id(application.getPost().getId())
+                .title(application.getPost().getTitle())
+                .build();
+    }
+
+    public ApplicationResponse applyStudy(Long studyId, Long memberId) {
+        Member appliedMember = memberRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("유효하지 않은 회원 id 입니다."));
+        Post study = postRepository.findByIdAndType(studyId, PostType.STUDY)
+                .orElseThrow(() -> new RuntimeException("유효하지 않은 스터디 id 입니다."));
+
+        Application application = Application.applyProject(appliedMember, study);
+        applicationRepository.save(application);
+
+        return ApplicationResponse.builder()
+                .id(application.getPost().getId())
                 .title(application.getPost().getTitle())
                 .build();
     }
