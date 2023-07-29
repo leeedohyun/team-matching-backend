@@ -6,10 +6,13 @@ import server.teammatching.entity.Post;
 import server.teammatching.entity.PostType;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
 
     List<Post> findByType(PostType postType);
 
     List<Post> findByLeaderAndType(Member leader, PostType postType);
+
+    Optional<Post> findByIdAndType(Long postId, PostType postType);
 }
