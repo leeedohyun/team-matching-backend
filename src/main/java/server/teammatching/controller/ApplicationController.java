@@ -48,4 +48,11 @@ public class ApplicationController {
         List<ApplicationResponse> applicationResponses = applicationService.checkAllApplications(memberId);
         return ResponseEntity.ok(applicationResponses);
     }
+
+    @ApiOperation(value = "지원 취소 API")
+    @DeleteMapping("{id}")
+    public ResponseEntity<String> deleteApplication(@PathVariable("id") Long applicationId) {
+        applicationService.deleteApplication(applicationId);
+        return ResponseEntity.ok("삭제되었습니다.");
+    }
 }

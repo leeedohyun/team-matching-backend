@@ -7,9 +7,10 @@ import server.teammatching.entity.ApplicationStatus;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class ApplicationResponse {
+public class RecruitmentResponse {
 
-    private Long id;
+    private Long memberId;
+    private Long postId;
     private String title;
     private ApplicationStatus applicationStatus;
 }

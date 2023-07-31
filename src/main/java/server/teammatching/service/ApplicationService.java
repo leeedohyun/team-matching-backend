@@ -4,13 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import server.teammatching.dto.response.ApplicationResponse;
-import server.teammatching.entity.Application;
-import server.teammatching.entity.Member;
-import server.teammatching.entity.Post;
-import server.teammatching.entity.PostType;
+import server.teammatching.entity.*;
 import server.teammatching.repository.ApplicationRepository;
 import server.teammatching.repository.MemberRepository;
 import server.teammatching.repository.PostRepository;
+import server.teammatching.repository.RecruitmentRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +21,7 @@ public class ApplicationService {
     private final ApplicationRepository applicationRepository;
     private final MemberRepository memberRepository;
     private final PostRepository postRepository;
+    private final RecruitmentRepository recruitmentRepository;
 
     public ApplicationResponse applyProject(Long projectId, Long memberId) {
         return getApplicationResponse(memberId, projectId, PostType.PROJECT, "유효하지 않은 프로젝트 id 입니다.");
@@ -41,13 +40,16 @@ public class ApplicationService {
                 .orElseThrow(() -> new RuntimeException("유효하지 않은 회원 id 입니다."));
         Post post = postRepository.findByIdAndType(postId, type)
                 .orElseThrow(() -> new RuntimeException(message));
+        Recruitment recruitment = recruitmentRepository.findByPost(post)
+                .orElseThrow(() -> new RuntimeException("유효하지 않은 게시글 id 입니다."));
 
-        Application application = Application.applyProject(appliedMember, post);
+        Application application = Application.apply(appliedMember, post, recruitment);
         applicationRepository.save(application);
 
         return ApplicationResponse.builder()
                 .id(application.getPost().getId())
                 .title(application.getPost().getTitle())
+                .applicationStatus(application.getStatus())
                 .build();
     }
 
@@ -62,9 +64,16 @@ public class ApplicationService {
             ApplicationResponse response = ApplicationResponse.builder()
                     .title(application.getPost().getTitle())
                     .id(application.getPost().getId())
+                    .applicationStatus(application.getStatus())
                     .build();
             appliedResponses.add(response);
         }
         return appliedResponses;
+    }
+
+    public void deleteApplication(Long applicationId) {
+        Application findApplication = applicationRepository.findById(applicationId)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 Id 입니다"));
+        applicationRepository.delete(findApplication);
     }
 }

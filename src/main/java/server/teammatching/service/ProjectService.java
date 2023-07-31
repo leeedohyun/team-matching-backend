@@ -2,30 +2,40 @@ package server.teammatching.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import server.teammatching.dto.request.ProjectRequestDto;
 import server.teammatching.dto.response.ProjectResponseDto;
-import server.teammatching.entity.Member;
-import server.teammatching.entity.Post;
-import server.teammatching.entity.PostType;
+import server.teammatching.entity.*;
+import server.teammatching.repository.ApplicationRepository;
 import server.teammatching.repository.MemberRepository;
 import server.teammatching.repository.PostRepository;
+import server.teammatching.repository.RecruitmentRepository;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class ProjectService {
 
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;
+    private final RecruitmentRepository recruitmentRepository;
+    private final ApplicationRepository applicationRepository;
 
     public ProjectResponseDto create(ProjectRequestDto requestDto, Long memberId) {
         Member leader = memberRepository.findById(memberId)
                 .orElseThrow(() -> new RuntimeException("유효하지 않은 사용자 id 입니다."));
 
-        Post project = Post.createProject(requestDto, leader);
-        Post savedProject = postRepository.save(project);
+        Post createdProject = Post.createProject(requestDto, leader);
+
+        Recruitment recruitment = new Recruitment();
+        createdProject.setRecruitment(recruitment);
+
+        Post savedProject = postRepository.save(createdProject);
+        recruitmentRepository.save(recruitment);
+
         return ProjectResponseDto.builder()
                 .postId(savedProject.getId())
                 .memberId(leader.getId())
@@ -77,6 +87,7 @@ public class ProjectService {
                 .build();
     }
 
+    @Transactional(readOnly = true)
     public List<ProjectResponseDto> checkAllProjects() {
         List<ProjectResponseDto> allProjects = new ArrayList<>();
         List<Post> findAllProjects = postRepository.findByType(PostType.PROJECT);
@@ -97,6 +108,7 @@ public class ProjectService {
         return allProjects;
     }
 
+    @Transactional(readOnly = true)
     public List<ProjectResponseDto> checkMemberProjects(Long memberId) {
         Member findLeader = memberRepository.findById(memberId)
                 .orElseThrow(() -> new RuntimeException("유효하지 않은 사용자 id 입니다."));
@@ -123,6 +135,8 @@ public class ProjectService {
     public void delete(Long postId) {
         Post findProject = postRepository.findById(postId)
                 .orElseThrow(() -> new RuntimeException("유효하지 않은 프로젝트 id 입니다."));
+        List<Application> projectApplications = applicationRepository.findByPost(findProject);
         postRepository.delete(findProject);
+        applicationRepository.deleteAll(projectApplications);
     }
 }
