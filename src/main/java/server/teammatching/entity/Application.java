@@ -24,7 +24,7 @@ public class Application extends BaseTimeEntity {
     @JoinColumn(name = "recruitment_id")
     private Recruitment recruitment;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
     private Post post;
 

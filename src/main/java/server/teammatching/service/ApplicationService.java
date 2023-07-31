@@ -70,4 +70,10 @@ public class ApplicationService {
         }
         return appliedResponses;
     }
+
+    public void deleteApplication(Long applicationId) {
+        Application findApplication = applicationRepository.findById(applicationId)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 Id 입니다"));
+        applicationRepository.delete(findApplication);
+    }
 }
