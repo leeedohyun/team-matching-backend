@@ -5,11 +5,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import server.teammatching.dto.request.TeamAndStudyCreateRequestDto;
 import server.teammatching.dto.response.TeamAndStudyCreateResponseDto;
-import server.teammatching.entity.Member;
-import server.teammatching.entity.Post;
-import server.teammatching.entity.PostType;
+import server.teammatching.entity.*;
+import server.teammatching.repository.ApplicationRepository;
 import server.teammatching.repository.MemberRepository;
 import server.teammatching.repository.PostRepository;
+import server.teammatching.repository.RecruitmentRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,13 +21,21 @@ public class StudyService {
 
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;
+    private final RecruitmentRepository recruitmentRepository;
+    private final ApplicationRepository applicationRepository;
 
     public TeamAndStudyCreateResponseDto create(TeamAndStudyCreateRequestDto requestDto, Long memberId) {
         Member leader = memberRepository.findById(memberId)
                 .orElseThrow(() -> new RuntimeException("유효하지 않은 사용자 id 입니다."));
 
         Post createdStudy = Post.createStudy(requestDto, leader);
+
+        Recruitment recruitment = new Recruitment();
+        createdStudy.setRecruitment(recruitment);
+
         Post savedStudy = postRepository.save(createdStudy);
+        recruitmentRepository.save(recruitment);
+
         return TeamAndStudyCreateResponseDto.builder()
                 .title(savedStudy.getTitle())
                 .postId(savedStudy.getId())
@@ -64,6 +72,7 @@ public class StudyService {
                 .build();
     }
 
+    @Transactional(readOnly = true)
     public List<TeamAndStudyCreateResponseDto> checkAllStudies() {
         List<Post> findStudies = postRepository.findByType(PostType.STUDY);
         List<TeamAndStudyCreateResponseDto> allStudies = new ArrayList<>();
@@ -81,6 +90,7 @@ public class StudyService {
         return allStudies;
     }
 
+    @Transactional(readOnly = true)
     public List<TeamAndStudyCreateResponseDto> checkMemberStudies(Long memberId) {
         Member findLeader = memberRepository.findById(memberId)            .
                 orElseThrow(() -> new RuntimeException("유효하지 않은 사용자 id 입니다."));
@@ -103,6 +113,8 @@ public class StudyService {
     public void delete(Long studyId) {
         Post findStudy = postRepository.findById(studyId)
                 .orElseThrow(() -> new RuntimeException("유효하지 않은 스터디 id 입니다."));
+        List<Application> studyApplications = applicationRepository.findByPost(findStudy);
         postRepository.delete(findStudy);
+        applicationRepository.deleteAll(studyApplications);
     }
 }

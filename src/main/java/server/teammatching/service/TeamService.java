@@ -5,11 +5,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import server.teammatching.dto.request.TeamAndStudyCreateRequestDto;
 import server.teammatching.dto.response.TeamAndStudyCreateResponseDto;
-import server.teammatching.entity.Member;
-import server.teammatching.entity.Post;
-import server.teammatching.entity.PostType;
+import server.teammatching.entity.*;
+import server.teammatching.repository.ApplicationRepository;
 import server.teammatching.repository.MemberRepository;
 import server.teammatching.repository.PostRepository;
+import server.teammatching.repository.RecruitmentRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,13 +21,21 @@ public class TeamService {
 
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;
+    private final RecruitmentRepository recruitmentRepository;
+    private final ApplicationRepository applicationRepository;
 
     public TeamAndStudyCreateResponseDto create(TeamAndStudyCreateRequestDto form , Long memberId) {
         Member leader = memberRepository.findById(memberId)
                 .orElseThrow(() -> new RuntimeException("유효하지 않은 사용자 id 입니다."));
 
-        Post team = Post.createTeam(form, leader);
-        Post savedTeam = postRepository.save(team);
+        Post createdTeam = Post.createTeam(form, leader);
+
+        Recruitment recruitment = new Recruitment();
+        createdTeam.setRecruitment(recruitment);
+
+        Post savedTeam = postRepository.save(createdTeam);
+        recruitmentRepository.save(recruitment);
+
         return TeamAndStudyCreateResponseDto.builder()
                 .title(savedTeam.getTitle())
                 .content(savedTeam.getContent())
@@ -64,6 +72,7 @@ public class TeamService {
                 .build();
     }
 
+    @Transactional(readOnly = true)
     public List<TeamAndStudyCreateResponseDto> checkAllTeams() {
         List<Post> findTeams = postRepository.findByType(PostType.TEAM);
         List<TeamAndStudyCreateResponseDto> allTeams = new ArrayList<>();
@@ -81,6 +90,7 @@ public class TeamService {
         return allTeams;
     }
 
+    @Transactional(readOnly = true)
     public List<TeamAndStudyCreateResponseDto> checkMemberTeams(Long memberId) {
         Member findLeader = memberRepository.findById(memberId)
                 .orElseThrow(() -> new RuntimeException("유효하지 않은 사용자 id 입니다."));
@@ -103,6 +113,8 @@ public class TeamService {
     public void delete(Long teamId) {
         Post findTeam = postRepository.findById(teamId)
                 .orElseThrow(() -> new RuntimeException("유효하지 않은 스터디 id 입니다."));
+        List<Application> teamApplications = applicationRepository.findByPost(findTeam);
         postRepository.delete(findTeam);
+        applicationRepository.deleteAll(teamApplications);
     }
 }

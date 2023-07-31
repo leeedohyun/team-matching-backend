@@ -48,11 +48,12 @@ public class Post extends BaseTimeEntity {
     @Lob
     private String content;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member leader;
 
-    @OneToOne(fetch = FetchType.LAZY, mappedBy = "post", cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "recruitment_id")
     private Recruitment recruitment;
 
     @Builder
@@ -69,6 +70,11 @@ public class Post extends BaseTimeEntity {
     public void setLeader(Member leader) {
         this.leader = leader;
         leader.getPostList().add(this);
+    }
+
+    public void setRecruitment(Recruitment recruitment) {
+        this.recruitment = recruitment;
+        recruitment.setPost(this);
     }
 
     public static Post createTeam(TeamAndStudyCreateRequestDto form, Member member) {
