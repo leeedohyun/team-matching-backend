@@ -1,7 +1,7 @@
 package server.teammatching.dto.response;
 
 import lombok.*;
-import server.teammatching.entity.PostStatus;
+import server.teammatching.entity.ApplicationStatus;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -10,5 +10,5 @@ import server.teammatching.entity.PostStatus;
 public class AlarmResponse {
 
     private Long alarmId;
-    private PostStatus postStatus;
+    private ApplicationStatus applicationStatus;
 }

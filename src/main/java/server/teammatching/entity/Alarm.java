@@ -1,12 +1,15 @@
 package server.teammatching.entity;
 
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
 @Entity
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Alarm extends BaseTimeEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,8 +26,13 @@ public class Alarm extends BaseTimeEntity {
 
     @Builder
     public Alarm(Member member, Post post) {
-        this.member = member;
         this.post = post;
+        setMember(member);
+    }
+
+    public void setMember(Member member) {
+        this.member = member;
+        member.getAlarms().add(this);
     }
 
     public static Alarm createAlarm(Member member, Post post) {

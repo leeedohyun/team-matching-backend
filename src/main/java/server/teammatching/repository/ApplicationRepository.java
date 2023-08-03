@@ -6,10 +6,13 @@ import server.teammatching.entity.Member;
 import server.teammatching.entity.Post;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ApplicationRepository extends JpaRepository<Application, Long> {
 
     List<Application> findByAppliedMember(Member appliedMember);
 
     List<Application> findByPost(Post post);
+
+    Optional<Application> findByAppliedMemberAndPost(Member appliedMember, Post post);
 }
