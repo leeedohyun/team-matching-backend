@@ -49,4 +49,8 @@ public class Application extends BaseTimeEntity {
         application.setRecruitment(recruitment);
         return application;
     }
+
+    public void updateStatus(ApplicationStatus status) {
+        this.status = status;
+    }
 }

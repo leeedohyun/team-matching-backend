@@ -9,7 +9,7 @@ import server.teammatching.entity.ApplicationStatus;
 @Builder
 public class ApplicationResponse {
 
-    private Long id;
+    private Long postId;
     private String title;
     private ApplicationStatus applicationStatus;
 }

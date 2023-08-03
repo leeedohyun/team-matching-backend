@@ -35,24 +35,6 @@ public class ApplicationService {
         return getApplicationResponse(memberId, teamId, PostType.TEAM, "유효하지 않은 스터디 id 입니다.");
     }
 
-    private ApplicationResponse getApplicationResponse(Long memberId, Long postId, PostType type, String message) {
-        Member appliedMember = memberRepository.findById(memberId)
-                .orElseThrow(() -> new RuntimeException("유효하지 않은 회원 id 입니다."));
-        Post post = postRepository.findByIdAndType(postId, type)
-                .orElseThrow(() -> new RuntimeException(message));
-        Recruitment recruitment = recruitmentRepository.findByPost(post)
-                .orElseThrow(() -> new RuntimeException("유효하지 않은 게시글 id 입니다."));
-
-        Application application = Application.apply(appliedMember, post, recruitment);
-        applicationRepository.save(application);
-
-        return ApplicationResponse.builder()
-                .id(application.getPost().getId())
-                .title(application.getPost().getTitle())
-                .applicationStatus(application.getStatus())
-                .build();
-    }
-
     @Transactional(readOnly = true)
     public List<ApplicationResponse> checkAllApplications(Long memberId) {
         Member findMember = memberRepository.findById(memberId)
@@ -63,7 +45,7 @@ public class ApplicationService {
         for (Application application : appliedList) {
             ApplicationResponse response = ApplicationResponse.builder()
                     .title(application.getPost().getTitle())
-                    .id(application.getPost().getId())
+                    .postId(application.getPost().getId())
                     .applicationStatus(application.getStatus())
                     .build();
             appliedResponses.add(response);
@@ -73,7 +55,51 @@ public class ApplicationService {
 
     public void deleteApplication(Long applicationId) {
         Application findApplication = applicationRepository.findById(applicationId)
-                .orElseThrow(() -> new RuntimeException("존재하지 않는 Id 입니다"));
+                .orElseThrow(() -> new RuntimeException("유효하지 않는 Id 입니다"));
         applicationRepository.delete(findApplication);
+    }
+
+    public ApplicationResponse approveApplication(Long applicationId) {
+        return getApplicationResponse(applicationId, ApplicationStatus.승인);
+    }
+
+    public ApplicationResponse rejectApplication(Long applicationId) {
+        return getApplicationResponse(applicationId, ApplicationStatus.거절);
+    }
+
+    private ApplicationResponse getApplicationResponse(Long memberId, Long postId, PostType type, String message) {
+        Member appliedMember = memberRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("유효하지 않은 회원 id 입니다."));
+        Post post = postRepository.findByIdAndType(postId, type)
+                .orElseThrow(() -> new RuntimeException(message));
+        Recruitment recruitment = recruitmentRepository.findByPost(post)
+                .orElseThrow(() -> new RuntimeException("유효하지 않은 게시글 id 입니다."));
+
+        if (post.getStatus() != PostStatus.모집중) {
+            throw new RuntimeException("모집이 완료된 게시글입니다.");
+        }
+        Application application = Application.apply(appliedMember, post, recruitment);
+        applicationRepository.save(application);
+
+        return ApplicationResponse.builder()
+                .postId(application.getPost().getId())
+                .title(application.getPost().getTitle())
+                .applicationStatus(application.getStatus())
+                .build();
+    }
+
+    private ApplicationResponse getApplicationResponse(Long applicationId, ApplicationStatus applicationStatus) {
+        Application findApplication = applicationRepository.findById(applicationId)
+                .orElseThrow(() -> new RuntimeException("유효하지 않은 Id 입니다."));
+
+        if (applicationStatus == ApplicationStatus.대기중) {
+            findApplication.updateStatus(applicationStatus);
+        }
+
+        return ApplicationResponse.builder()
+                .title(findApplication.getPost().getTitle())
+                .postId(findApplication.getPost().getId())
+                .applicationStatus(findApplication.getStatus())
+                .build();
     }
 }

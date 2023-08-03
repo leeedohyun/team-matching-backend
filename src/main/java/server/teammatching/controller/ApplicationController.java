@@ -50,9 +50,23 @@ public class ApplicationController {
     }
 
     @ApiOperation(value = "지원 취소 API")
-    @DeleteMapping("{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteApplication(@PathVariable("id") Long applicationId) {
         applicationService.deleteApplication(applicationId);
         return ResponseEntity.ok("삭제되었습니다.");
+    }
+
+    @ApiOperation(value = "지원 승인 API")
+    @PostMapping("/approve")
+    public ResponseEntity<ApplicationResponse> approveApplication(@RequestParam Long applicationId) {
+        ApplicationResponse approvalResponse = applicationService.approveApplication(applicationId);
+        return ResponseEntity.ok(approvalResponse);
+    }
+
+    @ApiOperation(value = "지원 거절 API")
+    @PostMapping("/reject")
+    public ResponseEntity<ApplicationResponse> rejectApplication(@RequestParam Long applicationId) {
+        ApplicationResponse approvalResponse = applicationService.rejectApplication(applicationId);
+        return ResponseEntity.ok(approvalResponse);
     }
 }
