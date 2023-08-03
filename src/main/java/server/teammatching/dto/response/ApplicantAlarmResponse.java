@@ -7,8 +7,9 @@ import server.teammatching.entity.ApplicationStatus;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class AlarmResponse {
+public class ApplicantAlarmResponse {
 
     private Long alarmId;
+    private String title;
     private ApplicationStatus applicationStatus;
 }

@@ -3,7 +3,8 @@ package server.teammatching.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import server.teammatching.dto.response.AlarmResponse;
+import server.teammatching.dto.response.ApplicantAlarmResponse;
+import server.teammatching.dto.response.LeaderAlarmResponse;
 import server.teammatching.entity.Alarm;
 import server.teammatching.entity.Application;
 import server.teammatching.entity.Member;
@@ -23,21 +24,43 @@ public class AlarmService {
     private final ApplicationRepository applicationRepository;
     private final MemberRepository memberRepository;
 
-    public List<AlarmResponse> checkAlarms(Long memberId) {
+    public List<ApplicantAlarmResponse> checkApplicantAlarms(Long memberId) {
         Member findMember = memberRepository.findById(memberId)
                 .orElseThrow(() -> new RuntimeException("유효하지 않은 id 입니다."));
         List<Alarm> alarmList = alarmRepository.findByMember(findMember);
 
-        List<AlarmResponse> responses = new ArrayList<>();
+        List<ApplicantAlarmResponse> responses = new ArrayList<>();
 
         for (Alarm alarm : alarmList) {
-            Application application = applicationRepository.findByAppliedMemberAndPost(findMember, alarm.getPost())
-                    .orElseThrow(() -> new RuntimeException("유효하지 않은 id 입니다."));
-            AlarmResponse alarmResponse = AlarmResponse.builder()
-                    .alarmId(alarm.getId())
-                    .applicationStatus(application.getStatus())
-                    .build();
-            responses.add(alarmResponse);
+            if (applicationRepository.findByAppliedMemberAndPost(findMember, alarm.getPost()).isPresent()) {
+                Application application = applicationRepository.findByAppliedMemberAndPost(findMember, alarm.getPost())
+                        .orElseThrow(() -> new RuntimeException("유효하지 않은 id 입니다."));
+                ApplicantAlarmResponse applicantAlarmResponse = ApplicantAlarmResponse.builder()
+                        .alarmId(alarm.getId())
+                        .applicationStatus(application.getStatus())
+                        .title(alarm.getPost().getTitle())
+                        .build();
+                responses.add(applicantAlarmResponse);
+            }
+        }
+        return responses;
+    }
+
+    public List<LeaderAlarmResponse> checkLeaderAlarms(Long memberId) {
+        Member findMember = memberRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("유효하지 않은 id 입니다."));
+        List<Alarm> alarmList = alarmRepository.findByMember(findMember);
+
+        List<LeaderAlarmResponse> responses = new ArrayList<>();
+
+        for (Alarm alarm : alarmList) {
+            if (!applicationRepository.findByAppliedMemberAndPost(findMember, alarm.getPost()).isPresent()) {
+                LeaderAlarmResponse leaderAlarmResponse = LeaderAlarmResponse.builder()
+                        .alarmId(alarm.getId())
+                        .title(alarm.getPost().getTitle())
+                        .build();
+                responses.add(leaderAlarmResponse);
+            }
         }
         return responses;
     }

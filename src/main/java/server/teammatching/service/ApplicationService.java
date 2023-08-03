@@ -72,12 +72,15 @@ public class ApplicationService {
                 .orElseThrow(() -> new RuntimeException(message));
         Recruitment recruitment = recruitmentRepository.findByPost(post)
                 .orElseThrow(() -> new RuntimeException("유효하지 않은 id 입니다."));
+        Alarm alarm = Alarm.createAlarm(post.getLeader(), post);
 
         if (post.getStatus() == PostStatus.모집완료) {
             throw new RuntimeException("모집이 완료된 게시글입니다.");
         }
+
         Application application = Application.apply(appliedMember, post, recruitment);
         applicationRepository.save(application);
+        alarmRepository.save(alarm);
 
         return ApplicationResponse.builder()
                 .postId(application.getPost().getId())
