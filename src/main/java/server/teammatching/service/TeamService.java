@@ -6,10 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import server.teammatching.dto.request.TeamAndStudyCreateRequestDto;
 import server.teammatching.dto.response.TeamAndStudyCreateResponseDto;
 import server.teammatching.entity.*;
-import server.teammatching.repository.ApplicationRepository;
-import server.teammatching.repository.MemberRepository;
-import server.teammatching.repository.PostRepository;
-import server.teammatching.repository.RecruitmentRepository;
+import server.teammatching.repository.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,10 +16,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TeamService {
 
-    private final PostRepository postRepository;
-    private final MemberRepository memberRepository;
-    private final RecruitmentRepository recruitmentRepository;
     private final ApplicationRepository applicationRepository;
+    private final MemberRepository memberRepository;
+    private final PostRepository postRepository;
+    private final RecruitmentRepository recruitmentRepository;
 
     public TeamAndStudyCreateResponseDto create(TeamAndStudyCreateRequestDto form , Long memberId) {
         Member leader = memberRepository.findById(memberId)

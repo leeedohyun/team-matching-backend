@@ -33,9 +33,6 @@ public class Post extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private PostStatus status;
 
-    @ColumnDefault("0")
-    private int likeNumber;
-
     private int designerNumber;
 
     private int frontendNumber;
