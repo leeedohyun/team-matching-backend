@@ -62,4 +62,20 @@ public class LikeService {
         }
         return responseList;
     }
+
+    public LikeResponseDto cancelLike(Long memberId, Long postId) {
+        Member likedMember = memberRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("유효하지 않은 사용자 id 입니다."));
+        Post findPost = postRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("유효하지 않은 id 입니다."));
+        Like canceledLike = likeRepository.findByLikedMemberAndPost(likedMember, findPost)
+                .orElseThrow(() -> new RuntimeException("유효하지 않은 id 입니다."));
+
+        likeRepository.delete(canceledLike);
+        return LikeResponseDto.builder()
+                .postId(canceledLike.getPost().getId())
+                .postTitle(canceledLike.getPost().getTitle())
+                .memberId(canceledLike.getLikedMember().getId())
+                .build();
+    }
 }

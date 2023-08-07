@@ -31,4 +31,11 @@ public class LikeController {
         List<LikeResponseDto> responseList = likeService.checkLikes(memberId);
         return ResponseEntity.ok(responseList);
     }
+
+    @ApiOperation(value = "관심 취소 API")
+    @DeleteMapping("")
+    public ResponseEntity<LikeResponseDto> cancelLike(@RequestParam Long memberId, @RequestParam Long postId) {
+        LikeResponseDto deleteResponse = likeService.cancelLike(memberId, postId);
+        return ResponseEntity.ok(deleteResponse);
+    }
 }
