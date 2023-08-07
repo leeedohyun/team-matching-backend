@@ -11,6 +11,9 @@ import server.teammatching.repository.LikeRepository;
 import server.teammatching.repository.MemberRepository;
 import server.teammatching.repository.PostRepository;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -39,5 +42,24 @@ public class LikeService {
                 .postId(savedLike.getPost().getId())
                 .postTitle(savedLike.getPost().getTitle())
                 .build();
+    }
+
+    @Transactional(readOnly = true)
+    public List<LikeResponseDto> checkLikes(Long memberId) {
+        Member findMember = memberRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("유효하지 않은 사용자 id 입니다."));
+
+        List<Like> likeList = likeRepository.findByLikedMember(findMember);
+        List<LikeResponseDto> responseList = new ArrayList<>();
+
+        for (Like like : likeList) {
+            LikeResponseDto response = LikeResponseDto.builder()
+                    .postId(like.getPost().getId())
+                    .memberId(like.getLikedMember().getId())
+                    .postTitle(like.getPost().getTitle())
+                    .build();
+            responseList.add(response);
+        }
+        return responseList;
     }
 }
