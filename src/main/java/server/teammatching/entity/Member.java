@@ -34,6 +34,9 @@ public class Member extends BaseTimeEntity {
     @Column(nullable = false)
     private String university;
 
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
     @OneToMany(mappedBy = "leader", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Post> postList = new ArrayList<>();
 
@@ -44,12 +47,13 @@ public class Member extends BaseTimeEntity {
     private List<Alarm> alarms = new ArrayList<>();
 
     @Builder
-    public Member(String loginId, String password, String email, String nickName, String university) {
+    public Member(String loginId, String password, String email, String nickName, String university, Role role) {
         this.loginId = loginId;
         this.password = password;
         this.email = email;
         this.nickName = nickName;
         this.university = university;
+        this.role = role;
     }
 
     public static Member createMember(MemberRequestDto request, PasswordEncoder passwordEncoder) {
@@ -59,6 +63,7 @@ public class Member extends BaseTimeEntity {
                 .nickName(request.getNickName())
                 .university(request.getUniversity())
                 .email(request.getEmail())
+                .role(Role.USER)
                 .build();
     }
 
