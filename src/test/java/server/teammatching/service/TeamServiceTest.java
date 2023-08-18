@@ -45,11 +45,11 @@ class TeamServiceTest {
         memberRepository.save(member);
 
         //when
-        TeamAndStudyCreateResponseDto teamAndStudyCreateResponseDto = teamService.create(teamAndStudyCreateRequestDto, member.getId());
+        TeamAndStudyCreateResponseDto teamAndStudyCreateResponseDto = teamService.create(teamAndStudyCreateRequestDto, member.getLoginId());
 
         //then
         assertThat(teamAndStudyCreateResponseDto.getTitle()).isEqualTo(teamAndStudyCreateRequestDto.getTitle());
-        assertThat(teamAndStudyCreateResponseDto.getMemberId()).isEqualTo(1L);
+        assertThat(teamAndStudyCreateResponseDto.getNickName()).isEqualTo("member");
         assertThat(teamAndStudyCreateResponseDto.getPostId()).isEqualTo(1L);
         assertThat(teamAndStudyCreateResponseDto.getType()).isEqualTo(PostType.TEAM);
         assertThat(teamAndStudyCreateResponseDto.getContent()).isEqualTo(teamAndStudyCreateRequestDto.getContent());
@@ -76,7 +76,7 @@ class TeamServiceTest {
                 .content("OO팀 모집합니다. 열심히 참여하실 분들 구합니다.")
                 .build();
 
-        TeamAndStudyCreateResponseDto responseDto = teamService.create(teamAndStudyCreateRequestDto, member.getId());
+        TeamAndStudyCreateResponseDto responseDto = teamService.create(teamAndStudyCreateRequestDto, member.getLoginId());
 
         TeamAndStudyCreateRequestDto updateRequest = TeamAndStudyCreateRequestDto.builder()
                 .title(null)
@@ -86,13 +86,13 @@ class TeamServiceTest {
                 .build();
 
         //when
-        TeamAndStudyCreateResponseDto updateResponse = teamService.update(updateRequest, responseDto.getPostId());
+        TeamAndStudyCreateResponseDto updateResponse = teamService.update(responseDto.getPostId(), updateRequest, "login");
 
         //then
         assertThat(updateResponse.getTitle()).isEqualTo(responseDto.getTitle());
         assertThat(updateResponse.getType()).isEqualTo(responseDto.getType());
         assertThat(updateResponse.getContent()).isEqualTo(responseDto.getContent());
-        assertThat(updateResponse.getMemberId()).isEqualTo(responseDto.getMemberId());
+        assertThat(updateResponse.getNickName()).isEqualTo(responseDto.getNickName());
         assertThat(updateResponse.getPostId()).isEqualTo(responseDto.getPostId());
     }
 }

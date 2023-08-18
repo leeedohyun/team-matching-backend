@@ -4,7 +4,9 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import server.teammatching.auth.PrincipalDetails;
 import server.teammatching.dto.request.ProjectRequestDto;
 import server.teammatching.dto.response.ProjectResponseDto;
 import server.teammatching.service.ProjectService;
@@ -22,17 +24,25 @@ public class ProjectController {
 
     @ApiOperation(value = "프로젝트 생성 API")
     @PostMapping("/new")
-    public ResponseEntity<ProjectResponseDto> create(@RequestBody ProjectRequestDto requestDto, Long memberId) {
-        ProjectResponseDto responseDto = projectService.create(requestDto, memberId);
+    public ResponseEntity<ProjectResponseDto> create(@AuthenticationPrincipal PrincipalDetails principal,
+                                                     @RequestBody ProjectRequestDto requestDto) {
+        if (principal == null) {
+            throw new RuntimeException("인증 정보가 없습니다.");
+        }
+        ProjectResponseDto responseDto = projectService.create(principal.getUsername(), requestDto);
         return ResponseEntity.created(URI.create(String.format("/new/%s", responseDto.getPostId())))
                 .body(responseDto);
     }
 
     @ApiOperation(value = "프로젝트 정보 수정 API")
     @PatchMapping("/{id}")
-    public ResponseEntity<ProjectResponseDto> update(@RequestBody ProjectRequestDto updateRequest,
-                                                     @PathVariable("id") Long projectId) {
-        ProjectResponseDto updateResponse = projectService.update(updateRequest, projectId);
+    public ResponseEntity<ProjectResponseDto> update(@PathVariable("id") Long projectId,
+                                                     @AuthenticationPrincipal PrincipalDetails principal,
+                                                     @RequestBody ProjectRequestDto updateRequest) {
+        if (principal == null) {
+            throw new RuntimeException("인증 정보가 없습니다.");
+        }
+        ProjectResponseDto updateResponse = projectService.update(projectId, principal.getUsername(), updateRequest);
         return ResponseEntity.ok(updateResponse);
     }
 
@@ -45,15 +55,23 @@ public class ProjectController {
 
     @ApiOperation(value = "회원이 생성한 프로젝트 조회 API")
     @GetMapping("/{id}")
-    public ResponseEntity<List<ProjectResponseDto>> checkMemberProject(@PathVariable("id") Long memberId) {
-        List<ProjectResponseDto> allMemberProjectsResponse = projectService.checkMemberProjects(memberId);
+    public ResponseEntity<List<ProjectResponseDto>> checkMemberProject(@PathVariable("id") String loginId,
+                                                                       @AuthenticationPrincipal PrincipalDetails principal) {
+        if (principal == null) {
+            throw new RuntimeException("인증 정보가 없습니다.");
+        }
+        List<ProjectResponseDto> allMemberProjectsResponse = projectService.checkMemberProjects(loginId, principal.getUsername());
         return ResponseEntity.ok(allMemberProjectsResponse);
     }
 
     @ApiOperation(value = "프로젝트 삭제 API")
     @DeleteMapping("/{id}/delete")
-    public ResponseEntity<String> delete(@PathVariable("id") Long postId) {
-        projectService.delete(postId);
+    public ResponseEntity<String> delete(@PathVariable("id") Long postId,
+                                         @AuthenticationPrincipal PrincipalDetails principal) {
+        if (principal == null) {
+            throw new RuntimeException("인증 정보가 없습니다.");
+        }
+        projectService.delete(postId, principal.getUsername());
         return ResponseEntity.ok("정상적으로 삭제되었습니다.");
     }
 }

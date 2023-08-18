@@ -21,21 +21,21 @@ public class ApplicationService {
     private final PostRepository postRepository;
     private final RecruitmentRepository recruitmentRepository;
 
-    public ApplicationResponse applyProject(Long projectId, Long memberId) {
+    public ApplicationResponse applyProject(Long projectId, String memberId) {
         return getApplicationResponse(memberId, projectId, PostType.PROJECT, "유효하지 않은 프로젝트 id 입니다.");
     }
 
-    public ApplicationResponse applyStudy(Long studyId, Long memberId) {
+    public ApplicationResponse applyStudy(Long studyId, String memberId) {
         return getApplicationResponse(memberId, studyId, PostType.STUDY, "유효하지 않은 스터디 id 입니다.");
     }
 
-    public ApplicationResponse applyTeam(Long teamId, Long memberId) {
+    public ApplicationResponse applyTeam(Long teamId, String memberId) {
         return getApplicationResponse(memberId, teamId, PostType.TEAM, "유효하지 않은 스터디 id 입니다.");
     }
 
     @Transactional(readOnly = true)
-    public List<ApplicationResponse> checkAllApplications(Long memberId) {
-        Member findMember = memberRepository.findById(memberId)
+    public List<ApplicationResponse> checkAllApplications(String memberId) {
+        Member findMember = memberRepository.findByLoginId(memberId)
                 .orElseThrow(() -> new RuntimeException("유효하지 않은 회원 id 입니다."));
         List<Application> appliedList = applicationRepository.findByAppliedMember(findMember);
         List<ApplicationResponse> appliedResponses = new ArrayList<>();
@@ -51,22 +51,20 @@ public class ApplicationService {
         return appliedResponses;
     }
 
-    public void deleteApplication(Long applicationId) {
-        Application findApplication = applicationRepository.findById(applicationId)
-                .orElseThrow(() -> new RuntimeException("유효하지 않는 Id 입니다"));
-        applicationRepository.delete(findApplication);
+    public void deleteApplication(Long applicationId, String memberId) {
+        applicationRepository.deleteByIdAndAppliedMember_LoginId(applicationId, memberId);
     }
 
-    public ApplicationResponse approveApplication(Long applicationId) {
+    public ApplicationResponse approveApplication(Long applicationId, String memberId) {
         return getApplicationResponse(applicationId, ApplicationStatus.승인);
     }
 
-    public ApplicationResponse rejectApplication(Long applicationId) {
+    public ApplicationResponse rejectApplication(Long applicationId, String memberId) {
         return getApplicationResponse(applicationId, ApplicationStatus.거절);
     }
 
-    private ApplicationResponse getApplicationResponse(Long memberId, Long postId, PostType type, String message) {
-        Member appliedMember = memberRepository.findById(memberId)
+    private ApplicationResponse getApplicationResponse(String memberId, Long postId, PostType type, String message) {
+        Member appliedMember = memberRepository.findByLoginId(memberId)
                 .orElseThrow(() -> new RuntimeException("유효하지 않은 회원 id 입니다."));
         Post post = postRepository.findByIdAndType(postId, type)
                 .orElseThrow(() -> new RuntimeException(message));
@@ -89,9 +87,11 @@ public class ApplicationService {
                 .build();
     }
 
-    private ApplicationResponse getApplicationResponse(Long applicationId, ApplicationStatus applicationStatus) {
+    private ApplicationResponse getApplicationResponse(
+            Long applicationId,
+            ApplicationStatus applicationStatus) {
         Application findApplication = applicationRepository.findById(applicationId)
-                .orElseThrow(() -> new RuntimeException("유효하지 않은 Id 입니다."));
+                .orElseThrow(() -> new RuntimeException("유효하지 않은 지원입니다."));
         Alarm alarm = Alarm.createAlarm(findApplication.getAppliedMember(), findApplication.getPost());
 
         if (findApplication.getStatus() == ApplicationStatus.대기중) {

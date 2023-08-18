@@ -21,8 +21,8 @@ public class ProjectService {
     private final PostRepository postRepository;
     private final RecruitmentRepository recruitmentRepository;
 
-    public ProjectResponseDto create(ProjectRequestDto requestDto, Long memberId) {
-        Member leader = memberRepository.findById(memberId)
+    public ProjectResponseDto create(String memberId, ProjectRequestDto requestDto) {
+        Member leader = memberRepository.findByLoginId(memberId)
                 .orElseThrow(() -> new RuntimeException("유효하지 않은 사용자 id 입니다."));
 
         Post createdProject = Post.createProject(requestDto, leader);
@@ -45,10 +45,13 @@ public class ProjectService {
                 .build();
     }
 
-    public ProjectResponseDto update(ProjectRequestDto updateRequest, Long projectId) {
+    public ProjectResponseDto update(Long projectId, String memberId, ProjectRequestDto updateRequest) {
         Post findProject = postRepository.findById(projectId)
                 .orElseThrow(() -> new IllegalStateException("유효하지 않은 팀 id 입니다."));
 
+        if (!memberId.equals(findProject.getLeader().getLoginId())) {
+            throw new RuntimeException("Invalid");
+        }
         if (updateRequest.getTitle() != null) {
             findProject.updateTitle(updateRequest.getTitle());
         }
@@ -106,8 +109,11 @@ public class ProjectService {
     }
 
     @Transactional(readOnly = true)
-    public List<ProjectResponseDto> checkMemberProjects(Long memberId) {
-        Member findLeader = memberRepository.findById(memberId)
+    public List<ProjectResponseDto> checkMemberProjects(String memberId, String authenticatedId) {
+        if (!memberId.equals(authenticatedId)) {
+            throw new RuntimeException("Invalid");
+        }
+        Member findLeader = memberRepository.findByLoginId(memberId)
                 .orElseThrow(() -> new RuntimeException("유효하지 않은 사용자 id 입니다."));
 
         List<Post> findMemberProjects = postRepository.findByLeaderAndType(findLeader, PostType.PROJECT);
@@ -129,11 +135,11 @@ public class ProjectService {
         return memberProjects;
     }
 
-    public void delete(Long postId) {
+    public void delete(Long postId, String memberId) {
         Post findProject = postRepository.findById(postId)
                 .orElseThrow(() -> new RuntimeException("유효하지 않은 프로젝트 id 입니다."));
         List<Application> projectApplications = applicationRepository.findByPost(findProject);
-        postRepository.delete(findProject);
+        postRepository.deleteByIdAndLeader_LoginId(postId, memberId);
         applicationRepository.deleteAll(projectApplications);
     }
 }

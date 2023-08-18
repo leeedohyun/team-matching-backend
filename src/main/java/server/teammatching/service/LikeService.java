@@ -23,8 +23,8 @@ public class LikeService {
     private final MemberRepository memberRepository;
     private final PostRepository postRepository;
 
-    public LikeResponseDto generateLike(Long memberId, Long postId) {
-        Member likedMember = memberRepository.findById(memberId)
+    public LikeResponseDto generateLike(String memberId, Long postId) {
+        Member likedMember = memberRepository.findByLoginId(memberId)
                 .orElseThrow(() -> new RuntimeException("유효하지 않은 사용자 id 입니다."));
         Post findPost = postRepository.findById(postId)
                 .orElseThrow(() -> new RuntimeException("유효하지 않은 사용자 id 입니다."));
@@ -45,8 +45,8 @@ public class LikeService {
     }
 
     @Transactional(readOnly = true)
-    public List<LikeResponseDto> checkLikes(Long memberId) {
-        Member findMember = memberRepository.findById(memberId)
+    public List<LikeResponseDto> checkLikes(String memberId) {
+        Member findMember = memberRepository.findByLoginId(memberId)
                 .orElseThrow(() -> new RuntimeException("유효하지 않은 사용자 id 입니다."));
 
         List<Like> likeList = likeRepository.findByLikedMember(findMember);
@@ -63,8 +63,8 @@ public class LikeService {
         return responseList;
     }
 
-    public LikeResponseDto cancelLike(Long memberId, Long postId) {
-        Member likedMember = memberRepository.findById(memberId)
+    public LikeResponseDto cancelLike(String  memberId, Long postId) {
+        Member likedMember = memberRepository.findByLoginId(memberId)
                 .orElseThrow(() -> new RuntimeException("유효하지 않은 사용자 id 입니다."));
         Post findPost = postRepository.findById(postId)
                 .orElseThrow(() -> new RuntimeException("유효하지 않은 id 입니다."));

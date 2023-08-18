@@ -10,7 +10,7 @@ import server.teammatching.entity.PostType;
 public class TeamAndStudyCreateResponseDto {
 
     private Long postId;
-    private Long memberId;
+    private String nickName;
     private String title;
     private String content;
     private PostType type;

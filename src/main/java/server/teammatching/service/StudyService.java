@@ -21,8 +21,8 @@ public class StudyService {
     private final PostRepository postRepository;
     private final RecruitmentRepository recruitmentRepository;
 
-    public TeamAndStudyCreateResponseDto create(TeamAndStudyCreateRequestDto requestDto, Long memberId) {
-        Member leader = memberRepository.findById(memberId)
+    public TeamAndStudyCreateResponseDto create(TeamAndStudyCreateRequestDto requestDto, String memberId) {
+        Member leader = memberRepository.findByLoginId(memberId)
                 .orElseThrow(() -> new RuntimeException("유효하지 않은 사용자 id 입니다."));
 
         Post createdStudy = Post.createStudy(requestDto, leader);
@@ -36,16 +36,19 @@ public class StudyService {
         return TeamAndStudyCreateResponseDto.builder()
                 .title(savedStudy.getTitle())
                 .postId(savedStudy.getId())
-                .memberId(leader.getId())
+                .nickName(leader.getNickName())
                 .type(savedStudy.getType())
                 .content(savedStudy.getContent())
                 .build();
     }
 
-    public TeamAndStudyCreateResponseDto update(TeamAndStudyCreateRequestDto updateRequest, Long studyId) {
+    public TeamAndStudyCreateResponseDto update(Long studyId, String memberId, TeamAndStudyCreateRequestDto updateRequest) {
         Post findStudy = postRepository.findById(studyId)
                 .orElseThrow(() -> new IllegalStateException("유효하지 않은 팀 id 입니다."));
 
+        if (!memberId.equals(findStudy.getLeader().getLoginId())) {
+            throw new RuntimeException("Invalid");
+        }
         if (updateRequest.getTitle() != "") {
             findStudy.updateTitle(updateRequest.getTitle());
         }
@@ -62,7 +65,7 @@ public class StudyService {
         Post savedStudy = postRepository.save(findStudy);
         return TeamAndStudyCreateResponseDto.builder()
                 .postId(savedStudy.getId())
-                .memberId(savedStudy.getLeader().getId())
+                .nickName(savedStudy.getLeader().getNickName())
                 .title(savedStudy.getTitle())
                 .type(savedStudy.getType())
                 .content(savedStudy.getContent())
@@ -77,7 +80,7 @@ public class StudyService {
         for (Post findStudy : findStudies) {
             TeamAndStudyCreateResponseDto study = TeamAndStudyCreateResponseDto.builder()
                     .postId(findStudy.getId())
-                    .memberId(findStudy.getLeader().getId())
+                    .nickName(findStudy.getLeader().getNickName())
                     .title(findStudy.getTitle())
                     .type(findStudy.getType())
                     .content(findStudy.getContent())
@@ -88,8 +91,12 @@ public class StudyService {
     }
 
     @Transactional(readOnly = true)
-    public List<TeamAndStudyCreateResponseDto> checkMemberStudies(Long memberId) {
-        Member findLeader = memberRepository.findById(memberId)            .
+    public List<TeamAndStudyCreateResponseDto> checkMemberStudies(String memberId, String authenticatedId) {
+        if (!memberId.equals(authenticatedId)) {
+            throw new RuntimeException("Invalid");
+        }
+        
+        Member findLeader = memberRepository.findByLoginId(memberId)            .
                 orElseThrow(() -> new RuntimeException("유효하지 않은 사용자 id 입니다."));
         List<Post> findMemberStudies = postRepository.findByLeaderAndType(findLeader, PostType.STUDY);
         List<TeamAndStudyCreateResponseDto> allMemberStudies = new ArrayList<>();
@@ -97,7 +104,7 @@ public class StudyService {
         for (Post findMemberStudy : findMemberStudies) {
             TeamAndStudyCreateResponseDto study = TeamAndStudyCreateResponseDto.builder()
                     .postId(findMemberStudy.getId())
-                    .memberId(findMemberStudy.getLeader().getId())
+                    .nickName(findMemberStudy.getLeader().getNickName())
                     .title(findMemberStudy.getTitle())
                     .type(findMemberStudy.getType())
                     .content(findMemberStudy.getContent())
@@ -107,11 +114,11 @@ public class StudyService {
         return allMemberStudies;
     }
 
-    public void delete(Long studyId) {
+    public void delete(Long studyId, String memberId) {
         Post findStudy = postRepository.findById(studyId)
                 .orElseThrow(() -> new RuntimeException("유효하지 않은 스터디 id 입니다."));
         List<Application> studyApplications = applicationRepository.findByPost(findStudy);
-        postRepository.delete(findStudy);
+        postRepository.deleteByIdAndLeader_LoginId(studyId, memberId);
         applicationRepository.deleteAll(studyApplications);
     }
 }

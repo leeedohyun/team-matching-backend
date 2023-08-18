@@ -46,11 +46,11 @@ class StudyServiceTest {
                 .build();
 
         //when
-        TeamAndStudyCreateResponseDto responseDto = studyService.create(teamAndStudyCreateRequestDto, member.getId());
+        TeamAndStudyCreateResponseDto responseDto = studyService.create(teamAndStudyCreateRequestDto, member.getLoginId());
 
         //then
         assertThat(responseDto.getTitle()).isEqualTo(teamAndStudyCreateRequestDto.getTitle());
-        assertThat(responseDto.getMemberId()).isEqualTo(1L);
+        assertThat(responseDto.getNickName()).isEqualTo("member");
         assertThat(responseDto.getPostId()).isEqualTo(1L);
         assertThat(responseDto.getType()).isEqualTo(PostType.STUDY);
         assertThat(responseDto.getContent()).isEqualTo(teamAndStudyCreateRequestDto.getContent());

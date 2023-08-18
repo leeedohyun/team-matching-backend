@@ -160,7 +160,7 @@ class MemberServiceTest {
         MemberResponseDto join = memberService.join(request);
 
         //when
-        MemberResponseDto findMemberResponse = memberService.findOne(join.getMemberId());
+        MemberResponseDto findMemberResponse = memberService.findOne(join.getLoginId(), "loginId11");
 
         //then
         assertThat(findMemberResponse.getMemberId()).isNotNull();
@@ -191,7 +191,7 @@ class MemberServiceTest {
                 .build();
 
         //when
-        memberService.update(member.getId(), updateRequest);
+        memberService.update(member.getLoginId(), updateRequest, "ldfj1");
 
         //then
         assertThat(member.getNickName()).isNotEqualTo("member");
@@ -218,7 +218,7 @@ class MemberServiceTest {
                 .build();
 
         //when
-        memberService.update(member.getId(), updateRequest);
+        memberService.update(member.getLoginId(), updateRequest, "ldfj1");
 
         //then
         assertThat(member.getNickName()).isNotEqualTo("eere22@naver.com");
@@ -245,7 +245,7 @@ class MemberServiceTest {
                 .build();
 
         //when
-        memberService.update(member.getId(), updateRequest);
+        memberService.update(member.getLoginId(), updateRequest, "ldfj1");
 
         //then
         assertThat(member.getNickName()).isNotEqualTo("홍익대학교");
@@ -265,12 +265,12 @@ class MemberServiceTest {
 
         //when
         Member savedMember = memberRepository.save(member);
-        Long withdrawalMemberId = savedMember.getId();
-        memberService.delete(withdrawalMemberId);
+        String withdrawalMemberId = savedMember.getLoginId();
+        memberService.delete(withdrawalMemberId, "ldfj1");
 
         //then
         assertNotNull(withdrawalMemberId);
-        assertThatThrownBy(() -> memberRepository.findById(withdrawalMemberId).get())
+        assertThatThrownBy(() -> memberRepository.findByLoginId(withdrawalMemberId).get())
                 .isInstanceOf(NoSuchElementException.class);
     }
 }
