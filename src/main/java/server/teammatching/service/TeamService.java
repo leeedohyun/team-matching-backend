@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import server.teammatching.dto.request.TeamAndStudyCreateRequestDto;
 import server.teammatching.dto.response.TeamAndStudyCreateResponseDto;
 import server.teammatching.entity.*;
+import server.teammatching.exception.MemberNotFoundException;
 import server.teammatching.repository.*;
 
 import java.util.ArrayList;
@@ -23,7 +24,7 @@ public class TeamService {
 
     public TeamAndStudyCreateResponseDto create(TeamAndStudyCreateRequestDto form , String memberId) {
         Member leader = memberRepository.findByLoginId(memberId)
-                .orElseThrow(() -> new RuntimeException("유효하지 않은 사용자 id 입니다."));
+                .orElseThrow(() -> new MemberNotFoundException("유효하지 않은 사용자 id 입니다."));
 
         Post createdTeam = Post.createTeam(form, leader);
 
@@ -97,7 +98,7 @@ public class TeamService {
         }
 
         Member findLeader = memberRepository.findByLoginId(memberId)
-                .orElseThrow(() -> new RuntimeException("유효하지 않은 사용자 id 입니다."));
+                .orElseThrow(() -> new MemberNotFoundException("유효하지 않은 사용자 id 입니다."));
         List<Post> findMemberTeams = postRepository.findByLeaderAndType(findLeader, PostType.TEAM);
         List<TeamAndStudyCreateResponseDto> allMemberTeams = new ArrayList<>();
 

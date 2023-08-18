@@ -9,6 +9,8 @@ import server.teammatching.dto.request.MemberUpdateRequestDto;
 import server.teammatching.dto.response.MemberResponseDto;
 import server.teammatching.dto.response.MemberUpdateResponseDto;
 import server.teammatching.entity.Member;
+import server.teammatching.exception.DuplicateResourceException;
+import server.teammatching.exception.MemberNotFoundException;
 import server.teammatching.repository.MemberRepository;
 
 import java.util.ArrayList;
@@ -34,7 +36,7 @@ public class MemberService {
     public MemberResponseDto findOne(String memberId, String authenticatedId) {
         if (memberId.equals(authenticatedId)) {
             Member findMember = memberRepository.findByLoginId(memberId)
-                    .orElseThrow(() -> new RuntimeException("존재하지 않는 회원입니다."));
+                    .orElseThrow(() -> new MemberNotFoundException("존재하지 않는 회원입니다."));
             return MemberResponseDto.from(findMember, "조회 성공");
         }
         throw new RuntimeException("Invalid");
@@ -62,7 +64,7 @@ public class MemberService {
     public MemberUpdateResponseDto update(String memberId, MemberUpdateRequestDto updateRequest, String authenticatedId) {
         if (memberId.equals(authenticatedId)) {
             Member findMember = memberRepository.findByLoginId(memberId)
-                    .orElseThrow(() -> new RuntimeException("존재하지 않는 회원입니다."));
+                    .orElseThrow(() -> new MemberNotFoundException("존재하지 않는 회원입니다."));
 
             if (updateRequest.getUpdatedNickName() != null) {
                 findMember.updateNickName(updateRequest.getUpdatedNickName());
@@ -85,19 +87,19 @@ public class MemberService {
             throw new RuntimeException("Invalid");
         }
         Member findMember = memberRepository.findByLoginId(memberId)
-                .orElseThrow(() -> new RuntimeException("존재하지 않는 회원입니다."));
+                .orElseThrow(() -> new MemberNotFoundException("존재하지 않는 회원입니다."));
         memberRepository.delete(findMember);
     }
 
     private void validateDuplicateLoginId(Member member) {
         if (memberRepository.existsByLoginId(member.getLoginId())) {
-            throw new IllegalStateException("다른 회원이 사용 중인 아이디입니다.");
+            throw new DuplicateResourceException("id", member.getLoginId());
         }
     }
 
     private void validateDuplicateNickName(Member member) {
         if (memberRepository.existsByNickName(member.getNickName())) {
-            throw new IllegalStateException("다른 회원이 사용 중인 닉네임입니다.");
+            throw new DuplicateResourceException("Nickname", member.getNickName());
         }
     }
 }

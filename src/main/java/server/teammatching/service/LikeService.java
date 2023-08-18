@@ -7,6 +7,7 @@ import server.teammatching.dto.response.LikeResponseDto;
 import server.teammatching.entity.Like;
 import server.teammatching.entity.Member;
 import server.teammatching.entity.Post;
+import server.teammatching.exception.MemberNotFoundException;
 import server.teammatching.repository.LikeRepository;
 import server.teammatching.repository.MemberRepository;
 import server.teammatching.repository.PostRepository;
@@ -25,7 +26,7 @@ public class LikeService {
 
     public LikeResponseDto generateLike(String memberId, Long postId) {
         Member likedMember = memberRepository.findByLoginId(memberId)
-                .orElseThrow(() -> new RuntimeException("유효하지 않은 사용자 id 입니다."));
+                .orElseThrow(() -> new MemberNotFoundException("유효하지 않은 사용자 id 입니다."));
         Post findPost = postRepository.findById(postId)
                 .orElseThrow(() -> new RuntimeException("유효하지 않은 사용자 id 입니다."));
 
@@ -47,7 +48,7 @@ public class LikeService {
     @Transactional(readOnly = true)
     public List<LikeResponseDto> checkLikes(String memberId) {
         Member findMember = memberRepository.findByLoginId(memberId)
-                .orElseThrow(() -> new RuntimeException("유효하지 않은 사용자 id 입니다."));
+                .orElseThrow(() -> new MemberNotFoundException("유효하지 않은 사용자 id 입니다."));
 
         List<Like> likeList = likeRepository.findByLikedMember(findMember);
         List<LikeResponseDto> responseList = new ArrayList<>();
@@ -65,7 +66,7 @@ public class LikeService {
 
     public LikeResponseDto cancelLike(String  memberId, Long postId) {
         Member likedMember = memberRepository.findByLoginId(memberId)
-                .orElseThrow(() -> new RuntimeException("유효하지 않은 사용자 id 입니다."));
+                .orElseThrow(() -> new MemberNotFoundException("유효하지 않은 사용자 id 입니다."));
         Post findPost = postRepository.findById(postId)
                 .orElseThrow(() -> new RuntimeException("유효하지 않은 id 입니다."));
         Like canceledLike = likeRepository.findByLikedMemberAndPost(likedMember, findPost)

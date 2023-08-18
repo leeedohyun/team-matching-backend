@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import server.teammatching.dto.response.ApplicationResponse;
 import server.teammatching.entity.*;
+import server.teammatching.exception.MemberNotFoundException;
 import server.teammatching.repository.*;
 
 import java.util.ArrayList;
@@ -36,7 +37,7 @@ public class ApplicationService {
     @Transactional(readOnly = true)
     public List<ApplicationResponse> checkAllApplications(String memberId) {
         Member findMember = memberRepository.findByLoginId(memberId)
-                .orElseThrow(() -> new RuntimeException("유효하지 않은 회원 id 입니다."));
+                .orElseThrow(() -> new MemberNotFoundException("유효하지 않은 회원 id 입니다."));
         List<Application> appliedList = applicationRepository.findByAppliedMember(findMember);
         List<ApplicationResponse> appliedResponses = new ArrayList<>();
 
@@ -65,7 +66,7 @@ public class ApplicationService {
 
     private ApplicationResponse getApplicationResponse(String memberId, Long postId, PostType type, String message) {
         Member appliedMember = memberRepository.findByLoginId(memberId)
-                .orElseThrow(() -> new RuntimeException("유효하지 않은 회원 id 입니다."));
+                .orElseThrow(() -> new MemberNotFoundException("유효하지 않은 회원 id 입니다."));
         Post post = postRepository.findByIdAndType(postId, type)
                 .orElseThrow(() -> new RuntimeException(message));
         Recruitment recruitment = recruitmentRepository.findByPost(post)
