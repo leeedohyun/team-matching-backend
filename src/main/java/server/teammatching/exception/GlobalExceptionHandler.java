@@ -26,4 +26,14 @@ public class GlobalExceptionHandler {
                         .message(e.getMessage())
                         .build());
     }
+
+    @ExceptionHandler(RecruitNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleRecruitNotFoundException(RecruitNotFoundException e) {
+        log.error(e.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ErrorResponse.builder()
+                        .status(HttpStatus.NOT_FOUND)
+                        .message(e.getMessage())
+                        .build());
+    }
 }

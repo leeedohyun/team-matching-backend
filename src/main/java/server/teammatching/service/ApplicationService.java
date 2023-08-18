@@ -7,6 +7,7 @@ import server.teammatching.dto.response.ApplicationResponse;
 import server.teammatching.entity.*;
 import server.teammatching.exception.MemberNotFoundException;
 import server.teammatching.exception.PostNotFoundException;
+import server.teammatching.exception.RecruitNotFoundException;
 import server.teammatching.repository.*;
 
 import java.util.ArrayList;
@@ -71,7 +72,7 @@ public class ApplicationService {
         Post post = postRepository.findByIdAndType(postId, type)
                 .orElseThrow(() -> new PostNotFoundException(message));
         Recruitment recruitment = recruitmentRepository.findByPost(post)
-                .orElseThrow(() -> new RuntimeException("유효하지 않은 id 입니다."));
+                .orElseThrow(() -> new RecruitNotFoundException("유효하지 않은 id 입니다."));
         Alarm alarm = Alarm.createAlarm(post.getLeader(), post);
 
         if (post.getStatus() == PostStatus.모집완료) {
