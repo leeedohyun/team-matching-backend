@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import server.teammatching.dto.response.ApplicationResponse;
 import server.teammatching.entity.*;
+import server.teammatching.exception.ApplicationNotFoundException;
 import server.teammatching.exception.MemberNotFoundException;
 import server.teammatching.exception.PostNotFoundException;
 import server.teammatching.exception.RecruitNotFoundException;
@@ -93,7 +94,7 @@ public class ApplicationService {
     private ApplicationResponse getApplicationResponse(Long applicationId,
                                                        ApplicationStatus applicationStatus) {
         Application findApplication = applicationRepository.findById(applicationId)
-                .orElseThrow(() -> new RuntimeException("유효하지 않은 지원입니다."));
+                .orElseThrow(() -> new ApplicationNotFoundException("유효하지 않은 지원입니다."));
         Alarm alarm = Alarm.createAlarm(findApplication.getAppliedMember(), findApplication.getPost());
 
         if (findApplication.getStatus() == ApplicationStatus.대기중) {
