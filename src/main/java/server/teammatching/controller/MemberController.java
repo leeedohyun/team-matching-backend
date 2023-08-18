@@ -5,8 +5,9 @@ import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import server.teammatching.auth.PrincipalDetails;
 import server.teammatching.dto.request.MemberUpdateRequestDto;
 import server.teammatching.dto.response.MemberUpdateResponseDto;
 import server.teammatching.service.MemberService;
@@ -27,19 +28,19 @@ public class MemberController {
 
     @ApiOperation(value = "회원 가입 API", notes = "회원 가입을 합니다.")
     @PostMapping(value = "/new", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<MemberResponseDto> create(@Valid @RequestBody MemberRequestDto request,
-                                       BindingResult result) {
-
+    public ResponseEntity<MemberResponseDto> create(@RequestBody @Valid MemberRequestDto request) {
         MemberResponseDto responseDto = memberService.join(request);
 
         return ResponseEntity.created(URI.create(String.format("/new/%s", responseDto.getMemberId())))
                 .body(responseDto);
     }
 
-    @ApiOperation(value = "회원 정보 조회 API")
+    @ApiOperation(value = "마이 페이지 조회 API")
     @GetMapping("/{id}")
-    public ResponseEntity<MemberResponseDto> getMemberInfo(@PathVariable("id") Long memberId) {
-        MemberResponseDto memberResponse = memberService.findOne(memberId);
+    public ResponseEntity<MemberResponseDto> getMemberInfo(@PathVariable("id") String loginId,
+                                                           @AuthenticationPrincipal PrincipalDetails principal) {
+        validateAuthentication(principal);
+        MemberResponseDto memberResponse = memberService.findOne(loginId, principal.getUsername());
         return ResponseEntity.ok(memberResponse);
     }
 
@@ -52,16 +53,26 @@ public class MemberController {
 
     @ApiOperation(value = "회원 정보 수정 API")
     @PatchMapping("/{id}/edit")
-    public ResponseEntity<MemberUpdateResponseDto> update(@PathVariable("id") Long memberId,
-                                                          MemberUpdateRequestDto updateRequest) {
-        MemberUpdateResponseDto updateResponse = memberService.update(memberId, updateRequest);
+    public ResponseEntity<MemberUpdateResponseDto> update(@PathVariable("id") String loginId,
+                                                          @RequestBody MemberUpdateRequestDto updateRequest,
+                                                          @AuthenticationPrincipal PrincipalDetails principal) {
+        validateAuthentication(principal);
+        MemberUpdateResponseDto updateResponse = memberService.update(loginId, updateRequest, principal.getUsername());
         return ResponseEntity.ok(updateResponse);
     }
 
     @ApiOperation(value = "회원 탈퇴 API")
     @DeleteMapping("{id}/withdrawal")
-    public ResponseEntity<String> delete(@PathVariable("id") Long memberId) {
-        memberService.delete(memberId);
+    public ResponseEntity<String> delete(@PathVariable("id") String loginId,
+                                         @AuthenticationPrincipal PrincipalDetails principal) {
+        validateAuthentication(principal);
+        memberService.delete(loginId, principal.getUsername());
         return ResponseEntity.ok("탈퇴가 되었습니다.");
+    }
+
+    private static void validateAuthentication(PrincipalDetails principal) {
+        if (principal == null) {
+            throw new RuntimeException("인증 정보가 없습니다.");
+        }
     }
 }

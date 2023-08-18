@@ -15,4 +15,8 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
     List<Application> findByPost(Post post);
 
     Optional<Application> findByAppliedMemberAndPost(Member appliedMember, Post post);
+
+    Optional<Application> findByIdAndAppliedMember_LoginId(Long applicationId, String loginId);
+
+    void deleteByIdAndAppliedMember_LoginId(Long applicationId, String loginId);
 }

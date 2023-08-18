@@ -21,8 +21,8 @@ public class TeamService {
     private final PostRepository postRepository;
     private final RecruitmentRepository recruitmentRepository;
 
-    public TeamAndStudyCreateResponseDto create(TeamAndStudyCreateRequestDto form , Long memberId) {
-        Member leader = memberRepository.findById(memberId)
+    public TeamAndStudyCreateResponseDto create(TeamAndStudyCreateRequestDto form , String memberId) {
+        Member leader = memberRepository.findByLoginId(memberId)
                 .orElseThrow(() -> new RuntimeException("유효하지 않은 사용자 id 입니다."));
 
         Post createdTeam = Post.createTeam(form, leader);
@@ -37,15 +37,18 @@ public class TeamService {
                 .title(savedTeam.getTitle())
                 .content(savedTeam.getContent())
                 .postId(savedTeam.getId())
-                .memberId(savedTeam.getLeader().getId())
+                .nickName(savedTeam.getLeader().getNickName())
                 .type(savedTeam.getType())
                 .build();
     }
 
-    public TeamAndStudyCreateResponseDto update(TeamAndStudyCreateRequestDto requestDto, Long postId) {
+    public TeamAndStudyCreateResponseDto update(Long postId, TeamAndStudyCreateRequestDto requestDto, String memberId) {
         Post findTeam = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalStateException("유효하지 않은 팀 id 입니다."));
 
+        if (!memberId.equals(findTeam.getLeader().getLoginId())) {
+            throw new RuntimeException("Invalid");
+        }
         if (requestDto.getTitle() != null) {
             findTeam.updateTitle(requestDto.getTitle());
         }
@@ -62,7 +65,7 @@ public class TeamService {
         Post savedTeam = postRepository.save(findTeam);
         return TeamAndStudyCreateResponseDto.builder()
                 .postId(savedTeam.getId())
-                .memberId(savedTeam.getLeader().getId())
+                .nickName(savedTeam.getLeader().getNickName())
                 .title(savedTeam.getTitle())
                 .type(savedTeam.getType())
                 .content(savedTeam.getContent())
@@ -77,7 +80,7 @@ public class TeamService {
         for (Post findTeam : findTeams) {
             TeamAndStudyCreateResponseDto team = TeamAndStudyCreateResponseDto.builder()
                     .postId(findTeam.getId())
-                    .memberId(findTeam.getLeader().getId())
+                    .nickName(findTeam.getLeader().getNickName())
                     .title(findTeam.getTitle())
                     .type(findTeam.getType())
                     .content(findTeam.getContent())
@@ -88,8 +91,12 @@ public class TeamService {
     }
 
     @Transactional(readOnly = true)
-    public List<TeamAndStudyCreateResponseDto> checkMemberTeams(Long memberId) {
-        Member findLeader = memberRepository.findById(memberId)
+    public List<TeamAndStudyCreateResponseDto> checkMemberTeams(String memberId, String authenticatedId) {
+        if (!memberId.equals(authenticatedId)) {
+            throw new RuntimeException("Invalid");
+        }
+
+        Member findLeader = memberRepository.findByLoginId(memberId)
                 .orElseThrow(() -> new RuntimeException("유효하지 않은 사용자 id 입니다."));
         List<Post> findMemberTeams = postRepository.findByLeaderAndType(findLeader, PostType.TEAM);
         List<TeamAndStudyCreateResponseDto> allMemberTeams = new ArrayList<>();
@@ -97,7 +104,7 @@ public class TeamService {
         for (Post findMemberTeam : findMemberTeams) {
             TeamAndStudyCreateResponseDto team = TeamAndStudyCreateResponseDto.builder()
                     .postId(findMemberTeam.getId())
-                    .memberId(findMemberTeam.getLeader().getId())
+                    .nickName(findMemberTeam.getLeader().getNickName())
                     .title(findMemberTeam.getTitle())
                     .type(findMemberTeam.getType())
                     .content(findMemberTeam.getContent())
@@ -107,11 +114,11 @@ public class TeamService {
         return allMemberTeams;
     }
 
-    public void delete(Long teamId) {
+    public void delete(Long teamId, String memberId) {
         Post findTeam = postRepository.findById(teamId)
                 .orElseThrow(() -> new RuntimeException("유효하지 않은 스터디 id 입니다."));
         List<Application> teamApplications = applicationRepository.findByPost(findTeam);
-        postRepository.delete(findTeam);
+        postRepository.deleteByIdAndLeader_LoginId(teamId,memberId);
         applicationRepository.deleteAll(teamApplications);
     }
 }

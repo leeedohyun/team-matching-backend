@@ -18,18 +18,18 @@ import java.util.List;
 @Transactional(readOnly = true)
 public class RecruitmentService {
 
-    private final RecruitmentRepository recruitmentRepository;
     private final PostRepository postRepository;
+    private final RecruitmentRepository recruitmentRepository;
 
     public void save(Recruitment recruitment) {
         recruitmentRepository.save(recruitment);
     }
 
-    public List<RecruitmentResponse> checkApplications(Long postId) {
-        Post findPost = postRepository.findById(postId)
-                .orElseThrow(() -> new RuntimeException("유효하지 않은 게시글 id 입니다"));
+    public List<RecruitmentResponse> checkApplications(Long postId, String memberId) {
+        Post findPost = postRepository.findByIdAndLeader_LoginId(postId, memberId)
+                .orElseThrow(() -> new RuntimeException("유효하지 않은 게시글 입니다"));
         Recruitment findRecruitment = recruitmentRepository.findByPost(findPost)
-                .orElseThrow(() -> new RuntimeException("유효하지 않은 게시글입니다"));
+                .orElseThrow(() -> new RuntimeException("유효하지 않은 채용입니다"));
         List<Application> applicationList = findRecruitment.getApplicationList();
         List<RecruitmentResponse> recruitmentResponses = new ArrayList<>();
 

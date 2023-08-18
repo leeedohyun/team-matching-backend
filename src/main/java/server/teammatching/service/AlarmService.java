@@ -24,8 +24,8 @@ public class AlarmService {
     private final ApplicationRepository applicationRepository;
     private final MemberRepository memberRepository;
 
-    public List<ApplicantAlarmResponse> checkApplicantAlarms(Long memberId) {
-        Member findMember = memberRepository.findById(memberId)
+    public List<ApplicantAlarmResponse> checkApplicantAlarms(String memberId) {
+        Member findMember = memberRepository.findByLoginId(memberId)
                 .orElseThrow(() -> new RuntimeException("유효하지 않은 id 입니다."));
         List<Alarm> alarmList = alarmRepository.findByMember(findMember);
 
@@ -46,15 +46,15 @@ public class AlarmService {
         return responses;
     }
 
-    public List<LeaderAlarmResponse> checkLeaderAlarms(Long memberId) {
-        Member findMember = memberRepository.findById(memberId)
+    public List<LeaderAlarmResponse> checkLeaderAlarms(String memberId) {
+        Member findMember = memberRepository.findByLoginId(memberId)
                 .orElseThrow(() -> new RuntimeException("유효하지 않은 id 입니다."));
         List<Alarm> alarmList = alarmRepository.findByMember(findMember);
 
         List<LeaderAlarmResponse> responses = new ArrayList<>();
 
         for (Alarm alarm : alarmList) {
-            if (!applicationRepository.findByAppliedMemberAndPost(findMember, alarm.getPost()).isPresent()) {
+            if (applicationRepository.findByAppliedMemberAndPost(findMember, alarm.getPost()).isPresent()) {
                 LeaderAlarmResponse leaderAlarmResponse = LeaderAlarmResponse.builder()
                         .alarmId(alarm.getId())
                         .title(alarm.getPost().getTitle())
