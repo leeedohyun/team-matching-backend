@@ -8,6 +8,7 @@ import server.teammatching.entity.Application;
 import server.teammatching.entity.Post;
 import server.teammatching.entity.Recruitment;
 import server.teammatching.exception.MemberNotFoundException;
+import server.teammatching.exception.PostNotFoundException;
 import server.teammatching.repository.PostRepository;
 import server.teammatching.repository.RecruitmentRepository;
 
@@ -28,7 +29,7 @@ public class RecruitmentService {
 
     public List<RecruitmentResponse> checkApplications(Long postId, String memberId) {
         Post findPost = postRepository.findByIdAndLeader_LoginId(postId, memberId)
-                .orElseThrow(() -> new MemberNotFoundException("유효하지 않은 게시글 입니다"));
+                .orElseThrow(() -> new PostNotFoundException("유효하지 않은 게시글 입니다"));
         Recruitment findRecruitment = recruitmentRepository.findByPost(findPost)
                 .orElseThrow(() -> new RuntimeException("유효하지 않은 채용입니다"));
         List<Application> applicationList = findRecruitment.getApplicationList();

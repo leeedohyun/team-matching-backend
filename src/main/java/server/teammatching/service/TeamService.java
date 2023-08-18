@@ -7,6 +7,7 @@ import server.teammatching.dto.request.TeamAndStudyCreateRequestDto;
 import server.teammatching.dto.response.TeamAndStudyCreateResponseDto;
 import server.teammatching.entity.*;
 import server.teammatching.exception.MemberNotFoundException;
+import server.teammatching.exception.PostNotFoundException;
 import server.teammatching.repository.*;
 
 import java.util.ArrayList;
@@ -45,7 +46,7 @@ public class TeamService {
 
     public TeamAndStudyCreateResponseDto update(Long postId, TeamAndStudyCreateRequestDto requestDto, String memberId) {
         Post findTeam = postRepository.findById(postId)
-                .orElseThrow(() -> new IllegalStateException("유효하지 않은 팀 id 입니다."));
+                .orElseThrow(() -> new PostNotFoundException("유효하지 않은 팀 id 입니다."));
 
         if (!memberId.equals(findTeam.getLeader().getLoginId())) {
             throw new RuntimeException("Invalid");
@@ -117,7 +118,7 @@ public class TeamService {
 
     public void delete(Long teamId, String memberId) {
         Post findTeam = postRepository.findById(teamId)
-                .orElseThrow(() -> new RuntimeException("유효하지 않은 스터디 id 입니다."));
+                .orElseThrow(() -> new PostNotFoundException("유효하지 않은 스터디 id 입니다."));
         List<Application> teamApplications = applicationRepository.findByPost(findTeam);
         postRepository.deleteByIdAndLeader_LoginId(teamId,memberId);
         applicationRepository.deleteAll(teamApplications);

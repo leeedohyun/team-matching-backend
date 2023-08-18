@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import server.teammatching.dto.response.ApplicationResponse;
 import server.teammatching.entity.*;
 import server.teammatching.exception.MemberNotFoundException;
+import server.teammatching.exception.PostNotFoundException;
 import server.teammatching.repository.*;
 
 import java.util.ArrayList;
@@ -68,7 +69,7 @@ public class ApplicationService {
         Member appliedMember = memberRepository.findByLoginId(memberId)
                 .orElseThrow(() -> new MemberNotFoundException("유효하지 않은 회원 id 입니다."));
         Post post = postRepository.findByIdAndType(postId, type)
-                .orElseThrow(() -> new RuntimeException(message));
+                .orElseThrow(() -> new PostNotFoundException(message));
         Recruitment recruitment = recruitmentRepository.findByPost(post)
                 .orElseThrow(() -> new RuntimeException("유효하지 않은 id 입니다."));
         Alarm alarm = Alarm.createAlarm(post.getLeader(), post);
@@ -88,9 +89,8 @@ public class ApplicationService {
                 .build();
     }
 
-    private ApplicationResponse getApplicationResponse(
-            Long applicationId,
-            ApplicationStatus applicationStatus) {
+    private ApplicationResponse getApplicationResponse(Long applicationId,
+                                                       ApplicationStatus applicationStatus) {
         Application findApplication = applicationRepository.findById(applicationId)
                 .orElseThrow(() -> new RuntimeException("유효하지 않은 지원입니다."));
         Alarm alarm = Alarm.createAlarm(findApplication.getAppliedMember(), findApplication.getPost());

@@ -7,6 +7,7 @@ import server.teammatching.dto.request.ProjectRequestDto;
 import server.teammatching.dto.response.ProjectResponseDto;
 import server.teammatching.entity.*;
 import server.teammatching.exception.MemberNotFoundException;
+import server.teammatching.exception.PostNotFoundException;
 import server.teammatching.repository.*;
 
 import java.util.ArrayList;
@@ -48,7 +49,7 @@ public class ProjectService {
 
     public ProjectResponseDto update(Long projectId, String memberId, ProjectRequestDto updateRequest) {
         Post findProject = postRepository.findById(projectId)
-                .orElseThrow(() -> new IllegalStateException("유효하지 않은 팀 id 입니다."));
+                .orElseThrow(() -> new PostNotFoundException("유효하지 않은 팀 id 입니다."));
 
         if (!memberId.equals(findProject.getLeader().getLoginId())) {
             throw new RuntimeException("Invalid");
@@ -115,7 +116,7 @@ public class ProjectService {
             throw new RuntimeException("Invalid");
         }
         Member findLeader = memberRepository.findByLoginId(memberId)
-                .orElseThrow(() -> new RuntimeException("유효하지 않은 사용자 id 입니다."));
+                .orElseThrow(() -> new MemberNotFoundException("유효하지 않은 사용자 id 입니다."));
 
         List<Post> findMemberProjects = postRepository.findByLeaderAndType(findLeader, PostType.PROJECT);
         List<ProjectResponseDto> memberProjects = new ArrayList<>();
@@ -138,7 +139,7 @@ public class ProjectService {
 
     public void delete(Long postId, String memberId) {
         Post findProject = postRepository.findById(postId)
-                .orElseThrow(() -> new RuntimeException("유효하지 않은 프로젝트 id 입니다."));
+                .orElseThrow(() -> new PostNotFoundException("유효하지 않은 프로젝트 id 입니다."));
         List<Application> projectApplications = applicationRepository.findByPost(findProject);
         postRepository.deleteByIdAndLeader_LoginId(postId, memberId);
         applicationRepository.deleteAll(projectApplications);
