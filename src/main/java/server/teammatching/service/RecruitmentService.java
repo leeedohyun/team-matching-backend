@@ -7,7 +7,6 @@ import server.teammatching.dto.response.RecruitmentResponse;
 import server.teammatching.entity.Application;
 import server.teammatching.entity.Post;
 import server.teammatching.entity.Recruitment;
-import server.teammatching.exception.MemberNotFoundException;
 import server.teammatching.exception.PostNotFoundException;
 import server.teammatching.exception.RecruitNotFoundException;
 import server.teammatching.repository.PostRepository;

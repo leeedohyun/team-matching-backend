@@ -36,4 +36,14 @@ public class GlobalExceptionHandler {
                         .message(e.getMessage())
                         .build());
     }
+
+    @ExceptionHandler(LikeNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleLikeNotFoundException(LikeNotFoundException e) {
+        log.error(e.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ErrorResponse.builder()
+                        .status(HttpStatus.NOT_FOUND)
+                        .message(e.getMessage())
+                        .build());
+    }
 }
