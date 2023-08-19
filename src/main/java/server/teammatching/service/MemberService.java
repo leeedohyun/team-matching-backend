@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import server.teammatching.auth.AuthenticationUtils;
 import server.teammatching.dto.request.MemberRequestDto;
 import server.teammatching.dto.request.MemberUpdateRequestDto;
 import server.teammatching.dto.response.MemberResponseDto;
@@ -29,17 +30,17 @@ public class MemberService {
         validateDuplicateLoginId(createdMember);
         validateDuplicateNickName(createdMember);
         Member savedMember = memberRepository.save(createdMember);
+
         return MemberResponseDto.from(savedMember, "회원가입이 성공했습니다.");
     }
 
     @Transactional(readOnly = true)
     public MemberResponseDto findOne(String memberId, String authenticatedId) {
-        if (memberId.equals(authenticatedId)) {
-            Member findMember = memberRepository.findByLoginId(memberId)
-                    .orElseThrow(() -> new MemberNotFoundException("존재하지 않는 회원입니다."));
-            return MemberResponseDto.from(findMember, "조회 성공");
-        }
-        throw new RuntimeException("Invalid");
+        AuthenticationUtils.verifyLoggedInUser(memberId, authenticatedId);
+        Member findMember = memberRepository.findByLoginId(memberId)
+                .orElseThrow(() -> new MemberNotFoundException("존재하지 않는 회원입니다."));
+
+        return MemberResponseDto.from(findMember, "조회 성공");
     }
 
     @Transactional(readOnly = true)
@@ -62,30 +63,26 @@ public class MemberService {
     }
 
     public MemberUpdateResponseDto update(String memberId, MemberUpdateRequestDto updateRequest, String authenticatedId) {
-        if (memberId.equals(authenticatedId)) {
-            Member findMember = memberRepository.findByLoginId(memberId)
-                    .orElseThrow(() -> new MemberNotFoundException("존재하지 않는 회원입니다."));
+        AuthenticationUtils.verifyLoggedInUser(memberId, authenticatedId);
+        Member findMember = memberRepository.findByLoginId(memberId)
+                .orElseThrow(() -> new MemberNotFoundException("존재하지 않는 회원입니다."));
 
-            if (updateRequest.getUpdatedNickName() != null) {
-                findMember.updateNickName(updateRequest.getUpdatedNickName());
-            }
-            if (updateRequest.getUpdatedEmail() != null) {
-                findMember.updateEmail(updateRequest.getUpdatedEmail());
-            }
-            if (updateRequest.getUpdatedUniversity() != null) {
-                findMember.updateUniversity(updateRequest.getUpdatedUniversity());
-            }
-
-            memberRepository.save(findMember);
-            return MemberUpdateResponseDto.from(findMember, "업데이트 성공");
+        if (updateRequest.getUpdatedNickName() != null) {
+            findMember.updateNickName(updateRequest.getUpdatedNickName());
         }
-        throw new RuntimeException("Invalid");
+        if (updateRequest.getUpdatedEmail() != null) {
+            findMember.updateEmail(updateRequest.getUpdatedEmail());
+        }
+        if (updateRequest.getUpdatedUniversity() != null) {
+            findMember.updateUniversity(updateRequest.getUpdatedUniversity());
+        }
+
+        memberRepository.save(findMember);
+        return MemberUpdateResponseDto.from(findMember, "업데이트 성공");
     }
 
     public void delete(String memberId, String authenticatedId) {
-        if (!memberId.equals(authenticatedId)) {
-            throw new RuntimeException("Invalid");
-        }
+        AuthenticationUtils.verifyLoggedInUser(memberId, authenticatedId);
         Member findMember = memberRepository.findByLoginId(memberId)
                 .orElseThrow(() -> new MemberNotFoundException("존재하지 않는 회원입니다."));
         memberRepository.delete(findMember);

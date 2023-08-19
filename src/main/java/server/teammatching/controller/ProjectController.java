@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import server.teammatching.auth.AuthenticationUtils;
 import server.teammatching.auth.PrincipalDetails;
 import server.teammatching.dto.request.ProjectRequestDto;
 import server.teammatching.dto.response.ProjectResponseDto;
@@ -26,9 +27,7 @@ public class ProjectController {
     @PostMapping("/new")
     public ResponseEntity<ProjectResponseDto> create(@AuthenticationPrincipal PrincipalDetails principal,
                                                      @RequestBody ProjectRequestDto requestDto) {
-        if (principal == null) {
-            throw new RuntimeException("인증 정보가 없습니다.");
-        }
+        AuthenticationUtils.validateAuthentication(principal);
         ProjectResponseDto responseDto = projectService.create(principal.getUsername(), requestDto);
         return ResponseEntity.created(URI.create(String.format("/new/%s", responseDto.getPostId())))
                 .body(responseDto);
@@ -39,9 +38,7 @@ public class ProjectController {
     public ResponseEntity<ProjectResponseDto> update(@PathVariable("id") Long projectId,
                                                      @AuthenticationPrincipal PrincipalDetails principal,
                                                      @RequestBody ProjectRequestDto updateRequest) {
-        if (principal == null) {
-            throw new RuntimeException("인증 정보가 없습니다.");
-        }
+        AuthenticationUtils.validateAuthentication(principal);
         ProjectResponseDto updateResponse = projectService.update(projectId, principal.getUsername(), updateRequest);
         return ResponseEntity.ok(updateResponse);
     }
@@ -57,9 +54,7 @@ public class ProjectController {
     @GetMapping("/{id}")
     public ResponseEntity<List<ProjectResponseDto>> checkMemberProject(@PathVariable("id") String loginId,
                                                                        @AuthenticationPrincipal PrincipalDetails principal) {
-        if (principal == null) {
-            throw new RuntimeException("인증 정보가 없습니다.");
-        }
+        AuthenticationUtils.validateAuthentication(principal);
         List<ProjectResponseDto> allMemberProjectsResponse = projectService.checkMemberProjects(loginId, principal.getUsername());
         return ResponseEntity.ok(allMemberProjectsResponse);
     }
@@ -68,9 +63,7 @@ public class ProjectController {
     @DeleteMapping("/{id}/delete")
     public ResponseEntity<String> delete(@PathVariable("id") Long postId,
                                          @AuthenticationPrincipal PrincipalDetails principal) {
-        if (principal == null) {
-            throw new RuntimeException("인증 정보가 없습니다.");
-        }
+        AuthenticationUtils.validateAuthentication(principal);
         projectService.delete(postId, principal.getUsername());
         return ResponseEntity.ok("정상적으로 삭제되었습니다.");
     }

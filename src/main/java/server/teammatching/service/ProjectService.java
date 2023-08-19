@@ -3,6 +3,7 @@ package server.teammatching.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import server.teammatching.auth.AuthenticationUtils;
 import server.teammatching.dto.request.ProjectRequestDto;
 import server.teammatching.dto.response.ProjectResponseDto;
 import server.teammatching.entity.*;
@@ -50,10 +51,8 @@ public class ProjectService {
     public ProjectResponseDto update(Long projectId, String memberId, ProjectRequestDto updateRequest) {
         Post findProject = postRepository.findById(projectId)
                 .orElseThrow(() -> new PostNotFoundException("유효하지 않은 팀 id 입니다."));
+        AuthenticationUtils.verifyLoggedInUser(memberId, findProject.getLeader().getLoginId());
 
-        if (!memberId.equals(findProject.getLeader().getLoginId())) {
-            throw new RuntimeException("Invalid");
-        }
         if (updateRequest.getTitle() != null) {
             findProject.updateTitle(updateRequest.getTitle());
         }
@@ -112,9 +111,7 @@ public class ProjectService {
 
     @Transactional(readOnly = true)
     public List<ProjectResponseDto> checkMemberProjects(String memberId, String authenticatedId) {
-        if (!memberId.equals(authenticatedId)) {
-            throw new RuntimeException("Invalid");
-        }
+        AuthenticationUtils.verifyLoggedInUser(memberId, authenticatedId);
         Member findLeader = memberRepository.findByLoginId(memberId)
                 .orElseThrow(() -> new MemberNotFoundException("유효하지 않은 사용자 id 입니다."));
 

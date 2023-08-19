@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import server.teammatching.auth.AuthenticationUtils;
 import server.teammatching.auth.PrincipalDetails;
 import server.teammatching.dto.response.ApplicationResponse;
 import server.teammatching.service.ApplicationService;
@@ -24,9 +25,7 @@ public class ApplicationController {
     @PostMapping("/projects/{id}")
     public ResponseEntity<ApplicationResponse> applyProject(@PathVariable("id") Long projectId,
                                                             @AuthenticationPrincipal PrincipalDetails principal) {
-        if (principal == null) {
-            throw new RuntimeException("인증 정보가 없습니다");
-        }
+        AuthenticationUtils.validateAuthentication(principal);
         ApplicationResponse applicationResponse = applicationService.applyProject(projectId, principal.getUsername());
         return ResponseEntity.ok(applicationResponse);
     }
@@ -35,9 +34,7 @@ public class ApplicationController {
     @PostMapping("/studies/{id}")
     public ResponseEntity<ApplicationResponse> applyStudy(@PathVariable("id") Long studyId,
                                                           @AuthenticationPrincipal PrincipalDetails principal) {
-        if (principal == null) {
-            throw new RuntimeException("인증 정보가 없습니다");
-        }
+        AuthenticationUtils.validateAuthentication(principal);
         ApplicationResponse applicationResponse = applicationService.applyStudy(studyId, principal.getUsername());
         return ResponseEntity.ok(applicationResponse);
     }
@@ -46,9 +43,7 @@ public class ApplicationController {
     @PostMapping("/teams/{id}")
     public ResponseEntity<ApplicationResponse> applyTeam(@PathVariable("id") Long studyId,
                                                          @AuthenticationPrincipal PrincipalDetails principal) {
-        if (principal == null) {
-            throw new RuntimeException("인증 정보가 없습니다");
-        }
+        AuthenticationUtils.validateAuthentication(principal);
         ApplicationResponse applicationResponse = applicationService.applyTeam(studyId, principal.getUsername());
         return ResponseEntity.ok(applicationResponse);
     }
@@ -56,9 +51,7 @@ public class ApplicationController {
     @ApiOperation(value = "회원이 지원한 모든 지원 리스트 조회 API")
     @GetMapping("")
     public ResponseEntity<List<ApplicationResponse>> checkAllApplications(@AuthenticationPrincipal PrincipalDetails principal) {
-        if (principal == null) {
-            throw new RuntimeException("인증 정보가 없습니다");
-        }
+        AuthenticationUtils.validateAuthentication(principal);
         List<ApplicationResponse> applicationResponses = applicationService.checkAllApplications(principal.getUsername());
         return ResponseEntity.ok(applicationResponses);
     }
@@ -67,9 +60,7 @@ public class ApplicationController {
     @DeleteMapping("/{id}/cancel")
     public ResponseEntity<String> deleteApplication(@PathVariable("id") Long applicationId,
                                                     @AuthenticationPrincipal PrincipalDetails principal) {
-        if (principal == null) {
-            throw new RuntimeException("인증 정보가 없습니다");
-        }
+        AuthenticationUtils.validateAuthentication(principal);
         applicationService.deleteApplication(applicationId, principal.getUsername());
         return ResponseEntity.ok("삭제되었습니다.");
     }
@@ -78,9 +69,7 @@ public class ApplicationController {
     @PostMapping("/approve")
     public ResponseEntity<ApplicationResponse> approveApplication(@RequestParam Long applicationId,
                                                                   @AuthenticationPrincipal PrincipalDetails principal) {
-        if (principal == null) {
-            throw new RuntimeException("인증 정보가 없습니다");
-        }
+        AuthenticationUtils.validateAuthentication(principal);
         ApplicationResponse approvalResponse = applicationService.approveApplication(applicationId, principal.getUsername());
         return ResponseEntity.ok(approvalResponse);
     }
@@ -89,9 +78,7 @@ public class ApplicationController {
     @PostMapping("/reject")
     public ResponseEntity<ApplicationResponse> rejectApplication(@RequestParam Long applicationId,
                                                                  @AuthenticationPrincipal PrincipalDetails principal) {
-        if (principal == null) {
-            throw new RuntimeException("인증 정보가 없습니다");
-        }
+        AuthenticationUtils.validateAuthentication(principal);
         ApplicationResponse approvalResponse = applicationService.rejectApplication(applicationId, principal.getUsername());
         return ResponseEntity.ok(approvalResponse);
     }

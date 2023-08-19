@@ -3,6 +3,7 @@ package server.teammatching.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import server.teammatching.auth.AuthenticationUtils;
 import server.teammatching.dto.request.TeamAndStudyCreateRequestDto;
 import server.teammatching.dto.response.TeamAndStudyCreateResponseDto;
 import server.teammatching.entity.*;
@@ -47,10 +48,8 @@ public class StudyService {
     public TeamAndStudyCreateResponseDto update(Long studyId, String memberId, TeamAndStudyCreateRequestDto updateRequest) {
         Post findStudy = postRepository.findById(studyId)
                 .orElseThrow(() -> new PostNotFoundException("유효하지 않은 팀 id 입니다."));
+        AuthenticationUtils.verifyLoggedInUser(memberId, findStudy.getLeader().getLoginId());
 
-        if (!memberId.equals(findStudy.getLeader().getLoginId())) {
-            throw new RuntimeException("Invalid");
-        }
         if (updateRequest.getTitle() != "") {
             findStudy.updateTitle(updateRequest.getTitle());
         }
@@ -94,10 +93,7 @@ public class StudyService {
 
     @Transactional(readOnly = true)
     public List<TeamAndStudyCreateResponseDto> checkMemberStudies(String memberId, String authenticatedId) {
-        if (!memberId.equals(authenticatedId)) {
-            throw new RuntimeException("Invalid");
-        }
-        
+        AuthenticationUtils.verifyLoggedInUser(memberId, authenticatedId);
         Member findLeader = memberRepository.findByLoginId(memberId)            .
                 orElseThrow(() -> new MemberNotFoundException("유효하지 않은 사용자 id 입니다."));
         List<Post> findMemberStudies = postRepository.findByLeaderAndType(findLeader, PostType.STUDY);

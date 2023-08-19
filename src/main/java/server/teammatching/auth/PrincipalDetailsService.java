@@ -6,6 +6,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import server.teammatching.entity.Member;
+import server.teammatching.exception.MemberNotFoundException;
 import server.teammatching.repository.MemberRepository;
 
 @Service
@@ -17,7 +18,7 @@ public class PrincipalDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Member member = memberRepository.findByLoginId(username)
-                .orElseThrow(() -> new RuntimeException("error"));
+                .orElseThrow(() -> new MemberNotFoundException("error"));
         return new PrincipalDetails(member);
     }
 }
