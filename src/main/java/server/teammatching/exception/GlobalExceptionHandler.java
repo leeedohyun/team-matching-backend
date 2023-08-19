@@ -76,4 +76,14 @@ public class GlobalExceptionHandler {
                         .message(e.getMessage())
                         .build());
     }
+
+    @ExceptionHandler(RecruitmentCompletedException.class)
+    public ResponseEntity<ErrorResponse> handleRecruitmentCompletedException(RecruitmentCompletedException e) {
+        log.error(e.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ErrorResponse.builder()
+                        .status(HttpStatus.CONFLICT)
+                        .message(e.getMessage())
+                        .build());
+    }
 }

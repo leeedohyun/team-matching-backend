@@ -33,7 +33,7 @@ public class LikeService {
                 .orElseThrow(() -> new PostNotFoundException("유효하지 않은 사용자 id 입니다."));
 
         if (likeRepository.findByLikedMemberAndPost(likedMember, findPost).isPresent()) {
-            throw new RuntimeException();
+            throw new LikeNotFoundException("Not Found");
         }
 
         Like generatedLike = Like.getnerateLike(likedMember, findPost);
