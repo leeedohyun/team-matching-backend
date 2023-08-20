@@ -65,6 +65,18 @@ public class ApplicationService {
         return getApplicationResponse(applicationId, memberId, ApplicationStatus.거절);
     }
 
+    private static void validateApplicationStatusWaiting(Application findApplication, ApplicationStatus applicationStatus) {
+        if (findApplication.getStatus() == ApplicationStatus.대기중) {
+            findApplication.updateStatus(applicationStatus);
+        }
+    }
+
+    private static void validateRecruitStatusCompleted(Post post) {
+        if (post.getStatus() == PostStatus.모집완료) {
+            throw new RecruitmentCompletedException("모집이 완료된 게시글입니다.");
+        }
+    }
+
     private ApplicationResponse getApplicationResponse(String memberId, Long postId, PostType type, String message) {
         Member appliedMember = memberRepository.findByLoginId(memberId)
                 .orElseThrow(() -> new MemberNotFoundException("유효하지 않은 회원 id 입니다."));
@@ -75,6 +87,8 @@ public class ApplicationService {
         Alarm alarm = Alarm.createAlarm(post.getLeader(), post);
 
         validateRecruitStatusCompleted(post);
+        validateApplicationNotProcessed(appliedMember, post);
+        validateRecruitCompleted(post);
 
         Application application = Application.apply(appliedMember, post, recruitment);
         applicationRepository.save(application);
@@ -85,6 +99,12 @@ public class ApplicationService {
                 .title(application.getPost().getTitle())
                 .applicationStatus(application.getStatus())
                 .build();
+    }
+
+    private static void validateRecruitCompleted(Post post) {
+        if (post.getStatus() == PostStatus.모집완료) {
+            throw new RecruitmentCompletedException("이미 모집이 완료되었습니다.");
+        }
     }
 
     private ApplicationResponse getApplicationResponse(Long applicationId,
@@ -106,15 +126,9 @@ public class ApplicationService {
                 .build();
     }
 
-    private static void validateApplicationStatusWaiting(Application findApplication, ApplicationStatus applicationStatus) {
-        if (findApplication.getStatus() == ApplicationStatus.대기중) {
-            findApplication.updateStatus(applicationStatus);
-        }
-    }
-
-    private static void validateRecruitStatusCompleted(Post post) {
-        if (post.getStatus() == PostStatus.모집완료) {
-            throw new RecruitmentCompletedException("모집이 완료된 게시글입니다.");
+    private void validateApplicationNotProcessed(Member appliedMember, Post post) {
+        if (applicationRepository.findByAppliedMemberAndPost(appliedMember, post).isPresent()) {
+            throw new AlreadyApplicationException("이미 지원한 상태입니다.");
         }
     }
 }

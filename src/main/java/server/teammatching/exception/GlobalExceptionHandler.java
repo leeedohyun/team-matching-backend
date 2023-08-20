@@ -86,4 +86,14 @@ public class GlobalExceptionHandler {
                         .message(e.getMessage())
                         .build());
     }
+
+    @ExceptionHandler(AlreadyApplicationException.class)
+    public ResponseEntity<ErrorResponse> handleAlreadyApplicationException(AlreadyApplicationException e) {
+        log.error(e.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ErrorResponse.builder()
+                        .status(HttpStatus.CONFLICT)
+                        .message(e.getMessage())
+                        .build());
+    }
 }
