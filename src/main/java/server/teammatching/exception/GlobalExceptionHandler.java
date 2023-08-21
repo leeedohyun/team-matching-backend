@@ -96,4 +96,14 @@ public class GlobalExceptionHandler {
                         .message(e.getMessage())
                         .build());
     }
+
+    @ExceptionHandler(InsufficientMembersException.class)
+    public ResponseEntity<ErrorResponse> handleInsufficientMembersException(InsufficientMembersException e) {
+        log.error(e.getMessage());
+        return ResponseEntity.badRequest()
+                .body(ErrorResponse.builder()
+                        .status(HttpStatus.BAD_REQUEST)
+                        .message(e.getMessage())
+                        .build());
+    }
 }

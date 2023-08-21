@@ -4,6 +4,7 @@ import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import server.teammatching.dto.request.ProjectRequestDto;
 import server.teammatching.dto.request.TeamAndStudyCreateRequestDto;
+import server.teammatching.exception.InsufficientMembersException;
 
 import javax.persistence.*;
 
@@ -101,6 +102,11 @@ public class Post extends BaseTimeEntity {
     }
 
     public static Post createProject(ProjectRequestDto requestDto, Member member) {
+        if (requestDto.getFrontendNumber() + requestDto.getBackendNumber() +
+                requestDto.getDesignerNumber() != requestDto.getRecruitNumber()) {
+            throw new InsufficientMembersException("총 인원수와 일치하지 않습니다.");
+        }
+
         Post project = Post.builder()
                 .title(requestDto.getTitle())
                 .field(requestDto.getField())
