@@ -38,3 +38,4 @@ out/
 
 ## etc ##
 .DS_Store
+**/src/**/application.yml
