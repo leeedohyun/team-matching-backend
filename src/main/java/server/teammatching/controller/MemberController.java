@@ -7,6 +7,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import server.teammatching.auth.AuthenticationUtils;
 import server.teammatching.auth.PrincipalDetails;
 import server.teammatching.dto.request.MemberUpdateRequestDto;
 import server.teammatching.dto.response.MemberUpdateResponseDto;
@@ -39,7 +40,7 @@ public class MemberController {
     @GetMapping("/{id}")
     public ResponseEntity<MemberResponseDto> getMemberInfo(@PathVariable("id") String loginId,
                                                            @AuthenticationPrincipal PrincipalDetails principal) {
-        validateAuthentication(principal);
+        AuthenticationUtils.validateAuthentication(principal);
         MemberResponseDto memberResponse = memberService.findOne(loginId, principal.getUsername());
         return ResponseEntity.ok(memberResponse);
     }
@@ -56,7 +57,7 @@ public class MemberController {
     public ResponseEntity<MemberUpdateResponseDto> update(@PathVariable("id") String loginId,
                                                           @RequestBody MemberUpdateRequestDto updateRequest,
                                                           @AuthenticationPrincipal PrincipalDetails principal) {
-        validateAuthentication(principal);
+        AuthenticationUtils.validateAuthentication(principal);
         MemberUpdateResponseDto updateResponse = memberService.update(loginId, updateRequest, principal.getUsername());
         return ResponseEntity.ok(updateResponse);
     }
@@ -65,14 +66,8 @@ public class MemberController {
     @DeleteMapping("{id}/withdrawal")
     public ResponseEntity<String> delete(@PathVariable("id") String loginId,
                                          @AuthenticationPrincipal PrincipalDetails principal) {
-        validateAuthentication(principal);
+        AuthenticationUtils.validateAuthentication(principal);
         memberService.delete(loginId, principal.getUsername());
         return ResponseEntity.ok("탈퇴가 되었습니다.");
-    }
-
-    private static void validateAuthentication(PrincipalDetails principal) {
-        if (principal == null) {
-            throw new RuntimeException("인증 정보가 없습니다.");
-        }
     }
 }

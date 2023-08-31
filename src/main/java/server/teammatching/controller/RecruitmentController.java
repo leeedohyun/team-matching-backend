@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import server.teammatching.auth.AuthenticationUtils;
 import server.teammatching.auth.PrincipalDetails;
 import server.teammatching.dto.response.RecruitmentResponse;
 import server.teammatching.service.RecruitmentService;
@@ -24,9 +25,7 @@ public class RecruitmentController {
     @GetMapping("/{id}")
     public ResponseEntity<List<RecruitmentResponse>> checkApplications(@PathVariable("id") Long postId,
                                                                        @AuthenticationPrincipal PrincipalDetails principal) {
-        if (principal == null) {
-            throw new RuntimeException("인증정보가 없습니다.");
-        }
+        AuthenticationUtils.validateAuthentication(principal);
         List<RecruitmentResponse> response = recruitmentService.checkApplications(postId, principal.getUsername());
         return ResponseEntity.ok(response);
     }

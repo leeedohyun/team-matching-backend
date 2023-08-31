@@ -3,9 +3,12 @@ package server.teammatching.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import server.teammatching.auth.AuthenticationUtils;
 import server.teammatching.dto.request.TeamAndStudyCreateRequestDto;
 import server.teammatching.dto.response.TeamAndStudyCreateResponseDto;
 import server.teammatching.entity.*;
+import server.teammatching.exception.MemberNotFoundException;
+import server.teammatching.exception.PostNotFoundException;
 import server.teammatching.repository.*;
 
 import java.util.ArrayList;
@@ -23,7 +26,7 @@ public class StudyService {
 
     public TeamAndStudyCreateResponseDto create(TeamAndStudyCreateRequestDto requestDto, String memberId) {
         Member leader = memberRepository.findByLoginId(memberId)
-                .orElseThrow(() -> new RuntimeException("유효하지 않은 사용자 id 입니다."));
+                .orElseThrow(() -> new MemberNotFoundException("유효하지 않은 사용자 id 입니다."));
 
         Post createdStudy = Post.createStudy(requestDto, leader);
 
@@ -44,11 +47,9 @@ public class StudyService {
 
     public TeamAndStudyCreateResponseDto update(Long studyId, String memberId, TeamAndStudyCreateRequestDto updateRequest) {
         Post findStudy = postRepository.findById(studyId)
-                .orElseThrow(() -> new IllegalStateException("유효하지 않은 팀 id 입니다."));
+                .orElseThrow(() -> new PostNotFoundException("유효하지 않은 팀 id 입니다."));
+        AuthenticationUtils.verifyLoggedInUser(memberId, findStudy.getLeader().getLoginId());
 
-        if (!memberId.equals(findStudy.getLeader().getLoginId())) {
-            throw new RuntimeException("Invalid");
-        }
         if (updateRequest.getTitle() != "") {
             findStudy.updateTitle(updateRequest.getTitle());
         }
@@ -92,12 +93,9 @@ public class StudyService {
 
     @Transactional(readOnly = true)
     public List<TeamAndStudyCreateResponseDto> checkMemberStudies(String memberId, String authenticatedId) {
-        if (!memberId.equals(authenticatedId)) {
-            throw new RuntimeException("Invalid");
-        }
-        
+        AuthenticationUtils.verifyLoggedInUser(memberId, authenticatedId);
         Member findLeader = memberRepository.findByLoginId(memberId)            .
-                orElseThrow(() -> new RuntimeException("유효하지 않은 사용자 id 입니다."));
+                orElseThrow(() -> new MemberNotFoundException("유효하지 않은 사용자 id 입니다."));
         List<Post> findMemberStudies = postRepository.findByLeaderAndType(findLeader, PostType.STUDY);
         List<TeamAndStudyCreateResponseDto> allMemberStudies = new ArrayList<>();
 
@@ -116,9 +114,21 @@ public class StudyService {
 
     public void delete(Long studyId, String memberId) {
         Post findStudy = postRepository.findById(studyId)
-                .orElseThrow(() -> new RuntimeException("유효하지 않은 스터디 id 입니다."));
+                .orElseThrow(() -> new PostNotFoundException("유효하지 않은 스터디 id 입니다."));
         List<Application> studyApplications = applicationRepository.findByPost(findStudy);
         postRepository.deleteByIdAndLeader_LoginId(studyId, memberId);
         applicationRepository.deleteAll(studyApplications);
+    }
+
+    public TeamAndStudyCreateResponseDto findOne(Long studyId) {
+        Post findStudy = postRepository.findById(studyId)
+                .orElseThrow(() -> new PostNotFoundException("유효하지 않은 스터디 id 입니다."));
+        return TeamAndStudyCreateResponseDto.builder()
+                .nickName(findStudy.getLeader().getNickName())
+                .postId(findStudy.getId())
+                .type(findStudy.getType())
+                .title(findStudy.getTitle())
+                .content(findStudy.getContent())
+                .build();
     }
 }

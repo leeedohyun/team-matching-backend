@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import server.teammatching.auth.AuthenticationUtils;
 import server.teammatching.auth.PrincipalDetails;
 import server.teammatching.dto.response.LikeResponseDto;
 import server.teammatching.service.LikeService;
@@ -24,9 +25,7 @@ public class LikeController {
     @PostMapping("")
     public ResponseEntity<LikeResponseDto> generateLike(@AuthenticationPrincipal PrincipalDetails principal,
                                                         @RequestParam Long postId) {
-        if (principal == null) {
-            throw new RuntimeException("인증 정보가 없습니다.");
-        }
+        AuthenticationUtils.validateAuthentication(principal);
         LikeResponseDto responseDto = likeService.generateLike(principal.getUsername(), postId);
         return ResponseEntity.ok(responseDto);
     }
@@ -34,9 +33,7 @@ public class LikeController {
     @ApiOperation(value = "관심 목록 조회 API")
     @GetMapping("")
     public ResponseEntity<List<LikeResponseDto>> checkLikes(@AuthenticationPrincipal PrincipalDetails principal) {
-        if (principal == null) {
-            throw new RuntimeException("인증 정보가 없습니다.");
-        }
+        AuthenticationUtils.validateAuthentication(principal);
         List<LikeResponseDto> responseList = likeService.checkLikes(principal.getUsername());
         return ResponseEntity.ok(responseList);
     }
@@ -45,9 +42,7 @@ public class LikeController {
     @DeleteMapping("")
     public ResponseEntity<LikeResponseDto> cancelLike(@AuthenticationPrincipal PrincipalDetails principal,
                                                       @RequestParam Long postId) {
-        if (principal == null) {
-            throw new RuntimeException("인증 정보가 없습니다.");
-        }
+        AuthenticationUtils.validateAuthentication(principal);
         LikeResponseDto deleteResponse = likeService.cancelLike(principal.getUsername(), postId);
         return ResponseEntity.ok(deleteResponse);
     }

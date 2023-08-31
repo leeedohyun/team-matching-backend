@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import server.teammatching.auth.AuthenticationUtils;
 import server.teammatching.auth.PrincipalDetails;
 import server.teammatching.dto.request.TeamAndStudyCreateRequestDto;
 import server.teammatching.dto.response.TeamAndStudyCreateResponseDto;
@@ -26,9 +27,7 @@ public class StudyController {
     @PostMapping("/new")
     public ResponseEntity<TeamAndStudyCreateResponseDto> create(@RequestBody TeamAndStudyCreateRequestDto requestDto,
                                                                 @AuthenticationPrincipal PrincipalDetails principal) {
-        if (principal == null) {
-            throw new RuntimeException("인증 정보가 없습니다.");
-        }
+        AuthenticationUtils.validateAuthentication(principal);
         TeamAndStudyCreateResponseDto responseDto = studyService.create(requestDto, principal.getUsername());
         return ResponseEntity.created(URI.create(String.format("/new/%s", responseDto.getPostId())))
                 .body(responseDto);
@@ -39,9 +38,7 @@ public class StudyController {
     public ResponseEntity<TeamAndStudyCreateResponseDto> update(@PathVariable("id") Long studyId,
                                                                 @AuthenticationPrincipal PrincipalDetails principal,
                                                                 @RequestBody TeamAndStudyCreateRequestDto updateRequest) {
-        if (principal == null) {
-            throw new RuntimeException("인증 정보가 없습니다.");
-        }
+        AuthenticationUtils.validateAuthentication(principal);
         TeamAndStudyCreateResponseDto updateResponse = studyService.update(studyId, principal.getUsername(), updateRequest);
         return ResponseEntity.ok(updateResponse);
     }
@@ -53,13 +50,18 @@ public class StudyController {
         return ResponseEntity.ok(allStudiesResponse);
     }
 
+    @ApiOperation(value = "스터디 상세 조회")
+    @GetMapping("/check/{id}")
+    public ResponseEntity<TeamAndStudyCreateResponseDto> checkOne(@PathVariable("id") Long studyId) {
+        TeamAndStudyCreateResponseDto responseDto = studyService.findOne(studyId);
+        return ResponseEntity.ok(responseDto);
+    }
+
     @ApiOperation(value = "회원이 생성한 스터디 조회 API")
     @GetMapping("/{id}")
     public ResponseEntity<List<TeamAndStudyCreateResponseDto>> checkMemberStudies(@PathVariable("id") String memberId,
                                                                                   @AuthenticationPrincipal PrincipalDetails principal) {
-        if (principal == null) {
-            throw new RuntimeException("인증 정보가 없습니다.");
-        }
+        AuthenticationUtils.validateAuthentication(principal);
         List<TeamAndStudyCreateResponseDto> allMemberStudiesResponse = studyService.checkMemberStudies(memberId, principal.getUsername());
         return ResponseEntity.ok(allMemberStudiesResponse);
     }
@@ -68,9 +70,7 @@ public class StudyController {
     @DeleteMapping("/{id}/delete")
     public ResponseEntity<String> delete(@PathVariable("id") Long studyId,
                                          @AuthenticationPrincipal PrincipalDetails principal) {
-        if (principal == null) {
-            throw new RuntimeException("인증 정보가 없습니다.");
-        }
+        AuthenticationUtils.validateAuthentication(principal);
         studyService.delete(studyId, principal.getUsername());
         return ResponseEntity.ok("정상적으로 삭제되었습니다.");
     }

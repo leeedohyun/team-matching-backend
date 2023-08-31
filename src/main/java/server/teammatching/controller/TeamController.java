@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import server.teammatching.auth.AuthenticationUtils;
 import server.teammatching.auth.PrincipalDetails;
 import server.teammatching.dto.request.TeamAndStudyCreateRequestDto;
 import server.teammatching.dto.response.TeamAndStudyCreateResponseDto;
@@ -26,9 +27,7 @@ public class TeamController {
     @PostMapping("/new")
     public ResponseEntity<TeamAndStudyCreateResponseDto> create(@RequestBody TeamAndStudyCreateRequestDto form,
                                                                 @AuthenticationPrincipal PrincipalDetails principal) {
-        if (principal == null) {
-            throw new RuntimeException("인증 정보가 없습니다.");
-        }
+        AuthenticationUtils.validateAuthentication(principal);
         TeamAndStudyCreateResponseDto teamAndStudyCreateResponseDto = teamService.create(form, principal.getUsername());
         return ResponseEntity.created(URI.create(String.format("/new/%s", teamAndStudyCreateResponseDto.getPostId())))
                 .body(teamAndStudyCreateResponseDto);
@@ -39,9 +38,7 @@ public class TeamController {
     public ResponseEntity<TeamAndStudyCreateResponseDto> update(@PathVariable("id") Long postId,
                                                                 @AuthenticationPrincipal PrincipalDetails principal,
                                                                 @RequestBody TeamAndStudyCreateRequestDto requestDto) {
-        if (principal == null) {
-            throw new RuntimeException("인증 정보가 없습니다.");
-        }
+        AuthenticationUtils.validateAuthentication(principal);
         TeamAndStudyCreateResponseDto responseDto = teamService.update(postId, requestDto, principal.getUsername());
         return ResponseEntity.ok(responseDto);
     }
@@ -53,13 +50,18 @@ public class TeamController {
         return ResponseEntity.ok(allTeamsResponse);
     }
 
+    @ApiOperation(value = "팀 상세 조회")
+    @GetMapping("/check/{id}")
+    public ResponseEntity<TeamAndStudyCreateResponseDto> checkOne(@PathVariable("id") Long teamId) {
+        TeamAndStudyCreateResponseDto responseDto = teamService.findOne(teamId);
+        return ResponseEntity.ok(responseDto);
+    }
+
     @ApiOperation(value = "회원이 생성한 팀 조회 API")
     @GetMapping("/{id}")
     public ResponseEntity<List<TeamAndStudyCreateResponseDto>> checkMemberTeams(@PathVariable("id") String loginId,
                                                                                 @AuthenticationPrincipal PrincipalDetails principal) {
-        if (principal == null) {
-            throw new RuntimeException("인증 정보가 없습니다.");
-        }
+        AuthenticationUtils.validateAuthentication(principal);
         List<TeamAndStudyCreateResponseDto> allMemberTeamsResponse = teamService.checkMemberTeams(loginId, principal.getUsername());
         return ResponseEntity.ok(allMemberTeamsResponse);
     }
@@ -68,9 +70,7 @@ public class TeamController {
     @DeleteMapping("/{id}/delete")
     public ResponseEntity<String> delete(@PathVariable("id") Long teamId,
                                          @AuthenticationPrincipal PrincipalDetails principal) {
-        if (principal == null) {
-            throw new RuntimeException("인증 정보가 없습니다.");
-        }
+        AuthenticationUtils.validateAuthentication(principal);
         teamService.delete(teamId, principal.getUsername());
         return ResponseEntity.ok("정상적으로 삭제되었습니다.");
     }

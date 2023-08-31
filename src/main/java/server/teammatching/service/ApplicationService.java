@@ -3,8 +3,10 @@ package server.teammatching.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import server.teammatching.auth.AuthenticationUtils;
 import server.teammatching.dto.response.ApplicationResponse;
 import server.teammatching.entity.*;
+import server.teammatching.exception.*;
 import server.teammatching.repository.*;
 
 import java.util.ArrayList;
@@ -36,7 +38,7 @@ public class ApplicationService {
     @Transactional(readOnly = true)
     public List<ApplicationResponse> checkAllApplications(String memberId) {
         Member findMember = memberRepository.findByLoginId(memberId)
-                .orElseThrow(() -> new RuntimeException("유효하지 않은 회원 id 입니다."));
+                .orElseThrow(() -> new MemberNotFoundException("유효하지 않은 회원 id 입니다."));
         List<Application> appliedList = applicationRepository.findByAppliedMember(findMember);
         List<ApplicationResponse> appliedResponses = new ArrayList<>();
 
@@ -56,25 +58,37 @@ public class ApplicationService {
     }
 
     public ApplicationResponse approveApplication(Long applicationId, String memberId) {
-        return getApplicationResponse(applicationId, ApplicationStatus.승인);
+        return getApplicationResponse(applicationId, memberId, ApplicationStatus.승인);
     }
 
     public ApplicationResponse rejectApplication(Long applicationId, String memberId) {
-        return getApplicationResponse(applicationId, ApplicationStatus.거절);
+        return getApplicationResponse(applicationId, memberId, ApplicationStatus.거절);
+    }
+
+    private static void validateApplicationStatusWaiting(Application findApplication, ApplicationStatus applicationStatus) {
+        if (findApplication.getStatus() == ApplicationStatus.대기중) {
+            findApplication.updateStatus(applicationStatus);
+        }
+    }
+
+    private static void validateRecruitStatusCompleted(Post post) {
+        if (post.getStatus() == PostStatus.모집완료) {
+            throw new RecruitmentCompletedException("모집이 완료된 게시글입니다.");
+        }
     }
 
     private ApplicationResponse getApplicationResponse(String memberId, Long postId, PostType type, String message) {
         Member appliedMember = memberRepository.findByLoginId(memberId)
-                .orElseThrow(() -> new RuntimeException("유효하지 않은 회원 id 입니다."));
+                .orElseThrow(() -> new MemberNotFoundException("유효하지 않은 회원 id 입니다."));
         Post post = postRepository.findByIdAndType(postId, type)
-                .orElseThrow(() -> new RuntimeException(message));
+                .orElseThrow(() -> new PostNotFoundException(message));
         Recruitment recruitment = recruitmentRepository.findByPost(post)
-                .orElseThrow(() -> new RuntimeException("유효하지 않은 id 입니다."));
+                .orElseThrow(() -> new RecruitNotFoundException("유효하지 않은 id 입니다."));
         Alarm alarm = Alarm.createAlarm(post.getLeader(), post);
 
-        if (post.getStatus() == PostStatus.모집완료) {
-            throw new RuntimeException("모집이 완료된 게시글입니다.");
-        }
+        validateRecruitStatusCompleted(post);
+        validateApplicationNotProcessed(appliedMember, post);
+        validateRecruitCompleted(post);
 
         Application application = Application.apply(appliedMember, post, recruitment);
         applicationRepository.save(application);
@@ -87,16 +101,21 @@ public class ApplicationService {
                 .build();
     }
 
-    private ApplicationResponse getApplicationResponse(
-            Long applicationId,
-            ApplicationStatus applicationStatus) {
+    private static void validateRecruitCompleted(Post post) {
+        if (post.getStatus() == PostStatus.모집완료) {
+            throw new RecruitmentCompletedException("이미 모집이 완료되었습니다.");
+        }
+    }
+
+    private ApplicationResponse getApplicationResponse(Long applicationId,
+                                                       String memberId,
+                                                       ApplicationStatus applicationStatus) {
         Application findApplication = applicationRepository.findById(applicationId)
-                .orElseThrow(() -> new RuntimeException("유효하지 않은 지원입니다."));
+                .orElseThrow(() -> new ApplicationNotFoundException("유효하지 않은 지원입니다."));
         Alarm alarm = Alarm.createAlarm(findApplication.getAppliedMember(), findApplication.getPost());
 
-        if (findApplication.getStatus() == ApplicationStatus.대기중) {
-            findApplication.updateStatus(applicationStatus);
-        }
+        AuthenticationUtils.verifyLoggedInUser(memberId, findApplication.getPost().getLeader().getLoginId());
+        validateApplicationStatusWaiting(findApplication, applicationStatus);
 
         alarmRepository.save(alarm);
 
@@ -105,5 +124,11 @@ public class ApplicationService {
                 .postId(findApplication.getPost().getId())
                 .applicationStatus(findApplication.getStatus())
                 .build();
+    }
+
+    private void validateApplicationNotProcessed(Member appliedMember, Post post) {
+        if (applicationRepository.findByAppliedMemberAndPost(appliedMember, post).isPresent()) {
+            throw new AlreadyApplicationException("이미 지원한 상태입니다.");
+        }
     }
 }
