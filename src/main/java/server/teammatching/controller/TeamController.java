@@ -50,6 +50,13 @@ public class TeamController {
         return ResponseEntity.ok(allTeamsResponse);
     }
 
+    @ApiOperation(value = "팀 상세 조회")
+    @GetMapping("/check/{id}")
+    public ResponseEntity<TeamAndStudyCreateResponseDto> checkOne(@PathVariable("id") Long teamId) {
+        TeamAndStudyCreateResponseDto responseDto = teamService.findOne(teamId);
+        return ResponseEntity.ok(responseDto);
+    }
+
     @ApiOperation(value = "회원이 생성한 팀 조회 API")
     @GetMapping("/{id}")
     public ResponseEntity<List<TeamAndStudyCreateResponseDto>> checkMemberTeams(@PathVariable("id") String loginId,

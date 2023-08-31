@@ -119,4 +119,16 @@ public class TeamService {
         postRepository.deleteByIdAndLeader_LoginId(teamId,memberId);
         applicationRepository.deleteAll(teamApplications);
     }
+
+    public TeamAndStudyCreateResponseDto findOne(Long teamId) {
+        Post findTeam = postRepository.findById(teamId)
+                .orElseThrow(() -> new PostNotFoundException("유효하지 않은 스터디 id 입니다."));
+        return TeamAndStudyCreateResponseDto.builder()
+                .nickName(findTeam.getLeader().getNickName())
+                .postId(findTeam.getId())
+                .type(findTeam.getType())
+                .title(findTeam.getTitle())
+                .content(findTeam.getContent())
+                .build();
+    }
 }

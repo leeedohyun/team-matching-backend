@@ -50,6 +50,13 @@ public class StudyController {
         return ResponseEntity.ok(allStudiesResponse);
     }
 
+    @ApiOperation(value = "스터디 상세 조회")
+    @GetMapping("/check/{id}")
+    public ResponseEntity<TeamAndStudyCreateResponseDto> checkOne(@PathVariable("id") Long studyId) {
+        TeamAndStudyCreateResponseDto responseDto = studyService.findOne(studyId);
+        return ResponseEntity.ok(responseDto);
+    }
+
     @ApiOperation(value = "회원이 생성한 스터디 조회 API")
     @GetMapping("/{id}")
     public ResponseEntity<List<TeamAndStudyCreateResponseDto>> checkMemberStudies(@PathVariable("id") String memberId,

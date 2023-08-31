@@ -50,6 +50,13 @@ public class ProjectController {
         return ResponseEntity.ok(allProjectsResponse);
     }
 
+    @ApiOperation(value = "프로젝트 상세 조회")
+    @GetMapping("/check/{postId}")
+    public ResponseEntity<ProjectResponseDto> checkOneProject(@PathVariable("postId") Long projectId) {
+        ProjectResponseDto responseDto = projectService.findOne(projectId);
+        return ResponseEntity.ok(responseDto);
+    }
+
     @ApiOperation(value = "회원이 생성한 프로젝트 조회 API")
     @GetMapping("/{id}")
     public ResponseEntity<List<ProjectResponseDto>> checkMemberProject(@PathVariable("id") String loginId,

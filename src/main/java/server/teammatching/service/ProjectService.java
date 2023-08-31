@@ -141,4 +141,19 @@ public class ProjectService {
         postRepository.deleteByIdAndLeader_LoginId(postId, memberId);
         applicationRepository.deleteAll(projectApplications);
     }
+
+    public ProjectResponseDto findOne(Long projectId) {
+        Post post = postRepository.findById(projectId)
+                .orElseThrow(() -> new PostNotFoundException("유효하지 않은 프로젝트입니다."));
+        return ProjectResponseDto.builder()
+                .postId(post.getId())
+                .backendNumber(post.getBackendNumber())
+                .frontendNumber(post.getFrontendNumber())
+                .designerNumber(post.getDesignerNumber())
+                .type(post.getType())
+                .title(post.getTitle())
+                .content(post.getContent())
+                .memberId(post.getLeader().getId())
+                .build();
+    }
 }

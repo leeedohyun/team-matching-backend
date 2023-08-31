@@ -119,4 +119,16 @@ public class StudyService {
         postRepository.deleteByIdAndLeader_LoginId(studyId, memberId);
         applicationRepository.deleteAll(studyApplications);
     }
+
+    public TeamAndStudyCreateResponseDto findOne(Long studyId) {
+        Post findStudy = postRepository.findById(studyId)
+                .orElseThrow(() -> new PostNotFoundException("유효하지 않은 스터디 id 입니다."));
+        return TeamAndStudyCreateResponseDto.builder()
+                .nickName(findStudy.getLeader().getNickName())
+                .postId(findStudy.getId())
+                .type(findStudy.getType())
+                .title(findStudy.getTitle())
+                .content(findStudy.getContent())
+                .build();
+    }
 }
