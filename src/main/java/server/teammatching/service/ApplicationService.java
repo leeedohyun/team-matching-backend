@@ -9,8 +9,9 @@ import server.teammatching.entity.*;
 import server.teammatching.exception.*;
 import server.teammatching.repository.*;
 
-import java.util.ArrayList;
 import java.util.List;
+
+import static java.util.stream.Collectors.toList;
 
 @Service
 @RequiredArgsConstructor
@@ -40,17 +41,10 @@ public class ApplicationService {
         Member findMember = memberRepository.findByLoginId(memberId)
                 .orElseThrow(() -> new MemberNotFoundException("유효하지 않은 회원 id 입니다."));
         List<Application> appliedList = applicationRepository.findByAppliedMember(findMember);
-        List<ApplicationResponse> appliedResponses = new ArrayList<>();
 
-        for (Application application : appliedList) {
-            ApplicationResponse response = ApplicationResponse.builder()
-                    .title(application.getPost().getTitle())
-                    .postId(application.getPost().getId())
-                    .applicationStatus(application.getStatus())
-                    .build();
-            appliedResponses.add(response);
-        }
-        return appliedResponses;
+        return appliedList.stream()
+                .map(ApplicationResponse::from)
+                .collect(toList());
     }
 
     public void deleteApplication(Long applicationId, String memberId) {
@@ -94,11 +88,7 @@ public class ApplicationService {
         applicationRepository.save(application);
         alarmRepository.save(alarm);
 
-        return ApplicationResponse.builder()
-                .postId(application.getPost().getId())
-                .title(application.getPost().getTitle())
-                .applicationStatus(application.getStatus())
-                .build();
+        return ApplicationResponse.from(application);
     }
 
     private static void validateRecruitCompleted(Post post) {
@@ -119,11 +109,7 @@ public class ApplicationService {
 
         alarmRepository.save(alarm);
 
-        return ApplicationResponse.builder()
-                .title(findApplication.getPost().getTitle())
-                .postId(findApplication.getPost().getId())
-                .applicationStatus(findApplication.getStatus())
-                .build();
+        return ApplicationResponse.from(findApplication);
     }
 
     private void validateApplicationNotProcessed(Member appliedMember, Post post) {

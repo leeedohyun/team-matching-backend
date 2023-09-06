@@ -1,6 +1,7 @@
 package server.teammatching.dto.response;
 
 import lombok.*;
+import server.teammatching.entity.Post;
 import server.teammatching.entity.PostType;
 
 @Getter
@@ -17,4 +18,17 @@ public class ProjectResponseDto {
     private int designerNumber;
     private int frontendNumber;
     private int backendNumber;
+
+    public static ProjectResponseDto from(Post project) {
+        return ProjectResponseDto.builder()
+                .postId(project.getId())
+                .memberId(project.getLeader().getId())
+                .title(project.getTitle())
+                .content(project.getContent())
+                .type(project.getType())
+                .designerNumber(project.getDesignerNumber())
+                .frontendNumber(project.getFrontendNumber())
+                .backendNumber(project.getBackendNumber())
+                .build();
+    }
 }

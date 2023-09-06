@@ -9,10 +9,14 @@ import server.teammatching.dto.response.ProjectResponseDto;
 import server.teammatching.entity.*;
 import server.teammatching.exception.MemberNotFoundException;
 import server.teammatching.exception.PostNotFoundException;
-import server.teammatching.repository.*;
+import server.teammatching.repository.ApplicationRepository;
+import server.teammatching.repository.MemberRepository;
+import server.teammatching.repository.PostRepository;
+import server.teammatching.repository.RecruitmentRepository;
 
-import java.util.ArrayList;
 import java.util.List;
+
+import static java.util.stream.Collectors.toList;
 
 @Service
 @RequiredArgsConstructor
@@ -36,16 +40,7 @@ public class ProjectService {
         Post savedProject = postRepository.save(createdProject);
         recruitmentRepository.save(recruitment);
 
-        return ProjectResponseDto.builder()
-                .postId(savedProject.getId())
-                .memberId(leader.getId())
-                .title(savedProject.getTitle())
-                .type(savedProject.getType())
-                .designerNumber(savedProject.getDesignerNumber())
-                .frontendNumber(savedProject.getFrontendNumber())
-                .backendNumber(savedProject.getBackendNumber())
-                .content(savedProject.getContent())
-                .build();
+        return ProjectResponseDto.from(savedProject);
     }
 
     public ProjectResponseDto update(Long projectId, String memberId, ProjectRequestDto updateRequest) {
@@ -76,37 +71,16 @@ public class ProjectService {
         }
 
         Post savedProject = postRepository.save(findProject);
-        return ProjectResponseDto.builder()
-                .postId(savedProject.getId())
-                .memberId(savedProject.getLeader().getId())
-                .title(savedProject.getTitle())
-                .designerNumber(savedProject.getDesignerNumber())
-                .backendNumber(savedProject.getBackendNumber())
-                .frontendNumber(savedProject.getFrontendNumber())
-                .content(savedProject.getContent())
-                .type(savedProject.getType())
-                .build();
+        return ProjectResponseDto.from(savedProject);
     }
 
     @Transactional(readOnly = true)
     public List<ProjectResponseDto> checkAllProjects() {
-        List<ProjectResponseDto> allProjects = new ArrayList<>();
         List<Post> findAllProjects = postRepository.findByType(PostType.PROJECT);
 
-        for (Post findProject : findAllProjects) {
-            ProjectResponseDto project = ProjectResponseDto.builder()
-                    .postId(findProject.getId())
-                    .memberId(findProject.getLeader().getId())
-                    .title(findProject.getTitle())
-                    .designerNumber(findProject.getDesignerNumber())
-                    .backendNumber(findProject.getBackendNumber())
-                    .frontendNumber(findProject.getFrontendNumber())
-                    .content(findProject.getContent())
-                    .type(findProject.getType())
-                    .build();
-            allProjects.add(project);
-        }
-        return allProjects;
+        return findAllProjects.stream()
+                .map(ProjectResponseDto::from)
+                .collect(toList());
     }
 
     @Transactional(readOnly = true)
@@ -116,22 +90,10 @@ public class ProjectService {
                 .orElseThrow(() -> new MemberNotFoundException("유효하지 않은 사용자 id 입니다."));
 
         List<Post> findMemberProjects = postRepository.findByLeaderAndType(findLeader, PostType.PROJECT);
-        List<ProjectResponseDto> memberProjects = new ArrayList<>();
 
-        for (Post findMemberProject : findMemberProjects) {
-            ProjectResponseDto project = ProjectResponseDto.builder()
-                    .postId(findMemberProject.getId())
-                    .memberId(findMemberProject.getLeader().getId())
-                    .title(findMemberProject.getTitle())
-                    .designerNumber(findMemberProject.getDesignerNumber())
-                    .backendNumber(findMemberProject.getBackendNumber())
-                    .frontendNumber(findMemberProject.getFrontendNumber())
-                    .content(findMemberProject.getContent())
-                    .type(findMemberProject.getType())
-                    .build();
-            memberProjects.add(project);
-        }
-        return memberProjects;
+        return findMemberProjects.stream()
+                .map(ProjectResponseDto::from)
+                .collect(toList());
     }
 
     public void delete(Long postId, String memberId) {
@@ -145,15 +107,7 @@ public class ProjectService {
     public ProjectResponseDto findOne(Long projectId) {
         Post post = postRepository.findById(projectId)
                 .orElseThrow(() -> new PostNotFoundException("유효하지 않은 프로젝트입니다."));
-        return ProjectResponseDto.builder()
-                .postId(post.getId())
-                .backendNumber(post.getBackendNumber())
-                .frontendNumber(post.getFrontendNumber())
-                .designerNumber(post.getDesignerNumber())
-                .type(post.getType())
-                .title(post.getTitle())
-                .content(post.getContent())
-                .memberId(post.getLeader().getId())
-                .build();
+        
+        return ProjectResponseDto.from(post);
     }
 }

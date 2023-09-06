@@ -12,8 +12,9 @@ import server.teammatching.exception.RecruitNotFoundException;
 import server.teammatching.repository.PostRepository;
 import server.teammatching.repository.RecruitmentRepository;
 
-import java.util.ArrayList;
 import java.util.List;
+
+import static java.util.stream.Collectors.toList;
 
 @Service
 @RequiredArgsConstructor
@@ -33,17 +34,9 @@ public class RecruitmentService {
         Recruitment findRecruitment = recruitmentRepository.findByPost(findPost)
                 .orElseThrow(() -> new RecruitNotFoundException("유효하지 않은 채용입니다"));
         List<Application> applicationList = findRecruitment.getApplicationList();
-        List<RecruitmentResponse> recruitmentResponses = new ArrayList<>();
 
-        for (Application application : applicationList) {
-            RecruitmentResponse recruitmentResponse = RecruitmentResponse.builder()
-                    .postId(application.getPost().getId())
-                    .title(application.getPost().getTitle())
-                    .memberId(application.getAppliedMember().getId())
-                    .applicationStatus(application.getStatus())
-                    .build();
-            recruitmentResponses.add(recruitmentResponse);
-        }
-        return recruitmentResponses;
+        return applicationList.stream()
+                .map(RecruitmentResponse::from)
+                .collect(toList());
     }
 }
