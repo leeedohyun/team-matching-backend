@@ -1,7 +1,11 @@
 package server.teammatching.dto.request;
 
 import io.swagger.annotations.ApiModelProperty;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import server.teammatching.entity.Member;
 
 import javax.validation.constraints.Email;
