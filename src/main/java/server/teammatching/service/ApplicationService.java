@@ -5,9 +5,25 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import server.teammatching.auth.AuthenticationUtils;
 import server.teammatching.dto.response.ApplicationResponse;
-import server.teammatching.entity.*;
-import server.teammatching.exception.*;
-import server.teammatching.repository.*;
+import server.teammatching.entity.Alarm;
+import server.teammatching.entity.Application;
+import server.teammatching.entity.ApplicationStatus;
+import server.teammatching.entity.Member;
+import server.teammatching.entity.Post;
+import server.teammatching.entity.PostStatus;
+import server.teammatching.entity.PostType;
+import server.teammatching.entity.Recruitment;
+import server.teammatching.exception.AlreadyApplicationException;
+import server.teammatching.exception.ApplicationNotFoundException;
+import server.teammatching.exception.MemberNotFoundException;
+import server.teammatching.exception.PostNotFoundException;
+import server.teammatching.exception.RecruitNotFoundException;
+import server.teammatching.exception.RecruitmentCompletedException;
+import server.teammatching.repository.AlarmRepository;
+import server.teammatching.repository.ApplicationRepository;
+import server.teammatching.repository.MemberRepository;
+import server.teammatching.repository.PostRepository;
+import server.teammatching.repository.RecruitmentRepository;
 
 import java.util.List;
 
