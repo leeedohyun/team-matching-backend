@@ -1,6 +1,10 @@
 package server.teammatching.dto.response;
 
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import server.teammatching.entity.Member;
 
 @Getter
@@ -14,16 +18,14 @@ public class MemberResponseDto {
     private String email;
     private String university;
     private String nickName;
-    private String message;
 
-    public static MemberResponseDto from(Member member, String message) {
+    public static MemberResponseDto from(Member member) {
         return MemberResponseDto.builder()
                 .email(member.getEmail())
                 .loginId(member.getLoginId())
                 .memberId(member.getId())
                 .university(member.getUniversity())
                 .nickName(member.getNickName())
-                .message(message)
                 .build();
     }
 }

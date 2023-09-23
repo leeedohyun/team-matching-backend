@@ -5,12 +5,29 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import server.teammatching.auth.AuthenticationUtils;
 import server.teammatching.dto.response.ApplicationResponse;
-import server.teammatching.entity.*;
-import server.teammatching.exception.*;
-import server.teammatching.repository.*;
+import server.teammatching.entity.Alarm;
+import server.teammatching.entity.Application;
+import server.teammatching.entity.ApplicationStatus;
+import server.teammatching.entity.Member;
+import server.teammatching.entity.Post;
+import server.teammatching.entity.PostStatus;
+import server.teammatching.entity.PostType;
+import server.teammatching.entity.Recruitment;
+import server.teammatching.exception.AlreadyApplicationException;
+import server.teammatching.exception.ApplicationNotFoundException;
+import server.teammatching.exception.MemberNotFoundException;
+import server.teammatching.exception.PostNotFoundException;
+import server.teammatching.exception.RecruitNotFoundException;
+import server.teammatching.exception.RecruitmentCompletedException;
+import server.teammatching.repository.AlarmRepository;
+import server.teammatching.repository.ApplicationRepository;
+import server.teammatching.repository.MemberRepository;
+import server.teammatching.repository.PostRepository;
+import server.teammatching.repository.RecruitmentRepository;
 
-import java.util.ArrayList;
 import java.util.List;
+
+import static java.util.stream.Collectors.toList;
 
 @Service
 @RequiredArgsConstructor
@@ -40,17 +57,10 @@ public class ApplicationService {
         Member findMember = memberRepository.findByLoginId(memberId)
                 .orElseThrow(() -> new MemberNotFoundException("유효하지 않은 회원 id 입니다."));
         List<Application> appliedList = applicationRepository.findByAppliedMember(findMember);
-        List<ApplicationResponse> appliedResponses = new ArrayList<>();
 
-        for (Application application : appliedList) {
-            ApplicationResponse response = ApplicationResponse.builder()
-                    .title(application.getPost().getTitle())
-                    .postId(application.getPost().getId())
-                    .applicationStatus(application.getStatus())
-                    .build();
-            appliedResponses.add(response);
-        }
-        return appliedResponses;
+        return appliedList.stream()
+                .map(ApplicationResponse::from)
+                .collect(toList());
     }
 
     public void deleteApplication(Long applicationId, String memberId) {
@@ -94,11 +104,7 @@ public class ApplicationService {
         applicationRepository.save(application);
         alarmRepository.save(alarm);
 
-        return ApplicationResponse.builder()
-                .postId(application.getPost().getId())
-                .title(application.getPost().getTitle())
-                .applicationStatus(application.getStatus())
-                .build();
+        return ApplicationResponse.from(application);
     }
 
     private static void validateRecruitCompleted(Post post) {
@@ -119,11 +125,7 @@ public class ApplicationService {
 
         alarmRepository.save(alarm);
 
-        return ApplicationResponse.builder()
-                .title(findApplication.getPost().getTitle())
-                .postId(findApplication.getPost().getId())
-                .applicationStatus(findApplication.getStatus())
-                .build();
+        return ApplicationResponse.from(findApplication);
     }
 
     private void validateApplicationNotProcessed(Member appliedMember, Post post) {

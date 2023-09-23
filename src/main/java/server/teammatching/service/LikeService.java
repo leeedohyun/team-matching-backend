@@ -14,8 +14,9 @@ import server.teammatching.repository.LikeRepository;
 import server.teammatching.repository.MemberRepository;
 import server.teammatching.repository.PostRepository;
 
-import java.util.ArrayList;
 import java.util.List;
+
+import static java.util.stream.Collectors.toList;
 
 @Service
 @RequiredArgsConstructor
@@ -40,11 +41,7 @@ public class LikeService {
 
         Like savedLike = likeRepository.save(generatedLike);
 
-        return LikeResponseDto.builder()
-                .memberId(savedLike.getLikedMember().getId())
-                .postId(savedLike.getPost().getId())
-                .postTitle(savedLike.getPost().getTitle())
-                .build();
+        return LikeResponseDto.from(savedLike);
     }
 
     @Transactional(readOnly = true)
@@ -53,17 +50,10 @@ public class LikeService {
                 .orElseThrow(() -> new MemberNotFoundException("유효하지 않은 사용자 id 입니다."));
 
         List<Like> likeList = likeRepository.findByLikedMember(findMember);
-        List<LikeResponseDto> responseList = new ArrayList<>();
 
-        for (Like like : likeList) {
-            LikeResponseDto response = LikeResponseDto.builder()
-                    .postId(like.getPost().getId())
-                    .memberId(like.getLikedMember().getId())
-                    .postTitle(like.getPost().getTitle())
-                    .build();
-            responseList.add(response);
-        }
-        return responseList;
+        return likeList.stream()
+                .map(LikeResponseDto::from)
+                .collect(toList());
     }
 
     public LikeResponseDto cancelLike(String  memberId, Long postId) {
@@ -75,10 +65,7 @@ public class LikeService {
                 .orElseThrow(() -> new LikeNotFoundException("유효하지 않은 id 입니다."));
 
         likeRepository.delete(canceledLike);
-        return LikeResponseDto.builder()
-                .postId(canceledLike.getPost().getId())
-                .postTitle(canceledLike.getPost().getTitle())
-                .memberId(canceledLike.getLikedMember().getId())
-                .build();
+
+        return LikeResponseDto.from(canceledLike);
     }
 }

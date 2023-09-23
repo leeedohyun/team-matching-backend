@@ -14,8 +14,8 @@ import server.teammatching.exception.DuplicateResourceException;
 import server.teammatching.exception.MemberNotFoundException;
 import server.teammatching.repository.MemberRepository;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -31,7 +31,7 @@ public class MemberService {
         validateDuplicateNickName(createdMember);
         Member savedMember = memberRepository.save(createdMember);
 
-        return MemberResponseDto.from(savedMember, "회원가입이 성공했습니다.");
+        return MemberResponseDto.from(savedMember);
     }
 
     @Transactional(readOnly = true)
@@ -40,26 +40,16 @@ public class MemberService {
         Member findMember = memberRepository.findByLoginId(memberId)
                 .orElseThrow(() -> new MemberNotFoundException("존재하지 않는 회원입니다."));
 
-        return MemberResponseDto.from(findMember, "조회 성공");
+        return MemberResponseDto.from(findMember);
     }
 
     @Transactional(readOnly = true)
     public List<MemberResponseDto> findAll() {
-        List<Member> members = memberRepository.findAll();
-        List<MemberResponseDto> membersResponse = new ArrayList<>();
+        List<Member> findMembers = memberRepository.findAll();
 
-        for (Member member : members) {
-            MemberResponseDto response = MemberResponseDto.builder()
-                    .memberId(member.getId())
-                    .email(member.getEmail())
-                    .loginId(member.getLoginId())
-                    .nickName(member.getNickName())
-                    .university(member.getUniversity())
-                    .message("조회 성공")
-                    .build();
-            membersResponse.add(response);
-        }
-        return membersResponse;
+        return findMembers.stream()
+                .map(MemberResponseDto::from)
+                .collect(Collectors.toList());
     }
 
     public MemberUpdateResponseDto update(String memberId, MemberUpdateRequestDto updateRequest, String authenticatedId) {
