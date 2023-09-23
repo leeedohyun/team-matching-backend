@@ -17,6 +17,7 @@ public class ProjectResponseDto {
     private Long postId;
     private Long memberId;
     private String title;
+    private String techStack;
     private String content;
     private PostType type;
     private int designerNumber;
@@ -29,6 +30,7 @@ public class ProjectResponseDto {
                 .memberId(project.getLeader().getId())
                 .title(project.getTitle())
                 .content(project.getContent())
+                .techStack(project.getTechStack())
                 .type(project.getType())
                 .designerNumber(project.getDesignerNumber())
                 .frontendNumber(project.getFrontendNumber())

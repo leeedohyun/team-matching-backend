@@ -44,6 +44,9 @@ public class Post extends BaseTimeEntity {
     @Column(nullable = false)
     private String field;
 
+    @Column(nullable = false)
+    private String techStack;
+
     @ColumnDefault("0")
     private int views;
 
@@ -72,13 +75,14 @@ public class Post extends BaseTimeEntity {
 
     @Builder
     public Post(String title, int recruitNumber, String field, PostStatus status, PostType type,
-                String content) {
+                String content, String techStack) {
         this.title = title;
         this.recruitNumber = recruitNumber;
         this.field = field;
         this.status = status;
         this.type = type;
         this.content = content;
+        this.techStack = techStack;
     }
 
     public void setLeader(Member leader) {
@@ -127,6 +131,7 @@ public class Post extends BaseTimeEntity {
                 .title(requestDto.getTitle())
                 .field(requestDto.getField())
                 .recruitNumber(requestDto.getRecruitNumber())
+                .techStack(requestDto.getTechStack())
                 .type(PostType.PROJECT)
                 .status(PostStatus.모집중)
                 .content(requestDto.getContent())

@@ -15,6 +15,7 @@ public class ProjectRequestDto {
     private String title;
     private int recruitNumber;
     private String field;
+    private String techStack;
     private String content;
     private int designerNumber;
     private int frontendNumber;
