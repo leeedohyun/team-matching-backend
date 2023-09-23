@@ -20,6 +20,7 @@ public class ProjectResponseDto {
     private String techStack;
     private String content;
     private PostType type;
+    private int recruitNumber;
     private int designerNumber;
     private int frontendNumber;
     private int backendNumber;
@@ -32,6 +33,7 @@ public class ProjectResponseDto {
                 .content(project.getContent())
                 .techStack(project.getTechStack())
                 .type(project.getType())
+                .recruitNumber(project.getRecruitNumber())
                 .designerNumber(project.getDesignerNumber())
                 .frontendNumber(project.getFrontendNumber())
                 .backendNumber(project.getBackendNumber())

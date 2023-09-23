@@ -19,6 +19,7 @@ public class TeamAndStudyCreateResponseDto {
     private String title;
     private String content;
     private PostType type;
+    private int recruitNumber;
 
     public static TeamAndStudyCreateResponseDto from(Post teamAndStudy) {
         return TeamAndStudyCreateResponseDto.builder()
@@ -27,6 +28,7 @@ public class TeamAndStudyCreateResponseDto {
                 .postId(teamAndStudy.getId())
                 .nickName(teamAndStudy.getLeader().getNickName())
                 .type(teamAndStudy.getType())
+                .recruitNumber(teamAndStudy.getRecruitNumber())
                 .build();
     }
 }
