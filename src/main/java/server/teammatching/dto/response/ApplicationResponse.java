@@ -17,12 +17,14 @@ public class ApplicationResponse {
     private Long postId;
     private String title;
     private ApplicationStatus applicationStatus;
+    private String resume;
 
     public static ApplicationResponse from(Application application) {
         return ApplicationResponse.builder()
                 .postId(application.getPost().getId())
                 .title(application.getPost().getTitle())
                 .applicationStatus(application.getStatus())
+                .resume(application.getResume())
                 .build();
     }
 }

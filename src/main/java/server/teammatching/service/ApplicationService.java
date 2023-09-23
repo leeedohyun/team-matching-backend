@@ -40,16 +40,16 @@ public class ApplicationService {
     private final PostRepository postRepository;
     private final RecruitmentRepository recruitmentRepository;
 
-    public ApplicationResponse applyProject(Long projectId, String memberId) {
-        return getApplicationResponse(memberId, projectId, PostType.PROJECT, "유효하지 않은 프로젝트 id 입니다.");
+    public ApplicationResponse applyProject(Long projectId, String memberId, String resume) {
+        return getApplicationResponse(memberId, projectId, resume, PostType.PROJECT, "유효하지 않은 프로젝트 id 입니다.");
     }
 
-    public ApplicationResponse applyStudy(Long studyId, String memberId) {
-        return getApplicationResponse(memberId, studyId, PostType.STUDY, "유효하지 않은 스터디 id 입니다.");
+    public ApplicationResponse applyStudy(Long studyId, String memberId, String resume) {
+        return getApplicationResponse(memberId, studyId, resume, PostType.STUDY, "유효하지 않은 스터디 id 입니다.");
     }
 
-    public ApplicationResponse applyTeam(Long teamId, String memberId) {
-        return getApplicationResponse(memberId, teamId, PostType.TEAM, "유효하지 않은 스터디 id 입니다.");
+    public ApplicationResponse applyTeam(Long teamId, String memberId, String resume) {
+        return getApplicationResponse(memberId, teamId, resume, PostType.TEAM, "유효하지 않은 스터디 id 입니다.");
     }
 
     @Transactional(readOnly = true)
@@ -87,7 +87,11 @@ public class ApplicationService {
         }
     }
 
-    private ApplicationResponse getApplicationResponse(String memberId, Long postId, PostType type, String message) {
+    private ApplicationResponse getApplicationResponse(String memberId,
+                                                       Long postId,
+                                                       String resume,
+                                                       PostType type,
+                                                       String message) {
         Member appliedMember = memberRepository.findByLoginId(memberId)
                 .orElseThrow(() -> new MemberNotFoundException("유효하지 않은 회원 id 입니다."));
         Post post = postRepository.findByIdAndType(postId, type)
@@ -100,7 +104,7 @@ public class ApplicationService {
         validateApplicationNotProcessed(appliedMember, post);
         validateRecruitCompleted(post);
 
-        Application application = Application.apply(appliedMember, post, recruitment);
+        Application application = Application.apply(appliedMember, post, recruitment, resume);
         applicationRepository.save(application);
         alarmRepository.save(alarm);
 

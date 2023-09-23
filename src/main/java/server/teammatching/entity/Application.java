@@ -14,6 +14,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 
 @Entity
@@ -24,6 +25,9 @@ public class Application extends BaseTimeEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "application_id")
     private Long id;
+
+    @Lob
+    private String resume;
 
     @Enumerated(EnumType.STRING)
     private ApplicationStatus status;
@@ -41,10 +45,11 @@ public class Application extends BaseTimeEntity {
     private Post post;
 
     @Builder
-    public Application(ApplicationStatus status, Member appliedMember, Post post) {
+    public Application(ApplicationStatus status, Member appliedMember, Post post, String resume) {
         this.status = status;
         this.appliedMember = appliedMember;
         this.post = post;
+        this.resume = resume;
     }
 
     public void setRecruitment(Recruitment recruitment) {
@@ -52,11 +57,12 @@ public class Application extends BaseTimeEntity {
         recruitment.getApplicationList().add(this);
     }
 
-    public static Application apply(Member appliedMember, Post post, Recruitment recruitment) {
+    public static Application apply(Member appliedMember, Post post, Recruitment recruitment, String resume) {
         Application application = Application.builder()
                 .status(ApplicationStatus.대기중)
                 .appliedMember(appliedMember)
                 .post(post)
+                .resume(resume)
                 .build();
         application.setRecruitment(recruitment);
         return application;
