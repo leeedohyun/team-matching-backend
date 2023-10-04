@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import server.teammatching.dto.response.RecruitmentResponse;
 import server.teammatching.entity.Application;
 import server.teammatching.entity.Post;
+import server.teammatching.entity.PostStatus;
 import server.teammatching.entity.Recruitment;
 import server.teammatching.exception.PostNotFoundException;
 import server.teammatching.exception.RecruitNotFoundException;
@@ -18,7 +19,7 @@ import static java.util.stream.Collectors.toList;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional
 public class RecruitmentService {
 
     private final PostRepository postRepository;
@@ -28,6 +29,15 @@ public class RecruitmentService {
         recruitmentRepository.save(recruitment);
     }
 
+    public String closeRecruitment(Long postId, String loginId) {
+        Post findPost = postRepository.findByIdAndLeader_LoginId(postId, loginId)
+                .orElseThrow(() -> new PostNotFoundException("유효하지 않은 게시글 입니다"));
+
+        findPost.updatePostStatus(PostStatus.모집완료);
+        return findPost.getTitle();
+    }
+
+    @Transactional(readOnly = true)
     public List<RecruitmentResponse> checkApplications(Long postId, String memberId) {
         Post findPost = postRepository.findByIdAndLeader_LoginId(postId, memberId)
                 .orElseThrow(() -> new PostNotFoundException("유효하지 않은 게시글 입니다"));

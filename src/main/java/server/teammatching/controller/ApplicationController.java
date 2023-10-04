@@ -29,8 +29,8 @@ public class ApplicationController {
     private final ApplicationService applicationService;
 
     @ApiOperation(value = "프로젝트 지원 API")
-    @PostMapping("/projects/{id}")
-    public ResponseEntity<ApplicationResponse> applyProject(@PathVariable("id") Long projectId,
+    @PostMapping("/projects/{postId}")
+    public ResponseEntity<ApplicationResponse> applyProject(@PathVariable("postId") Long projectId,
                                                             @AuthenticationPrincipal PrincipalDetails principal,
                                                             @RequestBody String resume) {
         AuthenticationUtils.validateAuthentication(principal);

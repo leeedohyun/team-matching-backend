@@ -44,7 +44,6 @@ public class Post extends BaseTimeEntity {
     @Column(nullable = false)
     private String field;
 
-    @Column(nullable = false)
     private String techStack;
 
     @ColumnDefault("0")
@@ -75,14 +74,13 @@ public class Post extends BaseTimeEntity {
 
     @Builder
     public Post(String title, int recruitNumber, String field, PostStatus status, PostType type,
-                String content, String techStack) {
+                String content) {
         this.title = title;
         this.recruitNumber = recruitNumber;
         this.field = field;
         this.status = status;
         this.type = type;
         this.content = content;
-        this.techStack = techStack;
     }
 
     public void setLeader(Member leader) {
@@ -169,5 +167,9 @@ public class Post extends BaseTimeEntity {
 
     public void updateBackendNumber(int backendNumber) {
         this.backendNumber = backendNumber;
+    }
+
+    public void updatePostStatus(PostStatus status) {
+        this.status = status;
     }
 }
