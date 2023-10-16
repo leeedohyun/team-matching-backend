@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import server.teammatching.ResumeDto;
 import server.teammatching.auth.AuthenticationUtils;
 import server.teammatching.auth.PrincipalDetails;
 import server.teammatching.dto.response.ApplicationResponse;
@@ -32,9 +33,11 @@ public class ApplicationController {
     @PostMapping("/projects/{postId}")
     public ResponseEntity<ApplicationResponse> applyProject(@PathVariable("postId") Long projectId,
                                                             @AuthenticationPrincipal PrincipalDetails principal,
-                                                            @RequestBody String resume) {
+                                                            @RequestBody ResumeDto resumeDto) {
         AuthenticationUtils.validateAuthentication(principal);
-        ApplicationResponse applicationResponse = applicationService.applyProject(projectId, principal.getUsername(), resume);
+        System.out.println("resumeDto = " + resumeDto.getResume());
+//        ApplicationResponse applicationResponse = applicationService.applyProject(projectId, principal.getUsername(), resume);
+        ApplicationResponse applicationResponse = applicationService.applyProject(projectId, principal.getUsername(), resumeDto);
         return ResponseEntity.ok(applicationResponse);
     }
 

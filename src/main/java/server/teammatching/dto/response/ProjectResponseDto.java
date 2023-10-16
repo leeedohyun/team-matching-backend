@@ -16,6 +16,7 @@ public class ProjectResponseDto {
 
     private Long postId;
     private Long memberId;
+    private String nickName;
     private String title;
     private String techStack;
     private String content;
@@ -29,6 +30,7 @@ public class ProjectResponseDto {
         return ProjectResponseDto.builder()
                 .postId(project.getId())
                 .memberId(project.getLeader().getId())
+                .nickName(project.getLeader().getNickName())
                 .title(project.getTitle())
                 .content(project.getContent())
                 .techStack(project.getTechStack())
