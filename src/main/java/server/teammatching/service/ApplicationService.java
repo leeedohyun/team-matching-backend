@@ -3,6 +3,7 @@ package server.teammatching.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import server.teammatching.dto.request.ResumeDto;
 import server.teammatching.auth.AuthenticationUtils;
 import server.teammatching.dto.response.ApplicationResponse;
 import server.teammatching.entity.Alarm;
@@ -40,8 +41,8 @@ public class ApplicationService {
     private final PostRepository postRepository;
     private final RecruitmentRepository recruitmentRepository;
 
-    public ApplicationResponse applyProject(Long projectId, String memberId, String resume) {
-        return getApplicationResponse(memberId, projectId, resume, PostType.PROJECT, "유효하지 않은 프로젝트 id 입니다.");
+    public ApplicationResponse applyProject(Long projectId, String memberId, ResumeDto resumeDto) {
+        return getApplicationResponse(memberId, projectId, resumeDto.getResume(), PostType.PROJECT, "유효하지 않은 프로젝트 id 입니다.");
     }
 
     public ApplicationResponse applyStudy(Long studyId, String memberId, String resume) {

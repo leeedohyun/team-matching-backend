@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import server.teammatching.ResumeDto;
+import server.teammatching.dto.request.ResumeDto;
 import server.teammatching.auth.AuthenticationUtils;
 import server.teammatching.auth.PrincipalDetails;
 import server.teammatching.dto.response.ApplicationResponse;
@@ -35,8 +35,6 @@ public class ApplicationController {
                                                             @AuthenticationPrincipal PrincipalDetails principal,
                                                             @RequestBody ResumeDto resumeDto) {
         AuthenticationUtils.validateAuthentication(principal);
-        System.out.println("resumeDto = " + resumeDto.getResume());
-//        ApplicationResponse applicationResponse = applicationService.applyProject(projectId, principal.getUsername(), resume);
         ApplicationResponse applicationResponse = applicationService.applyProject(projectId, principal.getUsername(), resumeDto);
         return ResponseEntity.ok(applicationResponse);
     }
@@ -45,19 +43,19 @@ public class ApplicationController {
     @PostMapping("/studies/{id}")
     public ResponseEntity<ApplicationResponse> applyStudy(@PathVariable("id") Long studyId,
                                                           @AuthenticationPrincipal PrincipalDetails principal,
-                                                          @RequestBody String resume) {
+                                                          @RequestBody ResumeDto resumeDto) {
         AuthenticationUtils.validateAuthentication(principal);
-        ApplicationResponse applicationResponse = applicationService.applyStudy(studyId, principal.getUsername(), resume);
+        ApplicationResponse applicationResponse = applicationService.applyProject(studyId, principal.getUsername(), resumeDto);
         return ResponseEntity.ok(applicationResponse);
     }
 
     @ApiOperation(value = "팀 지원 API")
     @PostMapping("/teams/{id}")
-    public ResponseEntity<ApplicationResponse> applyTeam(@PathVariable("id") Long studyId,
+    public ResponseEntity<ApplicationResponse> applyTeam(@PathVariable("id") Long teamId,
                                                          @AuthenticationPrincipal PrincipalDetails principal,
-                                                         @RequestBody String resume) {
+                                                         @RequestBody ResumeDto resumeDto) {
         AuthenticationUtils.validateAuthentication(principal);
-        ApplicationResponse applicationResponse = applicationService.applyTeam(studyId, principal.getUsername(), resume);
+        ApplicationResponse applicationResponse = applicationService.applyProject(teamId, principal.getUsername(), resumeDto);
         return ResponseEntity.ok(applicationResponse);
     }
 
