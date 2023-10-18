@@ -47,12 +47,14 @@ public class ApplicationService {
         return getApplicationResponse(memberId, projectId, resumeDto.getResume(), PostType.PROJECT, "유효하지 않은 프로젝트 id 입니다.");
     }
 
-    public ApplicationResponse applyStudy(Long studyId, String memberId, String resume) {
-        return getApplicationResponse(memberId, studyId, resume, PostType.STUDY, "유효하지 않은 스터디 id 입니다.");
+    public ApplicationResponse applyStudy(Long studyId, String memberId, ResumeDto resumeDto) {
+        validateMyRecruitment(studyId, memberId);
+        return getApplicationResponse(memberId, studyId, resumeDto.getResume(), PostType.STUDY, "유효하지 않은 스터디 id 입니다.");
     }
 
-    public ApplicationResponse applyTeam(Long teamId, String memberId, String resume) {
-        return getApplicationResponse(memberId, teamId, resume, PostType.TEAM, "유효하지 않은 스터디 id 입니다.");
+    public ApplicationResponse applyTeam(Long teamId, String memberId, ResumeDto resumeDto) {
+        validateMyRecruitment(teamId, memberId);
+        return getApplicationResponse(memberId, teamId, resumeDto.getResume(), PostType.TEAM, "유효하지 않은 스터디 id 입니다.");
     }
 
     @Transactional(readOnly = true)

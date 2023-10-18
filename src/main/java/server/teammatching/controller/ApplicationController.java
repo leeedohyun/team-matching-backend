@@ -45,7 +45,7 @@ public class ApplicationController {
                                                           @AuthenticationPrincipal PrincipalDetails principal,
                                                           @RequestBody ResumeDto resumeDto) {
         AuthenticationUtils.validateAuthentication(principal);
-        ApplicationResponse applicationResponse = applicationService.applyProject(studyId, principal.getUsername(), resumeDto);
+        ApplicationResponse applicationResponse = applicationService.applyStudy(studyId, principal.getUsername(), resumeDto);
         return ResponseEntity.ok(applicationResponse);
     }
 
@@ -55,7 +55,7 @@ public class ApplicationController {
                                                          @AuthenticationPrincipal PrincipalDetails principal,
                                                          @RequestBody ResumeDto resumeDto) {
         AuthenticationUtils.validateAuthentication(principal);
-        ApplicationResponse applicationResponse = applicationService.applyProject(teamId, principal.getUsername(), resumeDto);
+        ApplicationResponse applicationResponse = applicationService.applyTeam(teamId, principal.getUsername(), resumeDto);
         return ResponseEntity.ok(applicationResponse);
     }
 
