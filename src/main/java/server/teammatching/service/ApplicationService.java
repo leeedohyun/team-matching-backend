@@ -15,6 +15,7 @@ import server.teammatching.entity.PostStatus;
 import server.teammatching.entity.PostType;
 import server.teammatching.entity.Recruitment;
 import server.teammatching.exception.AlreadyApplicationException;
+import server.teammatching.exception.ApplicationException;
 import server.teammatching.exception.ApplicationNotFoundException;
 import server.teammatching.exception.MemberNotFoundException;
 import server.teammatching.exception.PostNotFoundException;
@@ -42,6 +43,7 @@ public class ApplicationService {
     private final RecruitmentRepository recruitmentRepository;
 
     public ApplicationResponse applyProject(Long projectId, String memberId, ResumeDto resumeDto) {
+        validateMyRecruitment(projectId, memberId);
         return getApplicationResponse(memberId, projectId, resumeDto.getResume(), PostType.PROJECT, "유효하지 않은 프로젝트 id 입니다.");
     }
 
@@ -136,6 +138,14 @@ public class ApplicationService {
     private void validateApplicationNotProcessed(Member appliedMember, Post post) {
         if (applicationRepository.findByAppliedMemberAndPost(appliedMember, post).isPresent()) {
             throw new AlreadyApplicationException("이미 지원한 상태입니다.");
+        }
+    }
+
+    private void validateMyRecruitment(Long postId, String memberId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new PostNotFoundException("존재하지 않는 ID입니다."));
+        if (post.getLeader().getLoginId() == memberId) {
+            throw new ApplicationException("본인이 생성한 팀에는 지원할 수 없습니다.");
         }
     }
 }

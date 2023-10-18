@@ -106,4 +106,14 @@ public class GlobalExceptionHandler {
                         .message(e.getMessage())
                         .build());
     }
+
+    @ExceptionHandler(ApplicationException.class)
+    public ResponseEntity<ErrorResponse> handleApplicationException(ApplicationException e) {
+        log.error(e.getMessage());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(ErrorResponse.builder()
+                        .status(HttpStatus.FORBIDDEN)
+                        .message(e.getMessage())
+                        .build());
+    }
 }
