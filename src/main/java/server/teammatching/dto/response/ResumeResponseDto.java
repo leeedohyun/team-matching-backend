@@ -17,6 +17,7 @@ public class ResumeResponseDto {
     private Long postId;
     private String loginId;
     private String resume;
+    private String nickName;
 
     public static ResumeResponseDto from(Application application) {
         return ResumeResponseDto.builder()
@@ -24,6 +25,7 @@ public class ResumeResponseDto {
                 .resume(application.getResume())
                 .loginId(application.getAppliedMember().getLoginId())
                 .postId(application.getPost().getId())
+                .nickName(application.getAppliedMember().getNickName())
                 .build();
     }
 }

@@ -55,9 +55,6 @@ public class StudyService {
         if (updateRequest.getTitle() != "") {
             findStudy.updateTitle(updateRequest.getTitle());
         }
-        if (updateRequest.getField() != "") {
-            findStudy.updateField(updateRequest.getField());
-        }
         if (updateRequest.getRecruitNumber() != 0) {
             findStudy.updateRecruitNumber(updateRequest.getRecruitNumber());
         }
