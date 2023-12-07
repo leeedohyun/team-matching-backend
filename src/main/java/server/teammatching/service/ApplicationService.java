@@ -146,7 +146,7 @@ public class ApplicationService {
     private void validateMyRecruitment(Long postId, String memberId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new PostNotFoundException("존재하지 않는 ID입니다."));
-        if (post.getLeader().getLoginId() == memberId) {
+        if (memberId.equals(post.getLeader().getLoginId())) {
             throw new ApplicationException("본인이 생성한 팀에는 지원할 수 없습니다.");
         }
     }

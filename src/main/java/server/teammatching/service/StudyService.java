@@ -52,13 +52,13 @@ public class StudyService {
                 .orElseThrow(() -> new PostNotFoundException("유효하지 않은 팀 id 입니다."));
         AuthenticationUtils.verifyLoggedInUser(memberId, findStudy.getLeader().getLoginId());
 
-        if (updateRequest.getTitle() != "") {
+        if (!updateRequest.getTitle().isEmpty()) {
             findStudy.updateTitle(updateRequest.getTitle());
         }
         if (updateRequest.getRecruitNumber() != 0) {
             findStudy.updateRecruitNumber(updateRequest.getRecruitNumber());
         }
-        if (updateRequest.getContent() != "") {
+        if (!updateRequest.getContent().isEmpty()) {
             findStudy.updateContent(updateRequest.getContent());
         }
 
