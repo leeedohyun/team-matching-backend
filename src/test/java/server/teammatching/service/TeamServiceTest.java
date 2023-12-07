@@ -29,7 +29,6 @@ class TeamServiceTest {
         //given
         TeamAndStudyCreateRequestDto teamAndStudyCreateRequestDto = TeamAndStudyCreateRequestDto.builder()
                 .title("OO팀 모집합니다.")
-                .field("공모전")
                 .recruitNumber(4)
                 .content("OO팀 모집합니다. 열심히 참여하실 분들 구합니다.")
                 .build();
@@ -71,7 +70,6 @@ class TeamServiceTest {
 
         TeamAndStudyCreateRequestDto teamAndStudyCreateRequestDto = TeamAndStudyCreateRequestDto.builder()
                 .title("OO팀 모집합니다.")
-                .field("공모전")
                 .recruitNumber(4)
                 .content("OO팀 모집합니다. 열심히 참여하실 분들 구합니다.")
                 .build();
@@ -80,7 +78,6 @@ class TeamServiceTest {
 
         TeamAndStudyCreateRequestDto updateRequest = TeamAndStudyCreateRequestDto.builder()
                 .title(null)
-                .field(null)
                 .recruitNumber(2)
                 .content(null)
                 .build();

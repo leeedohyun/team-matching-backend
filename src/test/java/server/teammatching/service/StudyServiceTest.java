@@ -40,7 +40,6 @@ class StudyServiceTest {
 
         TeamAndStudyCreateRequestDto teamAndStudyCreateRequestDto = TeamAndStudyCreateRequestDto.builder()
                 .title("OO 스터디 모집합니다.")
-                .field("전자")
                 .recruitNumber(4)
                 .content("OO 스터디 모집합니다. 열심히 참여하실 분들 구합니다.")
                 .build();

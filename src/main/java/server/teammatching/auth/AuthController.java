@@ -13,6 +13,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import server.teammatching.dto.request.LoginRequest;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 @RestController
 @RequiredArgsConstructor
 @Api(tags = {"로그인/로그아웃 API"})
@@ -23,9 +26,17 @@ public class AuthController {
 
     @ApiOperation(value = "로그인 API")
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<String> login(@RequestBody LoginRequest request, HttpServletRequest httpServletRequest, HttpServletResponse response) {
         try {
-            return ResponseEntity.ok(authService.login(request));
+            String login = authService.login(request);
+//            HttpSession session = httpServletRequest.getSession();
+//            Cookie sessionCookie = new Cookie("JSESSIONID", session.getId());
+//            sessionCookie.setHttpOnly(false);
+//            sessionCookie.setMaxAge(60 * 30);
+//            sessionCookie.setPath("/");
+//            sessionCookie.setSecure(false);
+//            response.addCookie(sessionCookie);
+            return ResponseEntity.ok().body(httpServletRequest.getSession().getId());
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

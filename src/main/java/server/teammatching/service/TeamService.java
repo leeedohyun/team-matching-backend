@@ -55,9 +55,6 @@ public class TeamService {
         if (requestDto.getTitle() != null) {
             findTeam.updateTitle(requestDto.getTitle());
         }
-        if (requestDto.getField() != null) {
-            findTeam.updateField(requestDto.getField());
-        }
         if (requestDto.getRecruitNumber() != 0) {
             findTeam.updateRecruitNumber(requestDto.getRecruitNumber());
         }

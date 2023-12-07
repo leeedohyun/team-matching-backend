@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import server.teammatching.auth.AuthenticationUtils;
@@ -30,6 +31,15 @@ public class RecruitmentController {
                                                                        @AuthenticationPrincipal PrincipalDetails principal) {
         AuthenticationUtils.validateAuthentication(principal);
         List<RecruitmentResponse> response = recruitmentService.checkApplications(postId, principal.getUsername());
+        return ResponseEntity.ok(response);
+    }
+
+    @ApiOperation(value = "채용 마감 API")
+    @PostMapping("/{id}/close")
+    public ResponseEntity<String> closeRecruitment(@PathVariable("id") Long postId,
+                                                   @AuthenticationPrincipal PrincipalDetails principal) {
+        AuthenticationUtils.validateAuthentication(principal);
+        String response = recruitmentService.closeRecruitment(postId, principal.getUsername());
         return ResponseEntity.ok(response);
     }
 }

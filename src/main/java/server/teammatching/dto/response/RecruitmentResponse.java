@@ -16,6 +16,8 @@ public class RecruitmentResponse {
 
     private Long memberId;
     private Long postId;
+    private Long applicationId;
+    private String nickname;
     private String title;
     private ApplicationStatus applicationStatus;
 
@@ -23,6 +25,8 @@ public class RecruitmentResponse {
         return RecruitmentResponse.builder()
                 .memberId(application.getAppliedMember().getId())
                 .postId(application.getPost().getId())
+                .applicationId(application.getId())
+                .nickname(application.getAppliedMember().getNickName())
                 .title(application.getPost().getTitle())
                 .applicationStatus(application.getStatus())
                 .build();

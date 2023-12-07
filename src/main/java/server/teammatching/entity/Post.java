@@ -22,7 +22,10 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -43,6 +46,8 @@ public class Post extends BaseTimeEntity {
 
     @Column(nullable = false)
     private String field;
+
+    private String techStack;
 
     @ColumnDefault("0")
     private int views;
@@ -70,6 +75,9 @@ public class Post extends BaseTimeEntity {
     @JoinColumn(name = "recruitment_id")
     private Recruitment recruitment;
 
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Alarm> alarms = new ArrayList<>();
+
     @Builder
     public Post(String title, int recruitNumber, String field, PostStatus status, PostType type,
                 String content) {
@@ -94,7 +102,6 @@ public class Post extends BaseTimeEntity {
     public static Post createTeam(TeamAndStudyCreateRequestDto form, Member member) {
         Post team = Post.builder()
                 .title(form.getTitle())
-                .field(form.getField())
                 .recruitNumber(form.getRecruitNumber())
                 .type(PostType.TEAM)
                 .status(PostStatus.모집중)
@@ -107,7 +114,6 @@ public class Post extends BaseTimeEntity {
     public static Post createStudy(TeamAndStudyCreateRequestDto form, Member member) {
         Post study = Post.builder()
                 .title(form.getTitle())
-                .field(form.getField())
                 .recruitNumber(form.getRecruitNumber())
                 .type(PostType.STUDY)
                 .status(PostStatus.모집중)
@@ -127,6 +133,7 @@ public class Post extends BaseTimeEntity {
                 .title(requestDto.getTitle())
                 .field(requestDto.getField())
                 .recruitNumber(requestDto.getRecruitNumber())
+                .techStack(requestDto.getTechStack())
                 .type(PostType.PROJECT)
                 .status(PostStatus.모집중)
                 .content(requestDto.getContent())
@@ -164,5 +171,9 @@ public class Post extends BaseTimeEntity {
 
     public void updateBackendNumber(int backendNumber) {
         this.backendNumber = backendNumber;
+    }
+
+    public void updatePostStatus(PostStatus status) {
+        this.status = status;
     }
 }
