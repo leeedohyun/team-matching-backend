@@ -2,7 +2,7 @@ package server.teammatching.exception;
 
 public class ApplicationNotFoundException extends RuntimeException {
 
-    public ApplicationNotFoundException(String message) {
-        super(message);
+    public ApplicationNotFoundException() {
+        super("This application does not exist.");
     }
 }

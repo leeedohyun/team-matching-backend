@@ -1,10 +1,15 @@
 package server.teammatching.service;
 
-import lombok.RequiredArgsConstructor;
+import static java.util.stream.Collectors.toList;
+
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import server.teammatching.dto.request.ResumeDto;
+
+import lombok.RequiredArgsConstructor;
 import server.teammatching.auth.AuthenticationUtils;
+import server.teammatching.dto.request.ResumeDto;
 import server.teammatching.dto.response.ApplicationResponse;
 import server.teammatching.entity.Alarm;
 import server.teammatching.entity.Application;
@@ -27,10 +32,6 @@ import server.teammatching.repository.MemberRepository;
 import server.teammatching.repository.PostRepository;
 import server.teammatching.repository.RecruitmentRepository;
 
-import java.util.List;
-
-import static java.util.stream.Collectors.toList;
-
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -44,23 +45,23 @@ public class ApplicationService {
 
     public ApplicationResponse applyProject(Long projectId, String memberId, ResumeDto resumeDto) {
         validateMyRecruitment(projectId, memberId);
-        return getApplicationResponse(memberId, projectId, resumeDto.getResume(), PostType.PROJECT, "유효하지 않은 프로젝트 id 입니다.");
+        return getApplicationResponse(memberId, projectId, resumeDto.getResume(), PostType.PROJECT);
     }
 
     public ApplicationResponse applyStudy(Long studyId, String memberId, ResumeDto resumeDto) {
         validateMyRecruitment(studyId, memberId);
-        return getApplicationResponse(memberId, studyId, resumeDto.getResume(), PostType.STUDY, "유효하지 않은 스터디 id 입니다.");
+        return getApplicationResponse(memberId, studyId, resumeDto.getResume(), PostType.STUDY);
     }
 
     public ApplicationResponse applyTeam(Long teamId, String memberId, ResumeDto resumeDto) {
         validateMyRecruitment(teamId, memberId);
-        return getApplicationResponse(memberId, teamId, resumeDto.getResume(), PostType.TEAM, "유효하지 않은 스터디 id 입니다.");
+        return getApplicationResponse(memberId, teamId, resumeDto.getResume(), PostType.TEAM);
     }
 
     @Transactional(readOnly = true)
     public List<ApplicationResponse> checkAllApplications(String memberId) {
         Member findMember = memberRepository.findByLoginId(memberId)
-                .orElseThrow(() -> new MemberNotFoundException("유효하지 않은 회원 id 입니다."));
+                .orElseThrow(MemberNotFoundException::new);
         List<Application> appliedList = applicationRepository.findByAppliedMember(findMember);
 
         return appliedList.stream()
@@ -95,12 +96,11 @@ public class ApplicationService {
     private ApplicationResponse getApplicationResponse(String memberId,
                                                        Long postId,
                                                        String resume,
-                                                       PostType type,
-                                                       String message) {
+                                                       PostType type) {
         Member appliedMember = memberRepository.findByLoginId(memberId)
-                .orElseThrow(() -> new MemberNotFoundException("유효하지 않은 회원 id 입니다."));
+                .orElseThrow(MemberNotFoundException::new);
         Post post = postRepository.findByIdAndType(postId, type)
-                .orElseThrow(() -> new PostNotFoundException(message));
+                .orElseThrow(PostNotFoundException::new);
         Recruitment recruitment = recruitmentRepository.findByPost(post)
                 .orElseThrow(() -> new RecruitNotFoundException("유효하지 않은 id 입니다."));
         Alarm alarm = Alarm.createAlarm(post.getLeader(), post);
@@ -126,7 +126,7 @@ public class ApplicationService {
                                                        String memberId,
                                                        ApplicationStatus applicationStatus) {
         Application findApplication = applicationRepository.findById(applicationId)
-                .orElseThrow(() -> new ApplicationNotFoundException("유효하지 않은 지원입니다."));
+                .orElseThrow(ApplicationNotFoundException::new);
         Alarm alarm = Alarm.createAlarm(findApplication.getAppliedMember(), findApplication.getPost());
 
         AuthenticationUtils.verifyLoggedInUser(memberId, findApplication.getPost().getLeader().getLoginId());
@@ -145,7 +145,7 @@ public class ApplicationService {
 
     private void validateMyRecruitment(Long postId, String memberId) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new PostNotFoundException("존재하지 않는 ID입니다."));
+                .orElseThrow(PostNotFoundException::new);
         if (memberId.equals(post.getLeader().getLoginId())) {
             throw new ApplicationException("본인이 생성한 팀에는 지원할 수 없습니다.");
         }

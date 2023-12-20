@@ -1,10 +1,11 @@
 package server.teammatching.auth;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+
+import lombok.RequiredArgsConstructor;
 import server.teammatching.entity.Member;
 import server.teammatching.exception.MemberNotFoundException;
 import server.teammatching.repository.MemberRepository;
@@ -18,7 +19,7 @@ public class PrincipalDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Member member = memberRepository.findByLoginId(username)
-                .orElseThrow(() -> new MemberNotFoundException("error"));
+                .orElseThrow(MemberNotFoundException::new);
         return new PrincipalDetails(member);
     }
 }

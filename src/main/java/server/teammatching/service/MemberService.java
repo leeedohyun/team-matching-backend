@@ -1,9 +1,13 @@
 package server.teammatching.service;
 
-import lombok.RequiredArgsConstructor;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import lombok.RequiredArgsConstructor;
 import server.teammatching.auth.AuthenticationUtils;
 import server.teammatching.dto.request.MemberRequestDto;
 import server.teammatching.dto.request.MemberUpdateRequestDto;
@@ -13,9 +17,6 @@ import server.teammatching.entity.Member;
 import server.teammatching.exception.DuplicateResourceException;
 import server.teammatching.exception.MemberNotFoundException;
 import server.teammatching.repository.MemberRepository;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -38,7 +39,7 @@ public class MemberService {
     public MemberResponseDto findOne(String memberId, String authenticatedId) {
         AuthenticationUtils.verifyLoggedInUser(memberId, authenticatedId);
         Member findMember = memberRepository.findByLoginId(memberId)
-                .orElseThrow(() -> new MemberNotFoundException("존재하지 않는 회원입니다."));
+                .orElseThrow(MemberNotFoundException::new);
 
         return MemberResponseDto.from(findMember);
     }
@@ -55,7 +56,7 @@ public class MemberService {
     public MemberUpdateResponseDto update(String memberId, MemberUpdateRequestDto updateRequest, String authenticatedId) {
         AuthenticationUtils.verifyLoggedInUser(memberId, authenticatedId);
         Member findMember = memberRepository.findByLoginId(memberId)
-                .orElseThrow(() -> new MemberNotFoundException("존재하지 않는 회원입니다."));
+                .orElseThrow(MemberNotFoundException::new);
 
         if (updateRequest.getUpdatedNickName() != null) {
             findMember.updateNickName(updateRequest.getUpdatedNickName());
@@ -74,7 +75,7 @@ public class MemberService {
     public void delete(String memberId, String authenticatedId) {
         AuthenticationUtils.verifyLoggedInUser(memberId, authenticatedId);
         Member findMember = memberRepository.findByLoginId(memberId)
-                .orElseThrow(() -> new MemberNotFoundException("존재하지 않는 회원입니다."));
+                .orElseThrow(MemberNotFoundException::new);
         memberRepository.delete(findMember);
     }
 

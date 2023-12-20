@@ -1,8 +1,12 @@
 package server.teammatching.service;
 
-import lombok.RequiredArgsConstructor;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import lombok.RequiredArgsConstructor;
 import server.teammatching.dto.response.ApplicantAlarmResponse;
 import server.teammatching.dto.response.LeaderAlarmResponse;
 import server.teammatching.entity.Alarm;
@@ -13,9 +17,6 @@ import server.teammatching.exception.MemberNotFoundException;
 import server.teammatching.repository.AlarmRepository;
 import server.teammatching.repository.ApplicationRepository;
 import server.teammatching.repository.MemberRepository;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -28,7 +29,7 @@ public class AlarmService {
 
     public List<ApplicantAlarmResponse> checkApplicantAlarms(String memberId) {
         Member findMember = memberRepository.findByLoginId(memberId)
-                .orElseThrow(() -> new MemberNotFoundException("유효하지 않은 id 입니다."));
+                .orElseThrow(MemberNotFoundException::new);
         List<Alarm> alarmList = alarmRepository.findByMember(findMember);
 
         List<ApplicantAlarmResponse> responses = new ArrayList<>();
@@ -36,7 +37,7 @@ public class AlarmService {
         for (Alarm alarm : alarmList) {
             if (applicationRepository.findByAppliedMemberAndPost(findMember, alarm.getPost()).isPresent()) {
                 Application application = applicationRepository.findByAppliedMemberAndPost(findMember, alarm.getPost())
-                        .orElseThrow(() -> new ApplicationNotFoundException("유효하지 않은 id 입니다."));
+                        .orElseThrow(ApplicationNotFoundException::new);
                 ApplicantAlarmResponse applicantAlarmResponse = ApplicantAlarmResponse.builder()
                         .alarmId(alarm.getId())
                         .applicationStatus(application.getStatus())
@@ -50,7 +51,7 @@ public class AlarmService {
 
     public List<LeaderAlarmResponse> checkLeaderAlarms(String memberId) {
         Member findMember = memberRepository.findByLoginId(memberId)
-                .orElseThrow(() -> new MemberNotFoundException("유효하지 않은 id 입니다."));
+                .orElseThrow(MemberNotFoundException::new);
         List<Alarm> alarmList = alarmRepository.findByMember(findMember);
 
         List<LeaderAlarmResponse> responses = new ArrayList<>();

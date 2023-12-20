@@ -1,7 +1,8 @@
 package server.teammatching.service;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import lombok.RequiredArgsConstructor;
 import server.teammatching.dto.response.ResumeResponseDto;
 import server.teammatching.entity.Application;
 import server.teammatching.exception.ApplicationNotFoundException;
@@ -15,7 +16,7 @@ public class ResumeService {
 
     public ResumeResponseDto findResume(Long applicationId) {
         Application application = applicationRepository.findById(applicationId)
-                .orElseThrow(() -> new ApplicationNotFoundException("지원이 존재하지 않습니다."));
+                .orElseThrow(ApplicationNotFoundException::new);
 
         return ResumeResponseDto.from(application);
     }

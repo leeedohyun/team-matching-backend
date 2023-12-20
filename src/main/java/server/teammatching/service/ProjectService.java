@@ -1,8 +1,13 @@
 package server.teammatching.service;
 
-import lombok.RequiredArgsConstructor;
+import static java.util.stream.Collectors.toList;
+
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import lombok.RequiredArgsConstructor;
 import server.teammatching.auth.AuthenticationUtils;
 import server.teammatching.dto.request.ProjectRequestDto;
 import server.teammatching.dto.response.ProjectResponseDto;
@@ -18,10 +23,6 @@ import server.teammatching.repository.MemberRepository;
 import server.teammatching.repository.PostRepository;
 import server.teammatching.repository.RecruitmentRepository;
 
-import java.util.List;
-
-import static java.util.stream.Collectors.toList;
-
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -34,7 +35,7 @@ public class ProjectService {
 
     public ProjectResponseDto create(String memberId, ProjectRequestDto requestDto) {
         Member leader = memberRepository.findByLoginId(memberId)
-                .orElseThrow(() -> new MemberNotFoundException("유효하지 않은 사용자 id 입니다."));
+                .orElseThrow(MemberNotFoundException::new);
 
         Post createdProject = Post.createProject(requestDto, leader);
 
@@ -49,7 +50,7 @@ public class ProjectService {
 
     public ProjectResponseDto update(Long projectId, String memberId, ProjectRequestDto updateRequest) {
         Post findProject = postRepository.findById(projectId)
-                .orElseThrow(() -> new PostNotFoundException("유효하지 않은 팀 id 입니다."));
+                .orElseThrow(PostNotFoundException::new);
         AuthenticationUtils.verifyLoggedInUser(memberId, findProject.getLeader().getLoginId());
 
         if (updateRequest.getTitle() != null) {
@@ -91,7 +92,7 @@ public class ProjectService {
     public List<ProjectResponseDto> checkMemberProjects(String memberId, String authenticatedId) {
         AuthenticationUtils.verifyLoggedInUser(memberId, authenticatedId);
         Member findLeader = memberRepository.findByLoginId(memberId)
-                .orElseThrow(() -> new MemberNotFoundException("유효하지 않은 사용자 id 입니다."));
+                .orElseThrow(MemberNotFoundException::new);
 
         List<Post> findMemberProjects = postRepository.findByLeaderAndType(findLeader, PostType.PROJECT);
 
@@ -102,7 +103,7 @@ public class ProjectService {
 
     public void delete(Long postId, String memberId) {
         Post findProject = postRepository.findById(postId)
-                .orElseThrow(() -> new PostNotFoundException("유효하지 않은 프로젝트 id 입니다."));
+                .orElseThrow(PostNotFoundException::new);
         List<Application> projectApplications = applicationRepository.findByPost(findProject);
         postRepository.deleteByIdAndLeader_LoginId(postId, memberId);
         applicationRepository.deleteAll(projectApplications);
@@ -110,7 +111,7 @@ public class ProjectService {
 
     public ProjectResponseDto findOne(Long projectId) {
         Post post = postRepository.findById(projectId)
-                .orElseThrow(() -> new PostNotFoundException("유효하지 않은 프로젝트입니다."));
+                .orElseThrow(PostNotFoundException::new);
         
         return ProjectResponseDto.from(post);
     }
