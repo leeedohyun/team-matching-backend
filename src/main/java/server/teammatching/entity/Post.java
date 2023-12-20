@@ -1,14 +1,7 @@
 package server.teammatching.entity;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import org.hibernate.annotations.ColumnDefault;
-import server.teammatching.dto.request.ProjectRequestDto;
-import server.teammatching.dto.request.TeamAndStudyCreateRequestDto;
-import server.teammatching.exception.InsufficientMembersException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -24,8 +17,17 @@ import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
-import java.util.ArrayList;
-import java.util.List;
+
+import org.hibernate.annotations.ColumnDefault;
+
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import server.teammatching.dto.request.ProjectRequestDto;
+import server.teammatching.dto.request.TeamAndStudyCreateRequestDto;
+import server.teammatching.exception.InsufficientMembersException;
 
 @Entity
 @Getter
@@ -77,17 +79,6 @@ public class Post extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Alarm> alarms = new ArrayList<>();
-
-    @Builder
-    public Post(String title, int recruitNumber, String field, PostStatus status, PostType type,
-                String content) {
-        this.title = title;
-        this.recruitNumber = recruitNumber;
-        this.field = field;
-        this.status = status;
-        this.type = type;
-        this.content = content;
-    }
 
     public void setLeader(Member leader) {
         this.leader = leader;

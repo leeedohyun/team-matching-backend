@@ -1,11 +1,7 @@
 package server.teammatching.entity;
 
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import server.teammatching.dto.request.MemberRequestDto;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -16,12 +12,21 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
-import java.util.ArrayList;
-import java.util.List;
+
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import server.teammatching.dto.request.MemberRequestDto;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Builder
 public class Member extends BaseTimeEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -56,16 +61,6 @@ public class Member extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Alarm> alarms = new ArrayList<>();
-
-    @Builder
-    public Member(String loginId, String password, String email, String nickName, String university, Role role) {
-        this.loginId = loginId;
-        this.password = password;
-        this.email = email;
-        this.nickName = nickName;
-        this.university = university;
-        this.role = role;
-    }
 
     public static Member createMember(MemberRequestDto request, PasswordEncoder passwordEncoder) {
         return Member.builder()
