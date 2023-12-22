@@ -41,14 +41,12 @@ class MemberTest {
     @Test
     @DisplayName("닉네임이 null이면 수정되지 않는다.")
     void notUpdateNickNameByNull() {
-        // given
         assertNickNameUpdate("hyun", null, "hyun");
     }
 
     @Test
     @DisplayName("닉네임이 빈 문자열이면 수정되지 않는다.")
     void notUpdateNickNameByEmptyString() {
-        // given
         assertNickNameUpdate("do", "", "do");
     }
 
@@ -56,6 +54,24 @@ class MemberTest {
     @DisplayName("닉네임이 null이거나 빈 문자열이 아니면 수정된다.")
     void updateNickName() {
         assertNickNameUpdate("lee", "LEE", "LEE");
+    }
+
+    @Test
+    @DisplayName("대학교가 null이면 수정되지 않는다.")
+    void notUpdateUniversityByNull() {
+        assertNickNameUpdate("홍익대학교", null, "홍익대학교");
+    }
+
+    @Test
+    @DisplayName("대학교가 빈 문자열이면 수정되지 않는다.")
+    void notUpdateUniversityByEmptyString() {
+        assertUniversityUpdate("홍익대학교", "", "홍익대학교");
+    }
+
+    @Test
+    @DisplayName("대학교가 null이거나 빈 문자열이 아니면 수정된다.")
+    void updateUniversity() {
+        assertNickNameUpdate("홍익대학교", "서울대학교", "서울대학교");
     }
 
     private void assertEmailUpdate(final String email, final String emailToUpdate, final String expected) {
@@ -86,5 +102,20 @@ class MemberTest {
 
         // then
         assertThat(member.getNickName()).isEqualTo(expected);
+    }
+
+    private void assertUniversityUpdate(final String university, final String universityToUpdate, final String expected) {
+        // given
+        final MemberRequestDto dto = MemberRequestDto.builder()
+                .password("1234")
+                .university(university)
+                .build();
+        final Member member = Member.createMember(dto, passwordEncoder);
+
+        // when
+        member.updateUniversity(universityToUpdate);
+
+        // then
+        assertThat(member.getUniversity()).isEqualTo(expected);
     }
 }
