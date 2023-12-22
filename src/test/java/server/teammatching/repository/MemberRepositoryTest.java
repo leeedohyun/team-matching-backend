@@ -64,10 +64,10 @@ class MemberRepositoryTest {
         final Member savedMember = memberRepository.save(member);
 
         // when
-        final boolean existsed = memberRepository.existsByLoginId(savedMember.getLoginId());
+        final boolean existed = memberRepository.existsByLoginId(savedMember.getLoginId());
 
         // then
-        Assertions.assertThat(existsed).isTrue();
+        Assertions.assertThat(existed).isTrue();
     }
 
     @DisplayName("로그인 아이디가 존재하지 않으면 false를 반환한다.")
@@ -91,10 +91,10 @@ class MemberRepositoryTest {
         final Member savedMember = memberRepository.save(member);
 
         // when
-        final boolean existsed = memberRepository.existsByNickName(savedMember.getNickName());
+        final boolean existed = memberRepository.existsByNickName(savedMember.getNickName());
 
         // then
-        Assertions.assertThat(existsed).isTrue();
+        Assertions.assertThat(existed).isTrue();
     }
 
     @DisplayName("닉네임이 존재하지 않으면 false를 반환한다.")
