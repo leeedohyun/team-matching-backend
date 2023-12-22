@@ -4,6 +4,8 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
@@ -53,5 +55,59 @@ class MemberRepositoryTest {
 
         // then
         Assertions.assertThat(findMember).isEqualTo(savedMember);
+    }
+
+    @Test
+    @DisplayName("로그인 아이디가 존재하면 true를 반환한다.")
+    void existsByLoginId() {
+        // given
+        final Member savedMember = memberRepository.save(member);
+
+        // when
+        final boolean existsed = memberRepository.existsByLoginId(savedMember.getLoginId());
+
+        // then
+        Assertions.assertThat(existsed).isTrue();
+    }
+
+    @DisplayName("로그인 아이디가 존재하지 않으면 false를 반환한다.")
+    @ParameterizedTest
+    @ValueSource(strings = {"hong", "kim", "park", "jang"})
+    void notExistsByLoginId(final String loginId) {
+        // given
+        memberRepository.save(member);
+
+        // when
+        final boolean notExisted = memberRepository.existsByLoginId(loginId);
+
+        // then
+        Assertions.assertThat(notExisted).isFalse();
+    }
+
+    @Test
+    @DisplayName("닉네임이 존재하면 true를 반환한다.")
+    void existsByNickName() {
+        // given
+        final Member savedMember = memberRepository.save(member);
+
+        // when
+        final boolean existsed = memberRepository.existsByNickName(savedMember.getNickName());
+
+        // then
+        Assertions.assertThat(existsed).isTrue();
+    }
+
+    @DisplayName("닉네임이 존재하지 않으면 false를 반환한다.")
+    @ParameterizedTest
+    @ValueSource(strings = {"hong", "kim", "park", "jang"})
+    void notExistsByNickName(final String nickName) {
+        // given
+        memberRepository.save(member);
+
+        // when
+        final boolean notExisted = memberRepository.existsByLoginId(nickName);
+
+        // then
+        Assertions.assertThat(notExisted).isFalse();
     }
 }
