@@ -38,6 +38,57 @@ class MemberTest {
         assertEmailUpdate("abd@gmail.com", "efg@naver.com", "efg@naver.com");
     }
 
+    @Test
+    @DisplayName("닉네임이 null이면 수정되지 않는다.")
+    void notUpdateNickNameByNull() {
+        // given
+        final MemberRequestDto dto = MemberRequestDto.builder()
+                .password("1234")
+                .nickName("hyun")
+                .build();
+        final Member member = Member.createMember(dto, passwordEncoder);
+
+        // when
+        member.updateNickName(null);
+
+        // then
+        assertThat(member.getNickName()).isEqualTo("hyun");
+    }
+
+    @Test
+    @DisplayName("닉네임이 빈 문자열이면 수정되지 않는다.")
+    void notUpdateNickNameByEmptyString() {
+        // given
+        final MemberRequestDto dto = MemberRequestDto.builder()
+                .password("1234")
+                .nickName("do")
+                .build();
+        final Member member = Member.createMember(dto, passwordEncoder);
+
+        // when
+        member.updateNickName("");
+
+        // then
+        assertThat(member.getNickName()).isEqualTo("do");
+    }
+
+    @Test
+    @DisplayName("닉네임이 null이거나 빈 문자열이 아니면 수정된다.")
+    void updateNickName() {
+        // given
+        final MemberRequestDto dto = MemberRequestDto.builder()
+                .password("1234")
+                .nickName("lee")
+                .build();
+        final Member member = Member.createMember(dto, passwordEncoder);
+
+        // when
+        member.updateNickName("LEE");
+
+        // then
+        assertThat(member.getNickName()).isEqualTo("LEE");
+    }
+
     private void assertEmailUpdate(final String email, final String emailToUpdate, final String expected) {
         // given
         final MemberRequestDto dto = MemberRequestDto.builder()
