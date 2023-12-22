@@ -13,23 +13,18 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
-import org.springframework.security.crypto.password.PasswordEncoder;
-
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import server.teammatching.dto.request.MemberRequestDto;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
-@Builder
 public class Member extends BaseTimeEntity {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "member_id")
     private Long id;
 
@@ -62,15 +57,15 @@ public class Member extends BaseTimeEntity {
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Alarm> alarms = new ArrayList<>();
 
-    public static Member createMember(MemberRequestDto request, PasswordEncoder passwordEncoder) {
-        return Member.builder()
-                .loginId(request.getLoginId())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .nickName(request.getNickName())
-                .university(request.getUniversity())
-                .email(request.getEmail())
-                .role(Role.USER)
-                .build();
+    @Builder
+    public Member(final String loginId, final String password, final String email, final String nickName,
+                  final String university) {
+        this.loginId = loginId;
+        this.password = password;
+        this.email = email;
+        this.nickName = nickName;
+        this.university = university;
+        this.role = Role.USER;
     }
 
     public void updateEmail(final String email) {

@@ -2,23 +2,10 @@ package server.teammatching.entity;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
-import org.springframework.security.crypto.password.PasswordEncoder;
-
-import server.teammatching.dto.request.MemberRequestDto;
 
 class MemberTest {
-
-    private PasswordEncoder passwordEncoder;
-
-    @BeforeEach
-    void setUp() {
-        passwordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
-
-    }
 
     @Test
     @DisplayName("이메일이 null이면 수정되지 않는다.")
@@ -76,11 +63,10 @@ class MemberTest {
 
     private void assertEmailUpdate(final String email, final String emailToUpdate, final String expected) {
         // given
-        final MemberRequestDto dto = MemberRequestDto.builder()
+        final Member member = Member.builder()
                 .password("1234")
                 .email(email)
                 .build();
-        final Member member = Member.createMember(dto, passwordEncoder);
 
         // when
         member.updateEmail(emailToUpdate);
@@ -91,12 +77,10 @@ class MemberTest {
 
     private void assertNickNameUpdate(final String nickName, final String nickNameToUpdate, final String expected) {
         // given
-        final MemberRequestDto dto = MemberRequestDto.builder()
+        final Member member = Member.builder()
                 .password("1234")
                 .nickName(nickName)
                 .build();
-        final Member member = Member.createMember(dto, passwordEncoder);
-
         // when
         member.updateNickName(nickNameToUpdate);
 
@@ -106,11 +90,10 @@ class MemberTest {
 
     private void assertUniversityUpdate(final String university, final String universityToUpdate, final String expected) {
         // given
-        final MemberRequestDto dto = MemberRequestDto.builder()
+        final Member member = Member.builder()
                 .password("1234")
                 .university(university)
                 .build();
-        final Member member = Member.createMember(dto, passwordEncoder);
 
         // when
         member.updateUniversity(universityToUpdate);

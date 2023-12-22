@@ -27,10 +27,17 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
 
     public MemberResponseDto join(MemberRequestDto request) {
-        Member createdMember = Member.createMember(request, passwordEncoder);
+        final String encryptedPassword = passwordEncoder.encode(request.getPassword());
+        final Member createdMember = Member.builder()
+                .university(request.getUniversity())
+                .nickName(request.getNickName())
+                .email(request.getEmail())
+                .loginId(request.getLoginId())
+                .password(encryptedPassword)
+                .build();
         validateDuplicateLoginId(createdMember);
         validateDuplicateNickName(createdMember);
-        Member savedMember = memberRepository.save(createdMember);
+        final Member savedMember = memberRepository.save(createdMember);
 
         return MemberResponseDto.from(savedMember);
     }
@@ -53,7 +60,8 @@ public class MemberService {
                 .collect(Collectors.toList());
     }
 
-    public MemberUpdateResponseDto update(String memberId, MemberUpdateRequestDto updateRequest, String authenticatedId) {
+    public MemberUpdateResponseDto update(String memberId, MemberUpdateRequestDto updateRequest,
+                                          String authenticatedId) {
         AuthenticationUtils.verifyLoggedInUser(memberId, authenticatedId);
         Member findMember = memberRepository.findByLoginId(memberId)
                 .orElseThrow(MemberNotFoundException::new);
