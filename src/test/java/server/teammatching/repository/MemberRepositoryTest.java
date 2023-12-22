@@ -41,4 +41,17 @@ class MemberRepositoryTest {
         // then
         Assertions.assertThat(findMember).isEqualTo(savedMember);
     }
+
+    @Test
+    @DisplayName("로그인 아이디로 회원 조회")
+    void findByLoginId() {
+        // given
+        final Member savedMember = memberRepository.save(member);
+
+        // when
+        final Member findMember = memberRepository.findByLoginId(savedMember.getLoginId()).get();
+
+        // then
+        Assertions.assertThat(findMember).isEqualTo(savedMember);
+    }
 }
