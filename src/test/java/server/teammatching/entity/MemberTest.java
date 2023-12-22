@@ -42,51 +42,20 @@ class MemberTest {
     @DisplayName("닉네임이 null이면 수정되지 않는다.")
     void notUpdateNickNameByNull() {
         // given
-        final MemberRequestDto dto = MemberRequestDto.builder()
-                .password("1234")
-                .nickName("hyun")
-                .build();
-        final Member member = Member.createMember(dto, passwordEncoder);
-
-        // when
-        member.updateNickName(null);
-
-        // then
-        assertThat(member.getNickName()).isEqualTo("hyun");
+        assertNickNameUpdate("hyun", null, "hyun");
     }
 
     @Test
     @DisplayName("닉네임이 빈 문자열이면 수정되지 않는다.")
     void notUpdateNickNameByEmptyString() {
         // given
-        final MemberRequestDto dto = MemberRequestDto.builder()
-                .password("1234")
-                .nickName("do")
-                .build();
-        final Member member = Member.createMember(dto, passwordEncoder);
-
-        // when
-        member.updateNickName("");
-
-        // then
-        assertThat(member.getNickName()).isEqualTo("do");
+        assertNickNameUpdate("do", "", "do");
     }
 
     @Test
     @DisplayName("닉네임이 null이거나 빈 문자열이 아니면 수정된다.")
     void updateNickName() {
-        // given
-        final MemberRequestDto dto = MemberRequestDto.builder()
-                .password("1234")
-                .nickName("lee")
-                .build();
-        final Member member = Member.createMember(dto, passwordEncoder);
-
-        // when
-        member.updateNickName("LEE");
-
-        // then
-        assertThat(member.getNickName()).isEqualTo("LEE");
+        assertNickNameUpdate("lee", "LEE", "LEE");
     }
 
     private void assertEmailUpdate(final String email, final String emailToUpdate, final String expected) {
@@ -102,5 +71,20 @@ class MemberTest {
 
         // then
         assertThat(member.getEmail()).isEqualTo(expected);
+    }
+
+    private void assertNickNameUpdate(final String nickName, final String nickNameToUpdate, final String expected) {
+        // given
+        final MemberRequestDto dto = MemberRequestDto.builder()
+                .password("1234")
+                .nickName(nickName)
+                .build();
+        final Member member = Member.createMember(dto, passwordEncoder);
+
+        // when
+        member.updateNickName(nickNameToUpdate);
+
+        // then
+        assertThat(member.getNickName()).isEqualTo(expected);
     }
 }
