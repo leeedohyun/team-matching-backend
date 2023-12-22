@@ -79,8 +79,10 @@ public class Member extends BaseTimeEntity {
         }
     }
 
-    public void updateNickName(String nickName) {
-        this.nickName = nickName;
+    public void updateNickName(final String nickName) {
+        if (nickName != null && !nickName.isEmpty()) {
+            this.nickName = nickName;
+        }
     }
 
     public void updateUniversity(String university) {
