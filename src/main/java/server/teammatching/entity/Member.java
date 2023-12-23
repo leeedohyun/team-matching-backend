@@ -58,8 +58,9 @@ public class Member extends BaseTimeEntity {
     private List<Alarm> alarms = new ArrayList<>();
 
     @Builder
-    public Member(final String loginId, final String password, final String email, final String nickName,
+    public Member(final Long id, final String loginId, final String password, final String email, final String nickName,
                   final String university) {
+        this.id = id;
         this.loginId = loginId;
         this.password = password;
         this.email = email;

@@ -1,8 +1,10 @@
 package server.teammatching.controller;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import lombok.RequiredArgsConstructor;
+import java.net.URI;
+import java.util.List;
+
+import javax.validation.Valid;
+
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -14,6 +16,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import lombok.RequiredArgsConstructor;
 import server.teammatching.auth.AuthenticationUtils;
 import server.teammatching.auth.PrincipalDetails;
 import server.teammatching.dto.request.MemberRequestDto;
@@ -21,10 +27,6 @@ import server.teammatching.dto.request.MemberUpdateRequestDto;
 import server.teammatching.dto.response.MemberResponseDto;
 import server.teammatching.dto.response.MemberUpdateResponseDto;
 import server.teammatching.service.MemberService;
-
-import javax.validation.Valid;
-import java.net.URI;
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -74,7 +76,7 @@ public class MemberController {
     public ResponseEntity<String> delete(@PathVariable("id") String loginId,
                                          @AuthenticationPrincipal PrincipalDetails principal) {
         AuthenticationUtils.validateAuthentication(principal);
-        memberService.delete(loginId, principal.getUsername());
+        memberService.delete(loginId);
         return ResponseEntity.ok("탈퇴가 되었습니다.");
     }
 }

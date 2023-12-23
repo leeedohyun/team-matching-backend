@@ -26,7 +26,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public MemberResponseDto join(MemberRequestDto request) {
+    public MemberResponseDto join(final MemberRequestDto request) {
         final String encryptedPassword = passwordEncoder.encode(request.getPassword());
         final Member createdMember = Member.builder()
                 .university(request.getUniversity())
@@ -80,9 +80,8 @@ public class MemberService {
         return MemberUpdateResponseDto.from(findMember, "업데이트 성공");
     }
 
-    public void delete(String memberId, String authenticatedId) {
-        AuthenticationUtils.verifyLoggedInUser(memberId, authenticatedId);
-        Member findMember = memberRepository.findByLoginId(memberId)
+    public void delete(final String memberId) {
+        final Member findMember = memberRepository.findByLoginId(memberId)
                 .orElseThrow(MemberNotFoundException::new);
         memberRepository.delete(findMember);
     }
