@@ -21,6 +21,7 @@ public class MemberResponseDto {
 
     public static MemberResponseDto from(Member member) {
         return MemberResponseDto.builder()
+                .memberId(member.getId())
                 .email(member.getEmail())
                 .loginId(member.getLoginId())
                 .memberId(member.getId())

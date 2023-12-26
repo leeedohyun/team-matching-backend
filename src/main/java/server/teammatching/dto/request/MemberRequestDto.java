@@ -1,15 +1,14 @@
 package server.teammatching.dto.request;
 
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import server.teammatching.entity.Member;
-
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -37,14 +36,4 @@ public class MemberRequestDto {
     @NotBlank(message = "현재 재학중인 대학교를 입력해야 합니다.")
     @ApiModelProperty(example = "대학교")
     private String university;
-
-    public Member toEntity() {
-        return Member.builder()
-                .loginId(loginId)
-                .password(password)
-                .email(email)
-                .university(university)
-                .nickName(nickName)
-                .build();
-    }
 }
