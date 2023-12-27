@@ -1,22 +1,23 @@
 package server.teammatching.repository;
 
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
+
 import server.teammatching.entity.Member;
 import server.teammatching.entity.Post;
 import server.teammatching.entity.PostType;
 
-import java.util.List;
-import java.util.Optional;
-
 public interface PostRepository extends JpaRepository<Post, Long> {
 
-    List<Post> findByType(PostType postType);
+    List<Post> findByType(final PostType postType);
 
-    List<Post> findByLeaderAndType(Member leader, PostType postType);
+    List<Post> findByLeaderAndType(final Member leader, final PostType postType);
 
-    Optional<Post> findByIdAndType(Long postId, PostType postType);
+    Optional<Post> findByIdAndType(final Long postId, final PostType postType);
 
-    Optional<Post> findByIdAndLeader_LoginId(Long postId, String loginId);
+    Optional<Post> findByIdAndLeader_LoginId(final Long postId, final String loginId);
 
-    void deleteByIdAndLeader_LoginId(Long postId, String loginId);
+    void deleteByIdAndLeader_LoginId(final Long postId, final String loginId);
 }

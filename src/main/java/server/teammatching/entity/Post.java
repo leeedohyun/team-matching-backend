@@ -25,7 +25,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import server.teammatching.dto.request.ProjectRequestDto;
 import server.teammatching.dto.request.TeamAndStudyCreateRequestDto;
 import server.teammatching.exception.InsufficientMembersException;
 
@@ -69,7 +68,7 @@ public class Post extends BaseTimeEntity {
     @Lob
     private String content;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "member_id")
     private Member leader;
 
@@ -80,7 +79,7 @@ public class Post extends BaseTimeEntity {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Alarm> alarms = new ArrayList<>();
 
-    public void setLeader(Member leader) {
+    public void setLeader(final Member leader) {
         this.leader = leader;
         leader.getPostList().add(this);
     }
@@ -91,7 +90,7 @@ public class Post extends BaseTimeEntity {
     }
 
     public static Post createTeam(TeamAndStudyCreateRequestDto form, Member member) {
-        Post team = Post.builder()
+        final Post team = Post.builder()
                 .title(form.getTitle())
                 .recruitNumber(form.getRecruitNumber())
                 .type(PostType.TEAM)
@@ -114,25 +113,26 @@ public class Post extends BaseTimeEntity {
         return study;
     }
 
-    public static Post createProject(ProjectRequestDto requestDto, Member member) {
-        if (requestDto.getFrontendNumber() + requestDto.getBackendNumber() +
-                requestDto.getDesignerNumber() != requestDto.getRecruitNumber()) {
+    public static Post createProject(final String title, final String field, final String techStack,
+                                     final String content, final int recruitNumber, final int designerNumber,
+                                     final int frontendNumber, final int backendNumber, final Member leader) {
+        if (frontendNumber + backendNumber + designerNumber != recruitNumber) {
             throw new InsufficientMembersException("총 인원수와 일치하지 않습니다.");
         }
 
-        Post project = Post.builder()
-                .title(requestDto.getTitle())
-                .field(requestDto.getField())
-                .recruitNumber(requestDto.getRecruitNumber())
-                .techStack(requestDto.getTechStack())
+        final Post project = Post.builder()
+                .title(title)
+                .field(field)
+                .recruitNumber(recruitNumber)
+                .techStack(techStack)
                 .type(PostType.PROJECT)
                 .status(PostStatus.모집중)
-                .content(requestDto.getContent())
-                .backendNumber(requestDto.getBackendNumber())
-                .designerNumber(requestDto.getDesignerNumber())
-                .frontendNumber(requestDto.getFrontendNumber())
+                .content(content)
+                .backendNumber(backendNumber)
+                .designerNumber(designerNumber)
+                .frontendNumber(frontendNumber)
                 .build();
-        project.setLeader(member);
+        project.setLeader(leader);
         return project;
     }
 
