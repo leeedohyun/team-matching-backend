@@ -1,8 +1,8 @@
 package server.teammatching.controller;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import lombok.RequiredArgsConstructor;
+import java.net.URI;
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -13,14 +13,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import lombok.RequiredArgsConstructor;
 import server.teammatching.auth.AuthenticationUtils;
 import server.teammatching.auth.PrincipalDetails;
 import server.teammatching.dto.request.ProjectRequestDto;
 import server.teammatching.dto.response.ProjectResponseDto;
 import server.teammatching.service.ProjectService;
-
-import java.net.URI;
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -46,7 +47,7 @@ public class ProjectController {
                                                      @AuthenticationPrincipal PrincipalDetails principal,
                                                      @RequestBody ProjectRequestDto updateRequest) {
         AuthenticationUtils.validateAuthentication(principal);
-        ProjectResponseDto updateResponse = projectService.update(projectId, principal.getUsername(), updateRequest);
+        ProjectResponseDto updateResponse = projectService.update(projectId, updateRequest);
         return ResponseEntity.ok(updateResponse);
     }
 
@@ -69,7 +70,7 @@ public class ProjectController {
     public ResponseEntity<List<ProjectResponseDto>> checkMemberProject(@PathVariable("id") String loginId,
                                                                        @AuthenticationPrincipal PrincipalDetails principal) {
         AuthenticationUtils.validateAuthentication(principal);
-        List<ProjectResponseDto> allMemberProjectsResponse = projectService.checkMemberProjects(loginId, principal.getUsername());
+        List<ProjectResponseDto> allMemberProjectsResponse = projectService.checkMemberProjects(loginId);
         return ResponseEntity.ok(allMemberProjectsResponse);
     }
 
@@ -78,7 +79,7 @@ public class ProjectController {
     public ResponseEntity<String> delete(@PathVariable("id") Long postId,
                                          @AuthenticationPrincipal PrincipalDetails principal) {
         AuthenticationUtils.validateAuthentication(principal);
-        projectService.delete(postId, principal.getUsername());
+        projectService.delete(postId);
         return ResponseEntity.ok("정상적으로 삭제되었습니다.");
     }
 }

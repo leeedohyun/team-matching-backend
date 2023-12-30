@@ -35,7 +35,10 @@ import server.teammatching.exception.InsufficientMembersException;
 @Builder
 public class Post extends BaseTimeEntity {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private static final String INSUFFICIENT_MEMBER_EXCEPTION_MESSAGE = "총 인원수와 일치하지 않습니다.";
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "post_id")
     private Long id;
 
@@ -116,9 +119,7 @@ public class Post extends BaseTimeEntity {
     public static Post createProject(final String title, final String field, final String techStack,
                                      final String content, final int recruitNumber, final int designerNumber,
                                      final int frontendNumber, final int backendNumber, final Member leader) {
-        if (frontendNumber + backendNumber + designerNumber != recruitNumber) {
-            throw new InsufficientMembersException("총 인원수와 일치하지 않습니다.");
-        }
+        validateRecruitMember(recruitNumber, designerNumber, frontendNumber, backendNumber);
 
         final Post project = Post.builder()
                 .title(title)
@@ -136,35 +137,53 @@ public class Post extends BaseTimeEntity {
         return project;
     }
 
-    public void updateTitle(String title) {
-        this.title = title;
+    public void updateTitle(final String title) {
+        if (title != null) {
+            this.title = title;
+        }
     }
 
-    public void updateField(String field) {
-        this.field = field;
+    public void updateField(final String field) {
+        if (field != null) {
+            this.field = field;
+        }
     }
 
-    public void updateRecruitNumber(int recruitNumber) {
+    public void updateRecruitNumber(final int recruitNumber) {
+        validateRecruitMember(recruitNumber, designerNumber, frontendNumber, backendNumber);
         this.recruitNumber = recruitNumber;
     }
 
-    public void updateContent(String content) {
-        this.content = content;
+    public void updateContent(final String content) {
+        if (content != null) {
+            this.content = content;
+        }
     }
 
-    public void updateDesignerNumber(int designerNumber) {
+    public void updateDesignerNumber(final int designerNumber) {
+        validateRecruitMember(recruitNumber, designerNumber, frontendNumber, backendNumber);
         this.designerNumber = designerNumber;
     }
 
-    public void updateFrontendNumber(int frontendNumber) {
+    public void updateFrontendNumber(final int frontendNumber) {
+        validateRecruitMember(recruitNumber, designerNumber, frontendNumber, backendNumber);
         this.frontendNumber = frontendNumber;
     }
 
-    public void updateBackendNumber(int backendNumber) {
+    public void updateBackendNumber(final int backendNumber) {
+        validateRecruitMember(recruitNumber, designerNumber, frontendNumber, backendNumber);
         this.backendNumber = backendNumber;
     }
 
-    public void updatePostStatus(PostStatus status) {
+    public void updatePostStatus(final PostStatus status) {
         this.status = status;
+    }
+
+    private static void validateRecruitMember(final int recruitNumber, final int designerNumber,
+                                              final int frontendNumber,
+                                              final int backendNumber) {
+        if (frontendNumber + backendNumber + designerNumber != recruitNumber) {
+            throw new InsufficientMembersException(INSUFFICIENT_MEMBER_EXCEPTION_MESSAGE);
+        }
     }
 }

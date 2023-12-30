@@ -1,5 +1,7 @@
 package server.teammatching.dto.response;
 
+import java.time.LocalDateTime;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,8 +10,6 @@ import lombok.NoArgsConstructor;
 import server.teammatching.entity.Post;
 import server.teammatching.entity.PostType;
 
-import java.time.LocalDateTime;
-
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
@@ -17,7 +17,6 @@ import java.time.LocalDateTime;
 public class ProjectResponseDto {
 
     private Long postId;
-    private Long memberId;
     private String nickName;
     private String title;
     private String techStack;
@@ -33,7 +32,6 @@ public class ProjectResponseDto {
     public static ProjectResponseDto from(Post project) {
         return ProjectResponseDto.builder()
                 .postId(project.getId())
-                .memberId(project.getLeader().getId())
                 .nickName(project.getLeader().getNickName())
                 .title(project.getTitle())
                 .content(project.getContent())

@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
-import server.teammatching.auth.AuthenticationUtils;
 import server.teammatching.dto.request.ProjectRequestDto;
 import server.teammatching.dto.response.ProjectResponseDto;
 import server.teammatching.entity.Application;
@@ -33,49 +32,32 @@ public class ProjectService {
     private final PostRepository postRepository;
     private final RecruitmentRepository recruitmentRepository;
 
-    public ProjectResponseDto create(String memberId, ProjectRequestDto requestDto) {
-        Member leader = memberRepository.findByLoginId(memberId)
+    public ProjectResponseDto create(final String memberId, final ProjectRequestDto requestDto) {
+        final Member leader = memberRepository.findByLoginId(memberId)
                 .orElseThrow(MemberNotFoundException::new);
-
-        Post createdProject = Post.createProject(requestDto, leader);
-
-        Recruitment recruitment = new Recruitment();
+        final Post createdProject = create(requestDto, leader);
+        final Recruitment recruitment = new Recruitment();
         createdProject.setRecruitment(recruitment);
 
-        Post savedProject = postRepository.save(createdProject);
+        final Post savedProject = postRepository.save(createdProject);
         recruitmentRepository.save(recruitment);
 
         return ProjectResponseDto.from(savedProject);
     }
 
-    public ProjectResponseDto update(Long projectId, String memberId, ProjectRequestDto updateRequest) {
-        Post findProject = postRepository.findById(projectId)
+    public ProjectResponseDto update(final Long projectId, final ProjectRequestDto updateRequest) {
+        final Post findProject = postRepository.findById(projectId)
                 .orElseThrow(PostNotFoundException::new);
-        AuthenticationUtils.verifyLoggedInUser(memberId, findProject.getLeader().getLoginId());
+        
+        findProject.updateTitle(updateRequest.getTitle());
+        findProject.updateField(updateRequest.getField());
+        findProject.updateRecruitNumber(updateRequest.getRecruitNumber());
+        findProject.updateDesignerNumber(updateRequest.getDesignerNumber());
+        findProject.updateFrontendNumber(updateRequest.getFrontendNumber());
+        findProject.updateBackendNumber(updateRequest.getBackendNumber());
+        findProject.updateContent(updateRequest.getContent());
 
-        if (updateRequest.getTitle() != null) {
-            findProject.updateTitle(updateRequest.getTitle());
-        }
-        if (updateRequest.getField() != null) {
-            findProject.updateField(updateRequest.getField());
-        }
-        if (updateRequest.getRecruitNumber() != 0) {
-            findProject.updateRecruitNumber(updateRequest.getRecruitNumber());
-        }
-        if (updateRequest.getFrontendNumber() != 0) {
-            findProject.updateFrontendNumber(updateRequest.getFrontendNumber());
-        }
-        if (updateRequest.getBackendNumber() != 0) {
-            findProject.updateBackendNumber(updateRequest.getBackendNumber());
-        }
-        if (updateRequest.getDesignerNumber() != 0) {
-            findProject.updateDesignerNumber(updateRequest.getDesignerNumber());
-        }
-        if (updateRequest.getContent() != null) {
-            findProject.updateContent(updateRequest.getContent());
-        }
-
-        Post savedProject = postRepository.save(findProject);
+        final Post savedProject = postRepository.save(findProject);
         return ProjectResponseDto.from(savedProject);
     }
 
@@ -89,30 +71,35 @@ public class ProjectService {
     }
 
     @Transactional(readOnly = true)
-    public List<ProjectResponseDto> checkMemberProjects(String memberId, String authenticatedId) {
-        AuthenticationUtils.verifyLoggedInUser(memberId, authenticatedId);
-        Member findLeader = memberRepository.findByLoginId(memberId)
-                .orElseThrow(MemberNotFoundException::new);
+    public ProjectResponseDto findOne(final Long projectId) {
+        final Post post = postRepository.findById(projectId)
+                .orElseThrow(PostNotFoundException::new);
 
-        List<Post> findMemberProjects = postRepository.findByLeaderAndType(findLeader, PostType.PROJECT);
+        return ProjectResponseDto.from(post);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ProjectResponseDto> checkMemberProjects(final String memberId) {
+        final Member findLeader = memberRepository.findByLoginId(memberId)
+                .orElseThrow(MemberNotFoundException::new);
+        final List<Post> findMemberProjects = postRepository.findByLeaderAndType(findLeader, PostType.PROJECT);
 
         return findMemberProjects.stream()
                 .map(ProjectResponseDto::from)
                 .collect(toList());
     }
 
-    public void delete(Long postId, String memberId) {
-        Post findProject = postRepository.findById(postId)
+    public void delete(final Long postId) {
+        final Post findProject = postRepository.findById(postId)
                 .orElseThrow(PostNotFoundException::new);
-        List<Application> projectApplications = applicationRepository.findByPost(findProject);
-        postRepository.deleteByIdAndLeader_LoginId(postId, memberId);
+        final List<Application> projectApplications = applicationRepository.findByPost(findProject);
+        postRepository.deleteById(postId);
         applicationRepository.deleteAll(projectApplications);
     }
 
-    public ProjectResponseDto findOne(Long projectId) {
-        Post post = postRepository.findById(projectId)
-                .orElseThrow(PostNotFoundException::new);
-        
-        return ProjectResponseDto.from(post);
+    private Post create(final ProjectRequestDto requestDto, final Member leader) {
+        return Post.createProject(requestDto.getTitle(), requestDto.getField(), requestDto.getTechStack(),
+                requestDto.getContent(), requestDto.getRecruitNumber(), requestDto.getDesignerNumber(),
+                requestDto.getFrontendNumber(), requestDto.getBackendNumber(), leader);
     }
 }
