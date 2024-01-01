@@ -33,51 +33,51 @@ public class ProjectController {
 
     @ApiOperation(value = "프로젝트 생성 API")
     @PostMapping("/new")
-    public ResponseEntity<ProjectResponseDto> create(@AuthenticationPrincipal PrincipalDetails principal,
-                                                     @RequestBody ProjectRequestDto requestDto) {
+    public ResponseEntity<ProjectResponseDto> create(@AuthenticationPrincipal final PrincipalDetails principal,
+                                                     @RequestBody final ProjectRequestDto requestDto) {
         AuthenticationUtils.validateAuthentication(principal);
-        ProjectResponseDto responseDto = projectService.create(principal.getUsername(), requestDto);
+        final ProjectResponseDto responseDto = projectService.create(principal.getUsername(), requestDto);
         return ResponseEntity.created(URI.create(String.format("/new/%s", responseDto.getPostId())))
                 .body(responseDto);
     }
 
     @ApiOperation(value = "프로젝트 정보 수정 API")
     @PatchMapping("/{id}")
-    public ResponseEntity<ProjectResponseDto> update(@PathVariable("id") Long projectId,
-                                                     @AuthenticationPrincipal PrincipalDetails principal,
-                                                     @RequestBody ProjectRequestDto updateRequest) {
+    public ResponseEntity<ProjectResponseDto> update(@PathVariable("id") final Long projectId,
+                                                     @AuthenticationPrincipal final PrincipalDetails principal,
+                                                     @RequestBody final ProjectRequestDto updateRequest) {
         AuthenticationUtils.validateAuthentication(principal);
-        ProjectResponseDto updateResponse = projectService.update(projectId, updateRequest);
+        final ProjectResponseDto updateResponse = projectService.update(projectId, updateRequest);
         return ResponseEntity.ok(updateResponse);
     }
 
     @ApiOperation(value = "모든 프로젝트 조회 API")
     @GetMapping("")
     public ResponseEntity<List<ProjectResponseDto>> checkAllProject() {
-        List<ProjectResponseDto> allProjectsResponse = projectService.checkAllProjects();
+        final List<ProjectResponseDto> allProjectsResponse = projectService.checkAllProjects();
         return ResponseEntity.ok(allProjectsResponse);
     }
 
     @ApiOperation(value = "프로젝트 상세 조회")
     @GetMapping("/check/{postId}")
-    public ResponseEntity<ProjectResponseDto> checkOneProject(@PathVariable("postId") Long projectId) {
-        ProjectResponseDto responseDto = projectService.findOne(projectId);
+    public ResponseEntity<ProjectResponseDto> checkOneProject(@PathVariable("postId") final Long projectId) {
+        final ProjectResponseDto responseDto = projectService.findOne(projectId);
         return ResponseEntity.ok(responseDto);
     }
 
     @ApiOperation(value = "회원이 생성한 프로젝트 조회 API")
     @GetMapping("/{id}")
-    public ResponseEntity<List<ProjectResponseDto>> checkMemberProject(@PathVariable("id") String loginId,
-                                                                       @AuthenticationPrincipal PrincipalDetails principal) {
+    public ResponseEntity<List<ProjectResponseDto>> checkMemberProject(@PathVariable("id") final String loginId,
+                                                                       @AuthenticationPrincipal final PrincipalDetails principal) {
         AuthenticationUtils.validateAuthentication(principal);
-        List<ProjectResponseDto> allMemberProjectsResponse = projectService.checkMemberProjects(loginId);
+        final List<ProjectResponseDto> allMemberProjectsResponse = projectService.checkMemberProjects(loginId);
         return ResponseEntity.ok(allMemberProjectsResponse);
     }
 
     @ApiOperation(value = "프로젝트 삭제 API")
     @DeleteMapping("/{id}/delete")
-    public ResponseEntity<String> delete(@PathVariable("id") Long postId,
-                                         @AuthenticationPrincipal PrincipalDetails principal) {
+    public ResponseEntity<String> delete(@PathVariable("id") final Long postId,
+                                         @AuthenticationPrincipal final PrincipalDetails principal) {
         AuthenticationUtils.validateAuthentication(principal);
         projectService.delete(postId);
         return ResponseEntity.ok("정상적으로 삭제되었습니다.");
