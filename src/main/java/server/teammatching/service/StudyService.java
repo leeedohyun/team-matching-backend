@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
-import server.teammatching.auth.AuthenticationUtils;
 import server.teammatching.dto.request.TeamAndStudyCreateRequestDto;
 import server.teammatching.dto.response.TeamAndStudyCreateResponseDto;
 import server.teammatching.entity.Application;
@@ -33,73 +32,64 @@ public class StudyService {
     private final PostRepository postRepository;
     private final RecruitmentRepository recruitmentRepository;
 
-    public TeamAndStudyCreateResponseDto create(TeamAndStudyCreateRequestDto requestDto, String memberId) {
-        Member leader = memberRepository.findByLoginId(memberId)
+    public TeamAndStudyCreateResponseDto create(final TeamAndStudyCreateRequestDto requestDto, final String memberId) {
+        final Member leader = memberRepository.findByLoginId(memberId)
                 .orElseThrow(MemberNotFoundException::new);
+        final Post createdStudy = Post.createStudy(requestDto.getTitle(), requestDto.getContent(),
+                requestDto.getRecruitNumber(), leader);
 
-        Post createdStudy = Post.createStudy(requestDto, leader);
-
-        Recruitment recruitment = new Recruitment();
+        final Recruitment recruitment = new Recruitment();
         createdStudy.setRecruitment(recruitment);
 
-        Post savedStudy = postRepository.save(createdStudy);
+        final Post savedStudy = postRepository.save(createdStudy);
         recruitmentRepository.save(recruitment);
 
         return TeamAndStudyCreateResponseDto.from(savedStudy);
     }
 
-    public TeamAndStudyCreateResponseDto update(Long studyId, String memberId, TeamAndStudyCreateRequestDto updateRequest) {
-        Post findStudy = postRepository.findById(studyId)
+    public TeamAndStudyCreateResponseDto update(final Long studyId, final TeamAndStudyCreateRequestDto updateRequest) {
+        final Post findStudy = postRepository.findById(studyId)
                 .orElseThrow(PostNotFoundException::new);
-        AuthenticationUtils.verifyLoggedInUser(memberId, findStudy.getLeader().getLoginId());
 
-        if (!updateRequest.getTitle().isEmpty()) {
-            findStudy.updateTitle(updateRequest.getTitle());
-        }
-        if (updateRequest.getRecruitNumber() != 0) {
-            findStudy.updateRecruitNumber(updateRequest.getRecruitNumber());
-        }
-        if (!updateRequest.getContent().isEmpty()) {
-            findStudy.updateContent(updateRequest.getContent());
-        }
+        findStudy.updateTitle(updateRequest.getTitle());
+        findStudy.updateContent(updateRequest.getContent());
+        findStudy.updateRecruitNumber(updateRequest.getRecruitNumber());
 
-        Post savedStudy = postRepository.save(findStudy);
+        final Post savedStudy = postRepository.save(findStudy);
         return TeamAndStudyCreateResponseDto.from(savedStudy);
     }
 
     @Transactional(readOnly = true)
-    public List<TeamAndStudyCreateResponseDto> checkAllStudies() {
-        List<Post> findStudies = postRepository.findByType(PostType.STUDY);
+    public TeamAndStudyCreateResponseDto findOne(final Long studyId) {
+        final Post findStudy = postRepository.findById(studyId)
+                .orElseThrow(PostNotFoundException::new);
+        return TeamAndStudyCreateResponseDto.from(findStudy);
+    }
 
+    @Transactional(readOnly = true)
+    public List<TeamAndStudyCreateResponseDto> checkAllStudies() {
+        final List<Post> findStudies = postRepository.findByType(PostType.STUDY);
         return findStudies.stream()
                 .map(TeamAndStudyCreateResponseDto::from)
                 .collect(toList());
     }
 
     @Transactional(readOnly = true)
-    public List<TeamAndStudyCreateResponseDto> checkMemberStudies(String memberId, String authenticatedId) {
-        AuthenticationUtils.verifyLoggedInUser(memberId, authenticatedId);
-        Member findLeader = memberRepository.findByLoginId(memberId)            .
+    public List<TeamAndStudyCreateResponseDto> checkMemberStudies(final String memberId) {
+        final Member findLeader = memberRepository.findByLoginId(memberId)            .
                 orElseThrow(MemberNotFoundException::new);
-        List<Post> findMemberStudies = postRepository.findByLeaderAndType(findLeader, PostType.STUDY);
+        final List<Post> findMemberStudies = postRepository.findByLeaderAndType(findLeader, PostType.STUDY);
 
         return findMemberStudies.stream()
                 .map(TeamAndStudyCreateResponseDto::from)
                 .collect(toList());
     }
 
-    public void delete(Long studyId, String memberId) {
-        Post findStudy = postRepository.findById(studyId)
+    public void delete(final Long studyId) {
+        final Post findStudy = postRepository.findById(studyId)
                 .orElseThrow(PostNotFoundException::new);
-        List<Application> studyApplications = applicationRepository.findByPost(findStudy);
-        postRepository.deleteByIdAndLeader_LoginId(studyId, memberId);
+        final List<Application> studyApplications = applicationRepository.findByPost(findStudy);
+        postRepository.deleteById(studyId);
         applicationRepository.deleteAll(studyApplications);
-    }
-
-    public TeamAndStudyCreateResponseDto findOne(Long studyId) {
-        Post findStudy = postRepository.findById(studyId)
-                .orElseThrow(PostNotFoundException::new);
-
-        return TeamAndStudyCreateResponseDto.from(findStudy);
     }
 }

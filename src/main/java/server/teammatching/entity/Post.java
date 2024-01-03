@@ -104,15 +104,16 @@ public class Post extends BaseTimeEntity {
         return team;
     }
 
-    public static Post createStudy(TeamAndStudyCreateRequestDto form, Member member) {
-        Post study = Post.builder()
-                .title(form.getTitle())
-                .recruitNumber(form.getRecruitNumber())
+    public static Post createStudy(final String title, final String content, final int recruitNumber,
+                                   final Member leader) {
+        final Post study = Post.builder()
+                .title(title)
+                .recruitNumber(recruitNumber)
                 .type(PostType.STUDY)
                 .status(PostStatus.모집중)
-                .content(form.getContent())
+                .content(content)
                 .build();
-        study.setLeader(member);
+        study.setLeader(leader);
         return study;
     }
 
