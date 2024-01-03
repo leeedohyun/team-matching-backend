@@ -33,51 +33,53 @@ public class StudyController {
 
     @ApiOperation(value = "스터디 생성 API")
     @PostMapping("/new")
-    public ResponseEntity<TeamAndStudyCreateResponseDto> create(@RequestBody TeamAndStudyCreateRequestDto requestDto,
-                                                                @AuthenticationPrincipal PrincipalDetails principal) {
+    public ResponseEntity<TeamAndStudyCreateResponseDto> create(
+            @RequestBody final TeamAndStudyCreateRequestDto requestDto,
+            @AuthenticationPrincipal final PrincipalDetails principal) {
         AuthenticationUtils.validateAuthentication(principal);
-        TeamAndStudyCreateResponseDto responseDto = studyService.create(requestDto, principal.getUsername());
+        final TeamAndStudyCreateResponseDto responseDto = studyService.create(requestDto, principal.getUsername());
         return ResponseEntity.created(URI.create(String.format("/new/%s", responseDto.getPostId())))
                 .body(responseDto);
     }
 
     @ApiOperation(value = "스터디 정보 수정 API")
     @PatchMapping("/{id}")
-    public ResponseEntity<TeamAndStudyCreateResponseDto> update(@PathVariable("id") Long studyId,
-                                                                @AuthenticationPrincipal PrincipalDetails principal,
-                                                                @RequestBody TeamAndStudyCreateRequestDto updateRequest) {
+    public ResponseEntity<TeamAndStudyCreateResponseDto> update(@PathVariable("id") final Long studyId,
+                                                                @AuthenticationPrincipal final PrincipalDetails principal,
+                                                                @RequestBody final TeamAndStudyCreateRequestDto updateRequest) {
         AuthenticationUtils.validateAuthentication(principal);
-        TeamAndStudyCreateResponseDto updateResponse = studyService.update(studyId, updateRequest);
+        final TeamAndStudyCreateResponseDto updateResponse = studyService.update(studyId, updateRequest);
         return ResponseEntity.ok(updateResponse);
     }
 
     @ApiOperation(value = "모든 스터디 조회 API")
-    @GetMapping("")
+    @GetMapping
     public ResponseEntity<List<TeamAndStudyCreateResponseDto>> checkAllStudies() {
-        List<TeamAndStudyCreateResponseDto> allStudiesResponse = studyService.checkAllStudies();
+        final List<TeamAndStudyCreateResponseDto> allStudiesResponse = studyService.checkAllStudies();
         return ResponseEntity.ok(allStudiesResponse);
     }
 
     @ApiOperation(value = "스터디 상세 조회")
     @GetMapping("/check/{id}")
-    public ResponseEntity<TeamAndStudyCreateResponseDto> checkOne(@PathVariable("id") Long studyId) {
-        TeamAndStudyCreateResponseDto responseDto = studyService.findOne(studyId);
+    public ResponseEntity<TeamAndStudyCreateResponseDto> checkOne(@PathVariable("id") final Long studyId) {
+        final TeamAndStudyCreateResponseDto responseDto = studyService.findOne(studyId);
         return ResponseEntity.ok(responseDto);
     }
 
     @ApiOperation(value = "회원이 생성한 스터디 조회 API")
     @GetMapping("/{id}")
-    public ResponseEntity<List<TeamAndStudyCreateResponseDto>> checkMemberStudies(@PathVariable("id") String memberId,
-                                                                                  @AuthenticationPrincipal PrincipalDetails principal) {
+    public ResponseEntity<List<TeamAndStudyCreateResponseDto>> checkMemberStudies(
+            @PathVariable("id") final String memberId,
+            @AuthenticationPrincipal final PrincipalDetails principal) {
         AuthenticationUtils.validateAuthentication(principal);
-        List<TeamAndStudyCreateResponseDto> allMemberStudiesResponse = studyService.checkMemberStudies(memberId);
+        final List<TeamAndStudyCreateResponseDto> allMemberStudiesResponse = studyService.checkMemberStudies(memberId);
         return ResponseEntity.ok(allMemberStudiesResponse);
     }
 
     @ApiOperation(value = "스터디 삭제 API")
     @DeleteMapping("/{id}/delete")
-    public ResponseEntity<String> delete(@PathVariable("id") Long studyId,
-                                         @AuthenticationPrincipal PrincipalDetails principal) {
+    public ResponseEntity<String> delete(@PathVariable("id") final Long studyId,
+                                         @AuthenticationPrincipal final PrincipalDetails principal) {
         AuthenticationUtils.validateAuthentication(principal);
         studyService.delete(studyId);
         return ResponseEntity.ok("정상적으로 삭제되었습니다.");
