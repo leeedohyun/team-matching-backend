@@ -20,6 +20,4 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     Optional<Post> findByIdAndLeader_LoginId(final Long postId, final String loginId);
 
     void deleteById(final Long postId);
-
-    void deleteByIdAndLeader_LoginId(final Long postId, final String loginId);
 }

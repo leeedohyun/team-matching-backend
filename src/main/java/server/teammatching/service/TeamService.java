@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
-import server.teammatching.auth.AuthenticationUtils;
 import server.teammatching.dto.request.TeamAndStudyCreateRequestDto;
 import server.teammatching.dto.response.TeamAndStudyCreateResponseDto;
 import server.teammatching.entity.Application;
@@ -33,73 +32,62 @@ public class TeamService {
     private final PostRepository postRepository;
     private final RecruitmentRepository recruitmentRepository;
 
-    public TeamAndStudyCreateResponseDto create(TeamAndStudyCreateRequestDto form , String memberId) {
-        Member leader = memberRepository.findByLoginId(memberId)
+    public TeamAndStudyCreateResponseDto create(final TeamAndStudyCreateRequestDto request, final String memberId) {
+        final Member leader = memberRepository.findByLoginId(memberId)
                 .orElseThrow(MemberNotFoundException::new);
-
-        Post createdTeam = Post.createTeam(form, leader);
-
-        Recruitment recruitment = new Recruitment();
+        final Post createdTeam = Post.createTeam(request.getTitle(), request.getContent(), request.getRecruitNumber(),
+                leader);
+        final Recruitment recruitment = new Recruitment();
         createdTeam.setRecruitment(recruitment);
 
-        Post savedTeam = postRepository.save(createdTeam);
+        final Post savedTeam = postRepository.save(createdTeam);
         recruitmentRepository.save(recruitment);
 
         return TeamAndStudyCreateResponseDto.from(savedTeam);
     }
 
-    public TeamAndStudyCreateResponseDto update(Long postId, TeamAndStudyCreateRequestDto requestDto, String memberId) {
-        Post findTeam = postRepository.findById(postId)
+    @Transactional(readOnly = true)
+    public TeamAndStudyCreateResponseDto findOne(final Long teamId) {
+        final Post findTeam = postRepository.findById(teamId)
                 .orElseThrow(PostNotFoundException::new);
-        AuthenticationUtils.verifyLoggedInUser(memberId, findTeam.getLeader().getLoginId());
+        return TeamAndStudyCreateResponseDto.from(findTeam);
+    }
 
-        if (requestDto.getTitle() != null) {
-            findTeam.updateTitle(requestDto.getTitle());
-        }
-        if (requestDto.getRecruitNumber() != 0) {
-            findTeam.updateRecruitNumber(requestDto.getRecruitNumber());
-        }
-        if (requestDto.getContent() != null) {
-            findTeam.updateContent(requestDto.getContent());
-        }
+    public TeamAndStudyCreateResponseDto update(final Long postId, final TeamAndStudyCreateRequestDto requestDto) {
+        final Post findTeam = postRepository.findById(postId)
+                .orElseThrow(PostNotFoundException::new);
 
-        Post savedTeam = postRepository.save(findTeam);
+        findTeam.updateTitle(requestDto.getTitle());
+        findTeam.updateContent(requestDto.getContent());
+        findTeam.updateRecruitNumber(requestDto.getRecruitNumber());
+
+        final Post savedTeam = postRepository.save(findTeam);
         return TeamAndStudyCreateResponseDto.from(savedTeam);
     }
 
     @Transactional(readOnly = true)
     public List<TeamAndStudyCreateResponseDto> checkAllTeams() {
         List<Post> findTeams = postRepository.findByType(PostType.TEAM);
-
         return findTeams.stream()
                 .map(TeamAndStudyCreateResponseDto::from)
                 .collect(toList());
     }
 
     @Transactional(readOnly = true)
-    public List<TeamAndStudyCreateResponseDto> checkMemberTeams(String memberId, String authenticatedId) {
-        AuthenticationUtils.verifyLoggedInUser(memberId, authenticatedId);
-        Member findLeader = memberRepository.findByLoginId(memberId)
+    public List<TeamAndStudyCreateResponseDto> checkMemberTeams(final String memberId) {
+        final Member findLeader = memberRepository.findByLoginId(memberId)
                 .orElseThrow(MemberNotFoundException::new);
-        List<Post> findMemberTeams = postRepository.findByLeaderAndType(findLeader, PostType.TEAM);
-
+        final List<Post> findMemberTeams = postRepository.findByLeaderAndType(findLeader, PostType.TEAM);
         return findMemberTeams.stream()
                 .map(TeamAndStudyCreateResponseDto::from)
                 .collect(toList());
     }
 
-    public void delete(Long teamId, String memberId) {
-        Post findTeam = postRepository.findById(teamId)
+    public void delete(final Long teamId) {
+        final Post findTeam = postRepository.findById(teamId)
                 .orElseThrow(PostNotFoundException::new);
-        List<Application> teamApplications = applicationRepository.findByPost(findTeam);
-        postRepository.deleteByIdAndLeader_LoginId(teamId,memberId);
+        final List<Application> teamApplications = applicationRepository.findByPost(findTeam);
+        postRepository.deleteById(teamId);
         applicationRepository.deleteAll(teamApplications);
-    }
-
-    public TeamAndStudyCreateResponseDto findOne(Long teamId) {
-        Post findTeam = postRepository.findById(teamId)
-                .orElseThrow(PostNotFoundException::new);
-
-        return TeamAndStudyCreateResponseDto.from(findTeam);
     }
 }

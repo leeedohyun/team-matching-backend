@@ -25,7 +25,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import server.teammatching.dto.request.TeamAndStudyCreateRequestDto;
 import server.teammatching.exception.InsufficientMembersException;
 
 @Entity
@@ -92,15 +91,16 @@ public class Post extends BaseTimeEntity {
         recruitment.setPost(this);
     }
 
-    public static Post createTeam(TeamAndStudyCreateRequestDto form, Member member) {
+    public static Post createTeam(final String title, final String content, final int recruitNumber,
+                                  final Member leader) {
         final Post team = Post.builder()
-                .title(form.getTitle())
-                .recruitNumber(form.getRecruitNumber())
+                .title(title)
+                .recruitNumber(recruitNumber)
                 .type(PostType.TEAM)
                 .status(PostStatus.모집중)
-                .content(form.getContent())
+                .content(content)
                 .build();
-        team.setLeader(member);
+        team.setLeader(leader);
         return team;
     }
 
