@@ -1,10 +1,5 @@
 package server.teammatching.entity;
 
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -13,6 +8,10 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
@@ -32,21 +31,17 @@ public class Alarm extends BaseTimeEntity {
     @JoinColumn(name = "post_id")
     private Post post;
 
-    @Builder
-    public Alarm(Member member, Post post) {
+    private Alarm(final Member member, final Post post) {
         this.post = post;
         setMember(member);
     }
 
-    public void setMember(Member member) {
-        this.member = member;
-        member.getAlarms().add(this);
+    public static Alarm createAlarm(final Member member, final Post post) {
+        return new Alarm(member, post);
     }
 
-    public static Alarm createAlarm(Member member, Post post) {
-        return Alarm.builder()
-                .member(member)
-                .post(post)
-                .build();
+    private void setMember(final Member member) {
+        this.member = member;
+        member.addAlarms(this);
     }
 }

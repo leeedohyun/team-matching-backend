@@ -81,16 +81,6 @@ public class Post extends BaseTimeEntity {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Alarm> alarms = new ArrayList<>();
 
-    public void setLeader(final Member leader) {
-        this.leader = leader;
-        leader.getPostList().add(this);
-    }
-
-    public void setRecruitment(Recruitment recruitment) {
-        this.recruitment = recruitment;
-        recruitment.setPost(this);
-    }
-
     public static Post createTeam(final String title, final String content, final int recruitNumber,
                                   final Member leader) {
         final Post team = Post.builder()
@@ -178,6 +168,16 @@ public class Post extends BaseTimeEntity {
 
     public void updatePostStatus(final PostStatus status) {
         this.status = status;
+    }
+
+    public void setRecruitment(Recruitment recruitment) {
+        this.recruitment = recruitment;
+        recruitment.setPost(this);
+    }
+
+    private void setLeader(final Member leader) {
+        this.leader = leader;
+        leader.getPostList().add(this);
     }
 
     private static void validateRecruitMember(final int recruitNumber, final int designerNumber,

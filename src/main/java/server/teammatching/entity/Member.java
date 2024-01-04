@@ -69,6 +69,10 @@ public class Member extends BaseTimeEntity {
         this.role = Role.USER;
     }
 
+    public void addAlarms(final Alarm alarm) {
+        alarms.add(alarm);
+    }
+
     public void updateEmail(final String email) {
         if (email != null && !email.isEmpty()) {
             this.email = email;
