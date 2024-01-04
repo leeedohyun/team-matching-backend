@@ -9,46 +9,29 @@ import static org.mockito.BDDMockito.given;
 import java.util.List;
 import java.util.Optional;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import server.teammatching.dto.request.ProjectRequestDto;
 import server.teammatching.dto.response.ProjectResponseDto;
-import server.teammatching.entity.Member;
 import server.teammatching.entity.Post;
 import server.teammatching.entity.PostType;
 import server.teammatching.exception.InsufficientMembersException;
 import server.teammatching.exception.MemberNotFoundException;
 import server.teammatching.exception.PostNotFoundException;
-import server.teammatching.repository.ApplicationRepository;
-import server.teammatching.repository.MemberRepository;
-import server.teammatching.repository.PostRepository;
-import server.teammatching.repository.RecruitmentRepository;
 
-@ExtendWith(MockitoExtension.class)
-class ProjectServiceTest {
-
-    private static final Member LEADER = createMember();
-    private static final List<Post> PROJECTS = createProjects();
-
-    @Mock
-    private MemberRepository memberRepository;
-
-    @Mock
-    private PostRepository postRepository;
-
-    @Mock
-    private ApplicationRepository applicationRepository;
-
-    @Mock
-    private RecruitmentRepository recruitmentRepository;
+class ProjectServiceTest extends PostServiceTest {
 
     @InjectMocks
     private ProjectService projectService;
+
+    private List<Post> projects;
+
+    @BeforeEach
+    void init() {
+        projects = createProjects();
+    }
 
     @Test
     void 프로젝트_생성_시_존재하지_않는_회원인_경우_예외_발생() {
@@ -70,14 +53,14 @@ class ProjectServiceTest {
     @Test
     void 프로젝트_생성_시_전체_인원과_분야별_인원_수의_합이_일치하지_않으면_예외_발생() {
         // given
-        given(memberRepository.findByLoginId(any())).willReturn(Optional.of(LEADER));
+        given(memberRepository.findByLoginId(any())).willReturn(Optional.of(leader));
 
         // when
         // then
         final ProjectRequestDto requestDto = ProjectRequestDto.builder().backendNumber(1).designerNumber(1)
                 .frontendNumber(0).recruitNumber(8).build();
 
-        assertThatThrownBy(() -> projectService.create(LEADER.getLoginId(), requestDto)).isInstanceOf(
+        assertThatThrownBy(() -> projectService.create(leader.getLoginId(), requestDto)).isInstanceOf(
                 InsufficientMembersException.class);
     }
 
@@ -90,13 +73,13 @@ class ProjectServiceTest {
 
         final Post project = Post.createProject(requestDto.getTitle(), requestDto.getField(), requestDto.getTechStack(),
                 requestDto.getContent(), requestDto.getRecruitNumber(), requestDto.getDesignerNumber(),
-                requestDto.getFrontendNumber(), requestDto.getBackendNumber(), LEADER);
+                requestDto.getFrontendNumber(), requestDto.getBackendNumber(), leader);
 
-        given(memberRepository.findByLoginId(any())).willReturn(Optional.ofNullable((LEADER)));
+        given(memberRepository.findByLoginId(any())).willReturn(Optional.ofNullable((leader)));
         given(postRepository.save(any())).willReturn(project);
 
         // when
-        final ProjectResponseDto responseDto = projectService.create(LEADER.getLoginId(), requestDto);
+        final ProjectResponseDto responseDto = projectService.create(leader.getLoginId(), requestDto);
 
         // then
         조회한_응답_검증(responseDto, project);
@@ -125,7 +108,7 @@ class ProjectServiceTest {
     @Test
     void 프로젝트_조회() {
         // given
-        final Post project = Post.createProject("제목", "분야", "기술스택", "내용", 3, 1, 1, 1, LEADER);
+        final Post project = Post.createProject("제목", "분야", "기술스택", "내용", 3, 1, 1, 1, leader);
 
         given(postRepository.findById(any()))
                 .willReturn(Optional.of(project));
@@ -153,13 +136,13 @@ class ProjectServiceTest {
     void 회원이_생성한_모든_프로젝트_조회() {
         // given
         given(memberRepository.findByLoginId(any()))
-                .willReturn(Optional.of(LEADER));
+                .willReturn(Optional.of(leader));
 
-        given(postRepository.findByLeaderAndType(LEADER, PostType.PROJECT))
-                .willReturn(PROJECTS);
+        given(postRepository.findByLeaderAndType(leader, PostType.PROJECT))
+                .willReturn(projects);
 
         // when
-        final List<ProjectResponseDto> responseDtos = projectService.checkMemberProjects(LEADER.getLoginId());
+        final List<ProjectResponseDto> responseDtos = projectService.checkMemberProjects(leader.getLoginId());
 
         // then
         assertThat(responseDtos).hasSize(2);
@@ -178,14 +161,9 @@ class ProjectServiceTest {
         );
     }
 
-    private static Member createMember() {
-        return Member.builder().loginId("hello").password(new BCryptPasswordEncoder().encode("1234"))
-                .university("홍익대학교").nickName("gi").email("akd@dbk.com").build();
-    }
-
-    private static List<Post> createProjects() {
-        final Post project1 = Post.createProject("프로젝트 모집", "백엔드", "자바, 스프링", "안녕하세요. 프로젝트 팀원 모집합니다.", 2, 0, 2, 0, LEADER);
-        final Post project2 = Post.createProject("프로젝트 모집", "디자이너", "피그마", "안녕하세요. 프로젝트 팀원 모집합니다.", 1, 1, 0, 0, LEADER);
+    private List<Post> createProjects() {
+        final Post project1 = Post.createProject("프로젝트 모집", "백엔드", "자바, 스프링", "안녕하세요. 프로젝트 팀원 모집합니다.", 2, 0, 2, 0, leader);
+        final Post project2 = Post.createProject("프로젝트 모집", "디자이너", "피그마", "안녕하세요. 프로젝트 팀원 모집합니다.", 1, 1, 0, 0, leader);
         return List.of(project1, project2);
     }
 }

@@ -10,36 +10,15 @@ import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import server.teammatching.dto.request.TeamAndStudyCreateRequestDto;
 import server.teammatching.dto.response.TeamAndStudyCreateResponseDto;
-import server.teammatching.entity.Member;
 import server.teammatching.entity.Post;
 import server.teammatching.exception.MemberNotFoundException;
 import server.teammatching.exception.PostNotFoundException;
-import server.teammatching.repository.ApplicationRepository;
-import server.teammatching.repository.MemberRepository;
-import server.teammatching.repository.PostRepository;
-import server.teammatching.repository.RecruitmentRepository;
 
-@ExtendWith(MockitoExtension.class)
-class TeamServiceTest {
-
-    @Mock
-    private ApplicationRepository applicationRepository;
-
-    @Mock
-    private MemberRepository memberRepository;
-
-    @Mock
-    private PostRepository postRepository;
-
-    @Mock
-    private RecruitmentRepository recruitmentRepository;
+class TeamServiceTest extends PostServiceTest {
 
     @InjectMocks
     private TeamService teamService;
@@ -47,16 +26,10 @@ class TeamServiceTest {
     @Test
     void 팀_생성() {
         // given
-        final Member member = Member.builder()
-                .id(1L)
-                .nickName("닉네임")
-                .loginId("id")
-                .build();
-
         given(memberRepository.findByLoginId(any()))
-                .willReturn(Optional.of(member));
+                .willReturn(Optional.of(leader));
 
-        final Post team = Post.createTeam("제목", "내용", 1, member);
+        final Post team = Post.createTeam("제목", "내용", 1, leader);
 
         given(postRepository.save(any()))
                 .willReturn(team);
@@ -96,11 +69,6 @@ class TeamServiceTest {
     @Test
     void 팀_상세_조회() {
         // given
-        final Member leader = Member.builder()
-                .nickName("닉네임")
-                .loginId("id")
-                .build();
-
         final Post team = Post.builder()
                 .id(1L)
                 .title("제목")
@@ -135,11 +103,6 @@ class TeamServiceTest {
     @Test
     void 모든_팀_조회() {
         // given
-        final Member leader = Member.builder()
-                .nickName("닉네임")
-                .loginId("id1")
-                .build();
-
         final Post team1 = Post.createTeam("제목1", "내용1", 1, leader);
         final Post team2 = Post.createTeam("제목2", "내용2", 2, leader);
 
@@ -161,10 +124,6 @@ class TeamServiceTest {
     @Test
     void 회원이_생성한_팀_조회() {
         // given
-        final Member leader = Member.builder()
-                .nickName("닉네임")
-                .loginId("id1")
-                .build();
         given(memberRepository.findByLoginId(any()))
                 .willReturn(Optional.of(leader));
 

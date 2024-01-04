@@ -10,36 +10,15 @@ import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import server.teammatching.dto.request.TeamAndStudyCreateRequestDto;
 import server.teammatching.dto.response.TeamAndStudyCreateResponseDto;
-import server.teammatching.entity.Member;
 import server.teammatching.entity.Post;
 import server.teammatching.exception.MemberNotFoundException;
 import server.teammatching.exception.PostNotFoundException;
-import server.teammatching.repository.ApplicationRepository;
-import server.teammatching.repository.MemberRepository;
-import server.teammatching.repository.PostRepository;
-import server.teammatching.repository.RecruitmentRepository;
 
-@ExtendWith(MockitoExtension.class)
-class StudyServiceTest {
-
-    @Mock
-    private ApplicationRepository applicationRepository;
-
-    @Mock
-    private MemberRepository memberRepository;
-
-    @Mock
-    private PostRepository postRepository;
-
-    @Mock
-    private RecruitmentRepository recruitmentRepository;
+class StudyServiceTest extends PostServiceTest {
 
     @InjectMocks
     private StudyService studyService;
@@ -47,29 +26,23 @@ class StudyServiceTest {
     @Test
     void 스터디_생성() {
         // given
-        final Member member = Member.builder()
-                .id(1L)
-                .loginId("hello")
-                .build();
-
         given(memberRepository.findByLoginId(any()))
-                .willReturn(Optional.of(member));
+                .willReturn(Optional.of(leader));
 
-        final Post study = Post.createStudy("title", "content", 1, member);
-
+        final Post study = Post.createStudy("title", "content", 1, leader);
         given(postRepository.save(any()))
                 .willReturn(study);
 
         // when
-        // then
         final TeamAndStudyCreateRequestDto requestDto = TeamAndStudyCreateRequestDto.builder()
                 .title("title")
                 .recruitNumber(1)
                 .content("content")
                 .build();
 
-        final TeamAndStudyCreateResponseDto responseDto = studyService.create(requestDto, member.getLoginId());
+        final TeamAndStudyCreateResponseDto responseDto = studyService.create(requestDto, leader.getLoginId());
 
+        // then
         assertThat(responseDto).usingRecursiveComparison()
                 .ignoringFields("postId")
                 .isEqualTo(TeamAndStudyCreateResponseDto.from(study));
@@ -96,11 +69,6 @@ class StudyServiceTest {
     @Test
     void 모든_스터디_조회() {
         // given
-        final Member leader = Member.builder()
-                .id(1L)
-                .loginId("hello")
-                .build();
-
         final List<Post> studies = List.of(
                 Post.builder()
                         .title("title1")
@@ -128,11 +96,6 @@ class StudyServiceTest {
 
     @Test
     void 회원이_생성한_모든_스터디_조회() {
-        final Member leader = Member.builder()
-                .id(1L)
-                .loginId("hello")
-                .build();
-
         final List<Post> studies = List.of(
                 Post.builder()
                         .title("title1")
@@ -180,11 +143,6 @@ class StudyServiceTest {
     @Test
     void 스터디_상세_조회() {
         // given
-        final Member leader = Member.builder()
-                .id(1L)
-                .loginId("hello")
-                .build();
-
         final Post study = Post.builder()
                 .title("title")
                 .content("content")
