@@ -61,6 +61,22 @@ class MemberTest {
         assertNickNameUpdate("홍익대학교", "서울대학교", "서울대학교");
     }
 
+    @Test
+    void 알람_추가() {
+        // given
+        final Member leader = Member.builder()
+                .id(1L)
+                .build();
+
+        final Post team = Post.createTeam("title", "content", 1, leader);
+
+        // when
+        Alarm.createAlarm(leader, team);
+
+        // then
+        assertThat(leader.getAlarms()).hasSize(1);
+    }
+
     private void assertEmailUpdate(final String email, final String emailToUpdate, final String expected) {
         // given
         final Member member = Member.builder()
@@ -88,7 +104,8 @@ class MemberTest {
         assertThat(member.getNickName()).isEqualTo(expected);
     }
 
-    private void assertUniversityUpdate(final String university, final String universityToUpdate, final String expected) {
+    private void assertUniversityUpdate(final String university, final String universityToUpdate,
+                                        final String expected) {
         // given
         final Member member = Member.builder()
                 .password("1234")
