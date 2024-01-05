@@ -2,6 +2,7 @@ package server.teammatching.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,18 +28,17 @@ public class AlarmService {
     private final ApplicationRepository applicationRepository;
     private final MemberRepository memberRepository;
 
-    public List<ApplicantAlarmResponse> checkApplicantAlarms(String memberId) {
-        Member findMember = memberRepository.findByLoginId(memberId)
+    public List<ApplicantAlarmResponse> checkApplicantAlarms(final String memberId) {
+        final Member findMember = memberRepository.findByLoginId(memberId)
                 .orElseThrow(MemberNotFoundException::new);
-        List<Alarm> alarmList = alarmRepository.findByMember(findMember);
+        final List<Alarm> alarms = alarmRepository.findByMember(findMember);
 
-        List<ApplicantAlarmResponse> responses = new ArrayList<>();
-
-        for (Alarm alarm : alarmList) {
+        final List<ApplicantAlarmResponse> responses = new ArrayList<>();
+        for (final Alarm alarm : alarms) {
             if (applicationRepository.findByAppliedMemberAndPost(findMember, alarm.getPost()).isPresent()) {
-                Application application = applicationRepository.findByAppliedMemberAndPost(findMember, alarm.getPost())
+                final Application application = applicationRepository.findByAppliedMemberAndPost(findMember, alarm.getPost())
                         .orElseThrow(ApplicationNotFoundException::new);
-                ApplicantAlarmResponse applicantAlarmResponse = ApplicantAlarmResponse.builder()
+                final ApplicantAlarmResponse applicantAlarmResponse = ApplicantAlarmResponse.builder()
                         .alarmId(alarm.getId())
                         .applicationStatus(application.getStatus())
                         .title(alarm.getPost().getTitle())
@@ -49,22 +49,21 @@ public class AlarmService {
         return responses;
     }
 
-    public List<LeaderAlarmResponse> checkLeaderAlarms(String memberId) {
-        Member findMember = memberRepository.findByLoginId(memberId)
+    public List<LeaderAlarmResponse> checkLeaderAlarms(final String memberId) {
+        final Member findMember = memberRepository.findByLoginId(memberId)
                 .orElseThrow(MemberNotFoundException::new);
-        List<Alarm> alarmList = alarmRepository.findByMember(findMember);
+        final List<Alarm> alarms = alarmRepository.findByMember(findMember);
+        return alarms.stream()
+                .filter(alarm ->
+                        applicationRepository.findByAppliedMemberAndPost(findMember, alarm.getPost()).isPresent())
+                .map(this::convertResponse)
+                .collect(Collectors.toList());
+    }
 
-        List<LeaderAlarmResponse> responses = new ArrayList<>();
-
-        for (Alarm alarm : alarmList) {
-            if (applicationRepository.findByAppliedMemberAndPost(findMember, alarm.getPost()).isPresent()) {
-                LeaderAlarmResponse leaderAlarmResponse = LeaderAlarmResponse.builder()
-                        .alarmId(alarm.getId())
-                        .title(alarm.getPost().getTitle())
-                        .build();
-                responses.add(leaderAlarmResponse);
-            }
-        }
-        return responses;
+    private LeaderAlarmResponse convertResponse(final Alarm alarm) {
+        return LeaderAlarmResponse.builder()
+                .alarmId(alarm.getId())
+                .title(alarm.getPost().getTitle())
+                .build();
     }
 }
