@@ -43,6 +43,14 @@ public class Like {
         setLikedMember(likedMember);
     }
 
+    public Like(final Long id, final LikeStatus likeStatus, final Member likedMember, final Post post) {
+        this.id = id;
+        this.likeStatus = likeStatus;
+        this.likedMember = likedMember;
+        this.post = post;
+        setLikedMember(likedMember);
+    }
+
     public static Like create(final Member likedMember, final Post post) {
         return new Like(LikeStatus.DEFAULT, likedMember, post);
     }

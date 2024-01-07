@@ -28,41 +28,40 @@ public class LikeService {
     private final MemberRepository memberRepository;
     private final PostRepository postRepository;
 
-    public LikeResponseDto generateLike(String memberId, Long postId) {
-        Member likedMember = memberRepository.findByLoginId(memberId)
+    public LikeResponseDto generateLike(final String memberId, final Long postId) {
+        final Member likedMember = memberRepository.findByLoginId(memberId)
                 .orElseThrow(MemberNotFoundException::new);
-        Post findPost = postRepository.findById(postId)
+        final Post findPost = postRepository.findById(postId)
                 .orElseThrow(PostNotFoundException::new);
 
         if (likeRepository.findByLikedMemberAndPost(likedMember, findPost).isPresent()) {
             throw new LikeNotFoundException("Not Found");
         }
 
-        Like generatedLike = Like.create(likedMember, findPost);
+        final Like generatedLike = Like.create(likedMember, findPost);
 
-        Like savedLike = likeRepository.save(generatedLike);
+        final Like savedLike = likeRepository.save(generatedLike);
 
         return LikeResponseDto.from(savedLike);
     }
 
     @Transactional(readOnly = true)
-    public List<LikeResponseDto> checkLikes(String memberId) {
-        Member findMember = memberRepository.findByLoginId(memberId)
+    public List<LikeResponseDto> checkLikes(final String memberId) {
+        final Member findMember = memberRepository.findByLoginId(memberId)
                 .orElseThrow(MemberNotFoundException::new);
-
-        List<Like> likeList = likeRepository.findByLikedMember(findMember);
+        final List<Like> likeList = likeRepository.findByLikedMember(findMember);
 
         return likeList.stream()
                 .map(LikeResponseDto::from)
                 .collect(toList());
     }
 
-    public LikeResponseDto cancelLike(String  memberId, Long postId) {
-        Member likedMember = memberRepository.findByLoginId(memberId)
+    public LikeResponseDto cancelLike(final String  memberId, final Long postId) {
+        final Member likedMember = memberRepository.findByLoginId(memberId)
                 .orElseThrow(MemberNotFoundException::new);
-        Post findPost = postRepository.findById(postId)
+        final Post findPost = postRepository.findById(postId)
                 .orElseThrow(PostNotFoundException::new);
-        Like canceledLike = likeRepository.findByLikedMemberAndPost(likedMember, findPost)
+        final Like canceledLike = likeRepository.findByLikedMemberAndPost(likedMember, findPost)
                 .orElseThrow(() -> new LikeNotFoundException("유효하지 않은 id 입니다."));
 
         likeRepository.delete(canceledLike);

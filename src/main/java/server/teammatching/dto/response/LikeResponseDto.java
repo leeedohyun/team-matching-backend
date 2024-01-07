@@ -17,7 +17,7 @@ public class LikeResponseDto {
     private Long postId;
     private String postTitle;
 
-    public static LikeResponseDto from(Like like) {
+    public static LikeResponseDto from(final Like like) {
         return LikeResponseDto.builder()
                 .memberId(like.getLikedMember().getId())
                 .postId(like.getPost().getId())
