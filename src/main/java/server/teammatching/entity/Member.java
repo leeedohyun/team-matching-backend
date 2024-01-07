@@ -73,6 +73,10 @@ public class Member extends BaseTimeEntity {
         alarms.add(alarm);
     }
 
+    public void addLikes(final Like like) {
+        likes.add(like);
+    }
+
     public void updateEmail(final String email) {
         if (email != null && !email.isEmpty()) {
             this.email = email;

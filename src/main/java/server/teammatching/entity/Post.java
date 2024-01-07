@@ -47,7 +47,7 @@ public class Post extends BaseTimeEntity {
     @Column(nullable = false)
     private int recruitNumber;
 
-    @Column(nullable = false)
+    @Column
     private String field;
 
     private String techStack;

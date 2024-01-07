@@ -1,10 +1,5 @@
 package server.teammatching.entity;
 
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -16,6 +11,10 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
@@ -38,23 +37,18 @@ public class Like {
     @JoinColumn(name = "post_id")
     private Post post;
 
-    @Builder
-    public Like(LikeStatus likeStatus, Member likedMember, Post post) {
+    private Like(final LikeStatus likeStatus, final Member likedMember, final Post post) {
         this.likeStatus = likeStatus;
         this.post = post;
         setLikedMember(likedMember);
     }
 
-    public static Like getnerateLike(Member likedMember, Post post) {
-        return Like.builder()
-                .post(post)
-                .likedMember(likedMember)
-                .likeStatus(LikeStatus.LIKE)
-                .build();
+    public static Like create(final Member likedMember, final Post post) {
+        return new Like(LikeStatus.DEFAULT, likedMember, post);
     }
 
-    public void setLikedMember(Member likedMember) {
+    private void setLikedMember(final Member likedMember) {
         this.likedMember = likedMember;
-        likedMember.getLikes().add(this);
+        likedMember.addLikes(this);
     }
 }

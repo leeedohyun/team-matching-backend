@@ -38,7 +38,7 @@ public class LikeService {
             throw new LikeNotFoundException("Not Found");
         }
 
-        Like generatedLike = Like.getnerateLike(likedMember, findPost);
+        Like generatedLike = Like.create(likedMember, findPost);
 
         Like savedLike = likeRepository.save(generatedLike);
 
