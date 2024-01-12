@@ -1,4 +1,4 @@
-package server.teammatching.integration;
+package server.teammatching.api.helper;
 
 import java.util.List;
 import java.util.stream.Collectors;
