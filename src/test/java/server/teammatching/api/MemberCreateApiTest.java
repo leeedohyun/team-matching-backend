@@ -12,9 +12,9 @@ import org.springframework.http.HttpStatus;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import server.teammatching.dto.request.MemberRequestDto;
-import server.teammatching.api.helper.InitIntegrationTest;
+import server.teammatching.api.helper.InitApiTest;
 
-class MemberCreateApiTest extends InitIntegrationTest {
+class MemberCreateApiTest extends InitApiTest {
 
     @Test
     void 회원_가입() {

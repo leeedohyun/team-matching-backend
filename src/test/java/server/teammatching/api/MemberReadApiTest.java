@@ -8,10 +8,9 @@ import org.springframework.http.HttpStatus;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import server.teammatching.api.helper.InitIntegrationTest;
+import server.teammatching.api.helper.InitApiTest;
 
-public class MemberReadApiTest extends InitIntegrationTest {
-
+public class MemberReadApiTest extends InitApiTest {
 
     @Test
     void 마이페이지_조회() {
@@ -38,7 +37,7 @@ public class MemberReadApiTest extends InitIntegrationTest {
                 .get("/members/{id}", 기본_회원_아이디)
                 .then()
                 .log().all()
-                .extract();;
+                .extract();
 
         // then
         assertThat(마이_페이지_조회_응답.statusCode()).isEqualTo(HttpStatus.UNAUTHORIZED.value());

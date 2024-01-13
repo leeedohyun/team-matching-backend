@@ -9,11 +9,11 @@ import server.teammatching.dto.request.LoginRequest;
 public class AuthSteps {
 
     public static String 로그인(final LoginRequest 로그인_요청) {
-        final ExtractableResponse<Response> 로그인_응답 = 응답을_반환하는_로그인(로그인_요청);
+        final ExtractableResponse<Response> 로그인_응답 = 요청을_받는_로그인(로그인_요청);
         return 로그인_응답.body().asString();
     }
 
-    public static ExtractableResponse<Response> 응답을_반환하는_로그인(final LoginRequest 로그인_요청) {
+    public static ExtractableResponse<Response> 요청을_받는_로그인(final LoginRequest 로그인_요청) {
         return given().log().all()
                 .contentType("application/json")
                 .when()
