@@ -5,6 +5,7 @@ import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 import static server.teammatching.api.steps.StudySteps.스터디_상세_조회_응답;
 import static server.teammatching.api.steps.StudySteps.요청을_받는_스터디_생성;
+import static server.teammatching.api.steps.StudySteps.응답을_반환하는_모든_스터디_조회;
 import static server.teammatching.api.steps.StudySteps.응답을_반환하는_회원이_생성한_스터디_조회;
 
 import org.junit.jupiter.api.Test;
@@ -12,7 +13,6 @@ import org.junit.jupiter.api.Test;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import server.teammatching.api.helper.InitApiTest;
-import server.teammatching.api.steps.StudySteps;
 import server.teammatching.dto.request.TeamAndStudyCreateRequestDto;
 
 public class StudyReadApiTest extends InitApiTest {
@@ -86,7 +86,7 @@ public class StudyReadApiTest extends InitApiTest {
         요청을_받는_스터디_생성(스터디_생성_요청2, 기본_세션);
 
         // when
-        final ExtractableResponse<Response> 모든_스터디_조회_응답 = StudySteps.응답을_반환하는_모든_스터디_조회();
+        final ExtractableResponse<Response> 모든_스터디_조회_응답 = 응답을_반환하는_모든_스터디_조회();
 
         // then
         assertThat(모든_스터디_조회_응답.statusCode()).isEqualTo(OK.value());
